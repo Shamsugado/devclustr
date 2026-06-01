@@ -8,16 +8,16 @@
 
 Developers keep their essentials scattered across too many places:
 
-| Where it lives | What's stored there |
-|---|---|
-| VS Code / Notion | Code snippets |
-| Chat history | AI prompts |
-| Buried project folders | Context files |
-| Browser bookmarks | Useful links |
-| Random folders | Docs & notes |
-| `.txt` files | Commands |
-| GitHub Gists | Project templates |
-| Bash history | Terminal commands |
+| Where it lives         | What's stored there |
+| ---------------------- | ------------------- |
+| VS Code / Notion       | Code snippets       |
+| Chat history           | AI prompts          |
+| Buried project folders | Context files       |
+| Browser bookmarks      | Useful links        |
+| Random folders         | Docs & notes        |
+| `.txt` files           | Commands            |
+| GitHub Gists           | Project templates   |
+| Bash history           | Terminal commands   |
 
 DevStash consolidates everything into **one fast, searchable, AI-enhanced hub**.
 
@@ -25,28 +25,28 @@ DevStash consolidates everything into **one fast, searchable, AI-enhanced hub**.
 
 ## Target Users
 
-| User | Need |
-|---|---|
-| **Everyday Developer** | Quickly grab snippets, prompts, commands, links |
-| **AI-first Developer** | Save prompts, contexts, workflows, system messages |
-| **Content Creator / Educator** | Store code blocks, explanations, course notes |
-| **Full-stack Builder** | Collect patterns, boilerplates, API examples |
+| User                           | Need                                               |
+| ------------------------------ | -------------------------------------------------- |
+| **Everyday Developer**         | Quickly grab snippets, prompts, commands, links    |
+| **AI-first Developer**         | Save prompts, contexts, workflows, system messages |
+| **Content Creator / Educator** | Store code blocks, explanations, course notes      |
+| **Full-stack Builder**         | Collect patterns, boilerplates, API examples       |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| **Framework** | [Next.js 15](https://nextjs.org) / [React 19](https://react.dev) |
-| **Language** | TypeScript |
-| **Database** | [Neon](https://neon.tech) (PostgreSQL) |
-| **ORM** | [Prisma 7](https://www.prisma.io/docs) |
-| **Auth** | [NextAuth v5](https://authjs.dev) — email/password + GitHub OAuth |
-| **File Storage** | [Cloudflare R2](https://developers.cloudflare.com/r2/) |
-| **AI** | [OpenAI](https://platform.openai.com/docs) — `gpt-4o-mini` |
-| **CSS** | [Tailwind CSS v4](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com) |
-| **Caching** | Redis _(optional, TBD)_ |
+| Layer            | Technology                                                                      |
+| ---------------- | ------------------------------------------------------------------------------- |
+| **Framework**    | [Next.js 15](https://nextjs.org) / [React 19](https://react.dev)                |
+| **Language**     | TypeScript                                                                      |
+| **Database**     | [Neon](https://neon.tech) (PostgreSQL)                                          |
+| **ORM**          | [Prisma 7](https://www.prisma.io/docs)                                          |
+| **Auth**         | [NextAuth v5](https://authjs.dev) — email/password + GitHub OAuth               |
+| **File Storage** | [Cloudflare R2](https://developers.cloudflare.com/r2/)                          |
+| **AI**           | [OpenAI](https://platform.openai.com/docs) — `gpt-4o-mini`                      |
+| **CSS**          | [Tailwind CSS v4](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com) |
+| **Caching**      | Redis _(optional, TBD)_                                                         |
 
 > ⚠️ **DB rule:** Never use `db push`. Always create and run migrations explicitly in dev, then prod.
 
@@ -58,15 +58,15 @@ DevStash consolidates everything into **one fast, searchable, AI-enhanced hub**.
 
 Items have a `contentType` of `text`, `url`, or `file`. URLs follow the pattern `/items/snippets`.
 
-| Type | Icon | Color | Hex | Content Type | Pro Only |
-|---|---|---|---|---|---|
-| Snippet | `Code` | Blue | `#3b82f6` | text | — |
-| Prompt | `Sparkles` | Purple | `#8b5cf6` | text | — |
-| Command | `Terminal` | Orange | `#f97316` | text | — |
-| Note | `StickyNote` | Yellow | `#fde047` | text | — |
-| Link | `Link` | Emerald | `#10b981` | url | — |
-| File | `File` | Gray | `#6b7280` | file | ✅ |
-| Image | `Image` | Pink | `#ec4899` | file | ✅ |
+| Type    | Icon         | Color   | Hex       | Content Type | Pro Only |
+| ------- | ------------ | ------- | --------- | ------------ | -------- |
+| Snippet | `Code`       | Blue    | `#3b82f6` | text         | —        |
+| Prompt  | `Sparkles`   | Purple  | `#8b5cf6` | text         | —        |
+| Command | `Terminal`   | Orange  | `#f97316` | text         | —        |
+| Note    | `StickyNote` | Yellow  | `#fde047` | text         | —        |
+| Link    | `Link`       | Emerald | `#10b981` | url          | —        |
+| File    | `File`       | Gray    | `#6b7280` | file         | ✅       |
+| Image   | `Image`      | Pink    | `#ec4899` | file         | ✅       |
 
 System types cannot be modified by users. Custom types will be added later (Pro).
 
@@ -85,6 +85,7 @@ Items are accessed and created via a **quick-access drawer**.
 ### C. Search
 
 Full-text search across:
+
 - Title
 - Content
 - Tags
@@ -125,17 +126,17 @@ Full-text search across:
 
 ## Monetization
 
-| Feature | Free | Pro ($8/mo or $72/yr) |
-|---|---|---|
-| Items | 50 total | Unlimited |
-| Collections | 3 | Unlimited |
-| Item types | All except file/image | All types |
-| File & image uploads | ❌ | ✅ |
-| AI features | ❌ | ✅ |
-| Custom types | ❌ | ✅ _(coming later)_ |
-| Export (JSON/ZIP) | ❌ | ✅ |
-| Priority support | ❌ | ✅ |
-| Search | Basic | Full |
+| Feature              | Free                  | Pro ($8/mo or $72/yr) |
+| -------------------- | --------------------- | --------------------- |
+| Items                | 50 total              | Unlimited             |
+| Collections          | 3                     | Unlimited             |
+| Item types           | All except file/image | All types             |
+| File & image uploads | ❌                    | ✅                    |
+| AI features          | ❌                    | ✅                    |
+| Custom types         | ❌                    | ✅ _(coming later)_   |
+| Export (JSON/ZIP)    | ❌                    | ✅                    |
+| Priority support     | ❌                    | ✅                    |
+| Search               | Basic                 | Full                  |
 
 > 🛠️ During development, all users have full access regardless of plan.
 
@@ -175,6 +176,13 @@ Full-text search across:
 - Subtle borders and shadows
 - Syntax highlighting for code blocks
 - Smooth transitions, hover states, toast notifications, loading skeletons
+
+### Screenshots
+
+Refer to the screenshots below as a base for the dashboard UI. It does not have to be exact. Use it as a reference.
+
+@context/screenshots/dashboard-ui-main.png
+@context/screenshots/dashboard-ui-drawer.png
 
 ### Responsive
 
@@ -367,41 +375,41 @@ model TagsOnItems {
 
 ## API Routes (planned)
 
-| Method | Route | Description |
-|---|---|---|
-| `GET/POST` | `/api/items` | List / create items |
-| `GET/PATCH/DELETE` | `/api/items/[id]` | Read / update / delete item |
-| `GET/POST` | `/api/collections` | List / create collections |
-| `GET/PATCH/DELETE` | `/api/collections/[id]` | Read / update / delete collection |
-| `POST` | `/api/collections/[id]/items` | Add item to collection |
-| `DELETE` | `/api/collections/[id]/items/[itemId]` | Remove item from collection |
-| `POST` | `/api/upload` | Upload file to R2 |
-| `POST` | `/api/ai/tag` | AI auto-tag suggestions |
-| `POST` | `/api/ai/explain` | AI explain code |
-| `POST` | `/api/ai/summarize` | AI summarize item |
-| `POST` | `/api/ai/optimize-prompt` | AI prompt optimizer |
-| `GET` | `/api/export` | Export user data |
-| `POST` | `/api/webhooks/stripe` | Stripe subscription events |
+| Method             | Route                                  | Description                       |
+| ------------------ | -------------------------------------- | --------------------------------- |
+| `GET/POST`         | `/api/items`                           | List / create items               |
+| `GET/PATCH/DELETE` | `/api/items/[id]`                      | Read / update / delete item       |
+| `GET/POST`         | `/api/collections`                     | List / create collections         |
+| `GET/PATCH/DELETE` | `/api/collections/[id]`                | Read / update / delete collection |
+| `POST`             | `/api/collections/[id]/items`          | Add item to collection            |
+| `DELETE`           | `/api/collections/[id]/items/[itemId]` | Remove item from collection       |
+| `POST`             | `/api/upload`                          | Upload file to R2                 |
+| `POST`             | `/api/ai/tag`                          | AI auto-tag suggestions           |
+| `POST`             | `/api/ai/explain`                      | AI explain code                   |
+| `POST`             | `/api/ai/summarize`                    | AI summarize item                 |
+| `POST`             | `/api/ai/optimize-prompt`              | AI prompt optimizer               |
+| `GET`              | `/api/export`                          | Export user data                  |
+| `POST`             | `/api/webhooks/stripe`                 | Stripe subscription events        |
 
 ---
 
 ## URL Structure
 
-| URL | Description |
-|---|---|
-| `/` | Dashboard / home |
-| `/items` | All items |
-| `/items/snippets` | Items filtered by type |
-| `/items/prompts` | Items filtered by type |
-| `/items/commands` | Items filtered by type |
-| `/items/notes` | Items filtered by type |
-| `/items/links` | Items filtered by type |
-| `/items/files` | Items filtered by type _(Pro)_ |
-| `/items/images` | Items filtered by type _(Pro)_ |
-| `/collections` | All collections |
-| `/collections/[id]` | Single collection view |
-| `/settings` | User settings |
-| `/settings/billing` | Subscription management |
+| URL                 | Description                    |
+| ------------------- | ------------------------------ |
+| `/`                 | Dashboard / home               |
+| `/items`            | All items                      |
+| `/items/snippets`   | Items filtered by type         |
+| `/items/prompts`    | Items filtered by type         |
+| `/items/commands`   | Items filtered by type         |
+| `/items/notes`      | Items filtered by type         |
+| `/items/links`      | Items filtered by type         |
+| `/items/files`      | Items filtered by type _(Pro)_ |
+| `/items/images`     | Items filtered by type _(Pro)_ |
+| `/collections`      | All collections                |
+| `/collections/[id]` | Single collection view         |
+| `/settings`         | User settings                  |
+| `/settings/billing` | Subscription management        |
 
 ---
 

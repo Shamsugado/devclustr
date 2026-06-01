@@ -19,3 +19,5 @@ Not Started
 ## History
 
 <!-- Keep this updated. Earliest to latest -->
+
+- **2026-05-28** — Initial Next.js 16 + Tailwind CSS v4 project setup. Git initialized and pushed to GitHub (`git@github.com:Shamsugado/devclustr.git`).
