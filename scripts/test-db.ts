@@ -8,38 +8,98 @@ const adapter = new PrismaNeon({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("Testing database connection...\n");
+  console.log("=== Database Verification ===\n");
 
-  // Verify connection and seeded item types
-  const itemTypes = await prisma.itemType.findMany({
-    orderBy: { name: "asc" },
-  });
-
-  console.log(`Found ${itemTypes.length} system item types:`);
-  for (const type of itemTypes) {
-    console.log(`  ${type.icon.padEnd(12)} ${type.name.padEnd(10)} ${type.color}`);
+  // ── System item types ─────────────────────────────────────────────────────
+  const itemTypes = await prisma.itemType.findMany({ orderBy: { name: "asc" } });
+  console.log(`Item types (${itemTypes.length}):`);
+  for (const t of itemTypes) {
+    console.log(`  [${t.isSystem ? "system" : "user  "}]  ${t.icon.padEnd(12)} ${t.name.padEnd(10)} ${t.color}`);
   }
 
-  // Quick counts across all tables
-  const [users, items, collections, tags] = await Promise.all([
+  // ── Demo user ─────────────────────────────────────────────────────────────
+  console.log("\nDemo user:");
+  const user = await prisma.user.findUnique({
+    where: { email: "demo@devstash.io" },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      isPro: true,
+      emailVerified: true,
+      password: true,
+    },
+  });
+
+  if (!user) {
+    console.log("  ✗ demo@devstash.io not found");
+  } else {
+    console.log(`  name:          ${user.name}`);
+    console.log(`  email:         ${user.email}`);
+    console.log(`  isPro:         ${user.isPro}`);
+    console.log(`  emailVerified: ${user.emailVerified?.toISOString()}`);
+    console.log(`  password hash: ${user.password ? user.password.slice(0, 29) + "…" : "MISSING"}`);
+  }
+
+  // ── Collections with item counts ──────────────────────────────────────────
+  console.log("\nCollections:");
+  const collections = await prisma.collection.findMany({
+    orderBy: { name: "asc" },
+    include: {
+      _count: { select: { items: true } },
+      defaultType: { select: { name: true } },
+    },
+  });
+
+  for (const col of collections) {
+    const fav = col.isFavorite ? " ★" : "";
+    const type = col.defaultType ? ` [default: ${col.defaultType.name}]` : "";
+    console.log(`  ${col.name.padEnd(22)} ${col._count.items} items${fav}${type}`);
+  }
+
+  // ── Items grouped by type ─────────────────────────────────────────────────
+  console.log("\nItems by type:");
+  const items = await prisma.item.findMany({
+    orderBy: [{ itemTypeId: "asc" }, { title: "asc" }],
+    include: { itemType: { select: { name: true } } },
+  });
+
+  const byType = items.reduce<Record<string, typeof items>>(
+    (acc, item) => {
+      const key = item.itemType.name;
+      (acc[key] ??= []).push(item);
+      return acc;
+    },
+    {}
+  );
+
+  for (const [type, group] of Object.entries(byType)) {
+    console.log(`  ${type} (${group.length}):`);
+    for (const item of group) {
+      const flags = [item.isFavorite && "fav", item.isPinned && "pinned"]
+        .filter(Boolean)
+        .join(", ");
+      console.log(`    - ${item.title}${flags ? ` [${flags}]` : ""}`);
+    }
+  }
+
+  // ── Totals ────────────────────────────────────────────────────────────────
+  const [userCount, itemCount, collectionCount] = await Promise.all([
     prisma.user.count(),
     prisma.item.count(),
     prisma.collection.count(),
-    prisma.tag.count(),
   ]);
 
-  console.log("\nTable counts:");
-  console.log(`  users:       ${users}`);
-  console.log(`  items:       ${items}`);
-  console.log(`  collections: ${collections}`);
-  console.log(`  tags:        ${tags}`);
-
-  console.log("\nDatabase connection OK ✓");
+  console.log("\nTotals:");
+  console.log(`  users:       ${userCount}`);
+  console.log(`  items:       ${itemCount}`);
+  console.log(`  collections: ${collectionCount}`);
+  console.log("\nDatabase OK ✓");
 }
 
 main()
   .catch((e) => {
-    console.error("Database connection FAILED:", e);
+    console.error("FAILED:", e);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());
