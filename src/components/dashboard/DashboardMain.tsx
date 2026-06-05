@@ -12,7 +12,23 @@ import {
   FolderOpen,
   Clock,
 } from "lucide-react";
-import { mockCollections, mockItems, mockItemTypes } from "@/lib/mock-data";
+import type { CollectionMeta } from "@/lib/db/collections";
+import type { getPinnedItems, getRecentItems } from "@/lib/db/items";
+
+type DashboardItem = Awaited<ReturnType<typeof getPinnedItems>>[0];
+type DashboardStats = {
+  totalItems: number;
+  totalCollections: number;
+  favoriteItems: number;
+  favoriteCollections: number;
+};
+
+interface DashboardMainProps {
+  stats: DashboardStats;
+  recentCollections: CollectionMeta[];
+  pinnedItems: DashboardItem[];
+  recentItems: Awaited<ReturnType<typeof getRecentItems>>;
+}
 
 const iconMap: Record<string, React.ElementType> = {
   Code,
@@ -24,69 +40,23 @@ const iconMap: Record<string, React.ElementType> = {
   Image: ImageIcon,
 };
 
-function getItemType(typeId: string) {
-  return mockItemTypes.find((t) => t.id === typeId);
-}
-
-function getCollectionTypeIds(collectionId: string): string[] {
-  return [
-    ...new Set(
-      mockItems
-        .filter((item) => item.collectionIds.includes(collectionId))
-        .map((item) => item.itemTypeId)
-    ),
-  ];
-}
-
-function formatRelativeTime(isoDate: string): string {
-  const diff = Date.now() - new Date(isoDate).getTime();
+function formatRelativeTime(date: Date | null): string {
+  if (!date) return "never";
+  const diff = Date.now() - date.getTime();
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   if (days === 0) return "today";
   if (days === 1) return "yesterday";
   return `${days}d ago`;
 }
 
-// Derived data
-const totalItems = mockItems.length;
-const totalCollections = mockCollections.length;
-const favoriteItems = mockItems.filter((i) => i.isFavorite).length;
-const favoriteCollections = mockCollections.filter((c) => c.isFavorite).length;
-
-const pinnedItems = mockItems.filter((item) => item.isPinned);
-
-const recentItems = [...mockItems].sort(
-  (a, b) => new Date(b.lastUsedAt).getTime() - new Date(a.lastUsedAt).getTime()
-);
-
-// Recent collections: ordered by most recently used item in each collection
-function getRecentCollections() {
-  const seen = new Set<string>();
-  const ordered: string[] = [];
-  [...mockItems]
-    .sort((a, b) => new Date(b.lastUsedAt).getTime() - new Date(a.lastUsedAt).getTime())
-    .forEach((item) => {
-      item.collectionIds.forEach((id) => {
-        if (!seen.has(id)) {
-          seen.add(id);
-          ordered.push(id);
-        }
-      });
-    });
-  return ordered
-    .map((id) => mockCollections.find((c) => c.id === id))
-    .filter((c): c is (typeof mockCollections)[0] => Boolean(c));
-}
-
-const recentCollections = getRecentCollections();
-
 // --- Sub-components ---
 
-function StatsCards() {
+function StatsCards({ stats }: { stats: DashboardStats }) {
   const cards = [
-    { label: "Items", value: totalItems, icon: Layers, color: "#3b82f6" },
-    { label: "Collections", value: totalCollections, icon: FolderOpen, color: "#8b5cf6" },
-    { label: "Favorite Items", value: favoriteItems, icon: Star, color: "#fde047" },
-    { label: "Favorite Collections", value: favoriteCollections, icon: Star, color: "#f97316" },
+    { label: "Items", value: stats.totalItems, icon: Layers, color: "#3b82f6" },
+    { label: "Collections", value: stats.totalCollections, icon: FolderOpen, color: "#8b5cf6" },
+    { label: "Favorite Items", value: stats.favoriteItems, icon: Star, color: "#fde047" },
+    { label: "Favorite Collections", value: stats.favoriteCollections, icon: Star, color: "#f97316" },
   ];
 
   return (
@@ -98,7 +68,7 @@ function StatsCards() {
           </div>
           <div>
             <p className="text-2xl font-bold text-foreground leading-none">{value}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{label}</p>
           </div>
         </div>
       ))}
@@ -106,45 +76,41 @@ function StatsCards() {
   );
 }
 
-function CollectionCard({ collection }: { collection: (typeof mockCollections)[0] }) {
-  const typeIds = getCollectionTypeIds(collection.id);
-
+function CollectionCard({ collection }: { collection: CollectionMeta }) {
   return (
     <div className="bg-card border border-border rounded-lg p-4 flex flex-col gap-2 relative group cursor-pointer hover:border-border/80 hover:bg-card/80 transition-colors">
       {collection.isFavorite && (
         <Star className="absolute top-3 right-3 h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
       )}
       <div className="pr-5">
-        <p className="text-sm font-semibold text-foreground truncate">{collection.name}</p>
-        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{collection.description}</p>
+        <p className="text-base font-semibold text-foreground truncate">{collection.name}</p>
+        <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{collection.description}</p>
       </div>
       <div className="flex items-center justify-between mt-auto pt-1">
         <div className="flex items-center gap-1">
-          {typeIds.map((typeId) => {
-            const type = getItemType(typeId);
-            if (!type) return null;
-            const Icon = iconMap[type.icon] ?? File;
+          {collection.itemTypes.map(({ typeId, icon, color }) => {
+            const Icon = iconMap[icon] ?? File;
             return (
               <span
                 key={typeId}
                 className="flex items-center justify-center h-5 w-5 rounded-sm"
-                style={{ backgroundColor: type.color + "22" }}
+                style={{ backgroundColor: color + "22" }}
               >
-                <Icon className="h-3 w-3" style={{ color: type.color }} />
+                <Icon className="h-3 w-3" style={{ color }} />
               </span>
             );
           })}
         </div>
-        <span className="text-[11px] text-muted-foreground">{collection.itemCount} items</span>
+        <span className="text-xs text-muted-foreground">{collection.itemCount} items</span>
       </div>
     </div>
   );
 }
 
-function PinnedItemCard({ item }: { item: (typeof mockItems)[0] }) {
-  const type = getItemType(item.itemTypeId);
-  const Icon = type ? (iconMap[type.icon] ?? File) : File;
-  const isUrl = item.contentType === "url";
+function PinnedItemCard({ item }: { item: DashboardItem }) {
+  const { itemType } = item;
+  const Icon = iconMap[itemType.icon] ?? File;
+  const isUrl = item.contentType === "URL";
 
   return (
     <div className="bg-card border border-border rounded-lg p-4 flex flex-col gap-2 relative cursor-pointer hover:border-border/80 hover:bg-card/80 transition-colors min-w-0">
@@ -152,11 +118,11 @@ function PinnedItemCard({ item }: { item: (typeof mockItems)[0] }) {
         <div className="flex items-center gap-2 min-w-0">
           <span
             className="shrink-0 flex items-center justify-center h-6 w-6 rounded-md"
-            style={{ backgroundColor: (type?.color ?? "#6b7280") + "22" }}
+            style={{ backgroundColor: itemType.color + "22" }}
           >
-            <Icon className="h-3.5 w-3.5" style={{ color: type?.color ?? "#6b7280" }} />
+            <Icon className="h-3.5 w-3.5" style={{ color: itemType.color }} />
           </span>
-          <p className="text-sm font-semibold text-foreground truncate">{item.title}</p>
+          <p className="text-base font-semibold text-foreground truncate">{item.title}</p>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           {item.isFavorite && (
@@ -167,21 +133,21 @@ function PinnedItemCard({ item }: { item: (typeof mockItems)[0] }) {
       </div>
 
       {isUrl ? (
-        <p className="text-xs text-blue-400 truncate">{item.url}</p>
+        <p className="text-sm text-blue-400 truncate">{item.url}</p>
       ) : (
-        <pre className="text-[11px] text-muted-foreground bg-background rounded px-2 py-1.5 overflow-hidden line-clamp-3 font-mono whitespace-pre-wrap break-all">
+        <pre className="text-xs text-muted-foreground bg-background rounded px-2 py-1.5 overflow-hidden line-clamp-3 font-mono whitespace-pre-wrap break-all">
           {item.content?.slice(0, 120)}
         </pre>
       )}
 
       {item.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-auto">
-          {item.tags.map((tag) => (
+          {item.tags.map(({ tag }) => (
             <span
-              key={tag}
-              className="text-[10px] px-1.5 py-0.5 rounded bg-background text-muted-foreground border border-border"
+              key={tag.name}
+              className="text-xs px-1.5 py-0.5 rounded bg-background text-muted-foreground border border-border"
             >
-              {tag}
+              {tag.name}
             </span>
           ))}
         </div>
@@ -190,37 +156,37 @@ function PinnedItemCard({ item }: { item: (typeof mockItems)[0] }) {
   );
 }
 
-function RecentItemCard({ item }: { item: (typeof mockItems)[0] }) {
-  const type = getItemType(item.itemTypeId);
-  const Icon = type ? (iconMap[type.icon] ?? File) : File;
+function RecentItemCard({ item }: { item: DashboardItem }) {
+  const { itemType } = item;
+  const Icon = iconMap[itemType.icon] ?? File;
 
   return (
     <div className="bg-card border border-border rounded-lg p-3 flex flex-col gap-2 cursor-pointer hover:border-border/80 hover:bg-card/80 transition-colors">
       <div className="flex items-center justify-between">
         <span
           className="flex items-center justify-center h-6 w-6 rounded-md shrink-0"
-          style={{ backgroundColor: (type?.color ?? "#6b7280") + "22" }}
+          style={{ backgroundColor: itemType.color + "22" }}
         >
-          <Icon className="h-3.5 w-3.5" style={{ color: type?.color ?? "#6b7280" }} />
+          <Icon className="h-3.5 w-3.5" style={{ color: itemType.color }} />
         </span>
         {item.isFavorite && (
           <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 shrink-0" />
         )}
       </div>
-      <p className="text-xs font-medium text-foreground line-clamp-2 leading-snug">{item.title}</p>
+      <p className="text-sm font-medium text-foreground line-clamp-2 leading-snug">{item.title}</p>
       {item.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-auto">
-          {item.tags.slice(0, 2).map((tag) => (
+          {item.tags.slice(0, 2).map(({ tag }) => (
             <span
-              key={tag}
-              className="text-[10px] px-1.5 py-0.5 rounded bg-background text-muted-foreground border border-border"
+              key={tag.name}
+              className="text-xs px-1.5 py-0.5 rounded bg-background text-muted-foreground border border-border"
             >
-              {tag}
+              {tag.name}
             </span>
           ))}
         </div>
       )}
-      <p className="text-[10px] text-muted-foreground/60 flex items-center gap-1">
+      <p className="text-xs text-muted-foreground/60 flex items-center gap-1">
         <Clock className="h-2.5 w-2.5" />
         {formatRelativeTime(item.lastUsedAt)}
       </p>
@@ -230,15 +196,20 @@ function RecentItemCard({ item }: { item: (typeof mockItems)[0] }) {
 
 // --- Main export ---
 
-export default function DashboardMain() {
+export default function DashboardMain({
+  stats,
+  recentCollections,
+  pinnedItems,
+  recentItems,
+}: DashboardMainProps) {
   return (
     <div className="space-y-6 pb-6">
       {/* Stats */}
-      <StatsCards />
+      <StatsCards stats={stats} />
 
       {/* Recent Collections */}
       <section>
-        <h2 className="text-sm font-semibold text-foreground mb-3">Recent Collections</h2>
+        <h2 className="text-base font-semibold text-foreground mb-3">Recent Collections</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {recentCollections.map((col) => (
             <CollectionCard key={col.id} collection={col} />
@@ -247,21 +218,23 @@ export default function DashboardMain() {
       </section>
 
       {/* Pinned Items */}
-      <section>
-        <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-1.5">
-          <Pin className="h-3.5 w-3.5 fill-foreground" />
-          Pinned
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {pinnedItems.map((item) => (
-            <PinnedItemCard key={item.id} item={item} />
-          ))}
-        </div>
-      </section>
+      {pinnedItems.length > 0 && (
+        <section>
+          <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-1.5">
+            <Pin className="h-3.5 w-3.5 fill-foreground" />
+            Pinned
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {pinnedItems.map((item) => (
+              <PinnedItemCard key={item.id} item={item} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Recent Items */}
       <section>
-        <h2 className="text-sm font-semibold text-foreground mb-3">All Items</h2>
+        <h2 className="text-base font-semibold text-foreground mb-3">All Items</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {recentItems.map((item) => (
             <RecentItemCard key={item.id} item={item} />

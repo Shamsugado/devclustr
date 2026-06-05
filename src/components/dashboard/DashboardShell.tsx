@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import TopBar from "@/components/dashboard/TopBar";
-import Sidebar from "@/components/dashboard/Sidebar";
+import Sidebar, { type SidebarData } from "@/components/dashboard/Sidebar";
 
-export default function DashboardShell({ children }: { children: React.ReactNode }) {
+interface DashboardShellProps {
+  children: React.ReactNode;
+  sidebarData: SidebarData;
+}
+
+export default function DashboardShell({ children, sidebarData }: DashboardShellProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -17,6 +22,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
           onCollapse={() => setCollapsed((c) => !c)}
           mobileOpen={mobileOpen}
           onMobileClose={() => setMobileOpen(false)}
+          sidebarData={sidebarData}
         />
         <main className="flex-1 overflow-y-auto p-4">{children}</main>
       </div>

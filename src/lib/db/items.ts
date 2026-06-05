@@ -1,0 +1,41 @@
+import { prisma } from "@/lib/prisma";
+
+export async function getDashboardStats(userId: string) {
+  const [totalItems, totalCollections, favoriteItems, favoriteCollections] = await Promise.all([
+    prisma.item.count({ where: { userId } }),
+    prisma.collection.count({ where: { userId } }),
+    prisma.item.count({ where: { userId, isFavorite: true } }),
+    prisma.collection.count({ where: { userId, isFavorite: true } }),
+  ]);
+  return { totalItems, totalCollections, favoriteItems, favoriteCollections };
+}
+
+export async function getPinnedItems(userId: string) {
+  return prisma.item.findMany({
+    where: { userId, isPinned: true },
+    include: {
+      itemType: { select: { id: true, icon: true, color: true } },
+      tags: { include: { tag: { select: { name: true } } } },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+}
+
+export async function getRecentItems(userId: string, limit = 10) {
+  return prisma.item.findMany({
+    where: { userId },
+    include: {
+      itemType: { select: { id: true, icon: true, color: true } },
+      tags: { include: { tag: { select: { name: true } } } },
+    },
+    orderBy: { lastUsedAt: "desc" },
+    take: limit,
+  });
+}
+
+export async function getSystemItemTypes() {
+  return prisma.itemType.findMany({
+    where: { isSystem: true },
+    select: { id: true, name: true, icon: true, color: true },
+  });
+}

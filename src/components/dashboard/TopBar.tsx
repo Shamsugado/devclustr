@@ -25,7 +25,7 @@ export default function TopBar({ onMobileMenuClick }: TopBarProps) {
         <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground text-xs font-bold">
           DS
         </div>
-        <span className="font-semibold text-foreground text-sm">DevClustr</span>
+        <span className="font-semibold text-foreground text-base">DevClustr</span>
       </div>
 
       {/* Search — centred */}

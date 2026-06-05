@@ -17,9 +17,8 @@ import {
   Plus,
   Settings,
   X,
-  User,
 } from "lucide-react";
-import { mockUser, mockItemTypes, mockCollections, mockItems } from "@/lib/mock-data";
+import type { CollectionMeta } from "@/lib/db/collections";
 
 const iconMap: Record<string, React.ElementType> = {
   Code,
@@ -31,28 +30,26 @@ const iconMap: Record<string, React.ElementType> = {
   Image: ImageIcon,
 };
 
-function getRecentCollections() {
-  const seenIds = new Set<string>();
-  const ordered: string[] = [];
+export type SidebarItemType = {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+};
 
-  [...mockItems]
-    .sort((a, b) => new Date(b.lastUsedAt).getTime() - new Date(a.lastUsedAt).getTime())
-    .forEach((item) => {
-      item.collectionIds.forEach((id) => {
-        if (!seenIds.has(id)) {
-          seenIds.add(id);
-          ordered.push(id);
-        }
-      });
-    });
+export type SidebarData = {
+  itemTypes: SidebarItemType[];
+  favoriteCollections: CollectionMeta[];
+  recentCollections: CollectionMeta[];
+  user: { name: string; email: string; image: string | null } | null;
+};
 
-  return ordered
-    .map((id) => mockCollections.find((c) => c.id === id))
-    .filter((c): c is (typeof mockCollections)[0] => Boolean(c));
-}
-
-function getTypeColor(typeId: string) {
-  return mockItemTypes.find((t) => t.id === typeId)?.color ?? "#6b7280";
+interface SidebarProps {
+  collapsed: boolean;
+  onCollapse: () => void;
+  mobileOpen: boolean;
+  onMobileClose: () => void;
+  sidebarData: SidebarData;
 }
 
 function getUserInitials(name: string) {
@@ -64,24 +61,15 @@ function getUserInitials(name: string) {
     .slice(0, 2);
 }
 
-interface SidebarProps {
-  collapsed: boolean;
-  onCollapse: () => void;
-  mobileOpen: boolean;
-  onMobileClose: () => void;
-}
-
-function SidebarContent() {
-  const favoriteCollections = mockCollections.filter((c) => c.isFavorite);
-  const allRecent = getRecentCollections();
-  const recentCollections = allRecent.filter((c) => !c.isFavorite).slice(0, 3);
+function SidebarContent({ data }: { data: SidebarData }) {
+  const { itemTypes, favoriteCollections, recentCollections, user } = data;
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-5">
         {/* Quick Access */}
         <section>
-          <p className="px-2 mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <p className="px-2 mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Quick Access
           </p>
           <ul className="space-y-0.5">
@@ -93,11 +81,11 @@ function SidebarContent() {
 
         {/* Item Types */}
         <section>
-          <p className="px-2 mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <p className="px-2 mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Item Types
           </p>
           <ul className="space-y-0.5">
-            {mockItemTypes.map((type) => {
+            {itemTypes.map((type) => {
               const Icon = iconMap[type.icon] ?? File;
               const slug = type.name.toLowerCase() + "s";
               return (
@@ -115,7 +103,7 @@ function SidebarContent() {
         {/* Collections */}
         <section>
           <div className="flex items-center justify-between px-2 mb-1">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Collections
             </p>
             <button className="text-muted-foreground hover:text-foreground transition-colors">
@@ -125,10 +113,10 @@ function SidebarContent() {
 
           {favoriteCollections.length > 0 && (
             <>
-              <p className="px-2 mb-0.5 text-[10px] text-muted-foreground/60">Favorites</p>
+              <p className="px-2 mb-0.5 text-xs text-muted-foreground/60">Favorites</p>
               <ul className="space-y-0.5 mb-2">
                 {favoriteCollections.map((col) => (
-                  <CollectionItem key={col.id} collection={col} />
+                  <CollectionItem key={col.id} collection={col} showStar />
                 ))}
               </ul>
             </>
@@ -136,37 +124,46 @@ function SidebarContent() {
 
           {recentCollections.length > 0 && (
             <>
-              <p className="px-2 mb-0.5 text-[10px] text-muted-foreground/60">Recent</p>
+              <p className="px-2 mb-0.5 text-xs text-muted-foreground/60">Recent</p>
               <ul className="space-y-0.5">
                 {recentCollections.map((col) => (
-                  <CollectionItem key={col.id} collection={col} />
+                  <CollectionItem key={col.id} collection={col} showStar={false} />
                 ))}
               </ul>
             </>
           )}
+
+          <Link
+            href="/collections"
+            className="flex items-center gap-2 px-2 mt-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            View all collections
+          </Link>
         </section>
       </nav>
 
       {/* User area */}
-      <div className="shrink-0 border-t border-border px-3 py-3">
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary text-primary-foreground text-xs font-semibold shrink-0">
-            {mockUser.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={mockUser.image} alt={mockUser.name} className="h-full w-full rounded-full object-cover" />
-            ) : (
-              getUserInitials(mockUser.name)
-            )}
+      {user && (
+        <div className="shrink-0 border-t border-border px-3 py-3">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary text-primary-foreground text-xs font-semibold shrink-0">
+              {user.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={user.image} alt={user.name} className="h-full w-full rounded-full object-cover" />
+              ) : (
+                getUserInitials(user.name)
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
+              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+            </div>
+            <button className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
+              <Settings className="h-4 w-4" />
+            </button>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-foreground truncate">{mockUser.name}</p>
-            <p className="text-[10px] text-muted-foreground truncate">{mockUser.email}</p>
-          </div>
-          <button className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
-            <Settings className="h-4 w-4" />
-          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -184,7 +181,7 @@ function NavItem({
     <li>
       <Link
         href={href}
-        className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-base text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
       >
         {icon}
         <span>{label}</span>
@@ -193,23 +190,41 @@ function NavItem({
   );
 }
 
-function CollectionItem({ collection }: { collection: (typeof mockCollections)[0] }) {
-  const color = getTypeColor(collection.dominantTypeId);
+function CollectionItem({
+  collection,
+  showStar,
+}: {
+  collection: CollectionMeta;
+  showStar: boolean;
+}) {
   return (
     <li>
       <Link
         href={`/collections/${collection.id}`}
-        className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-base text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
       >
-        <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+        {showStar ? (
+          <Star className="h-2.5 w-2.5 shrink-0 fill-yellow-400 text-yellow-400" />
+        ) : (
+          <span
+            className="h-2 w-2 rounded-full shrink-0"
+            style={{ backgroundColor: collection.dominantTypeColor }}
+          />
+        )}
         <span className="flex-1 truncate">{collection.name}</span>
-        <span className="text-[10px] text-muted-foreground/60 shrink-0">{collection.itemCount}</span>
+        <span className="text-xs text-muted-foreground/60 shrink-0">{collection.itemCount}</span>
       </Link>
     </li>
   );
 }
 
-export default function Sidebar({ collapsed, onCollapse, mobileOpen, onMobileClose }: SidebarProps) {
+export default function Sidebar({
+  collapsed,
+  onCollapse,
+  mobileOpen,
+  onMobileClose,
+  sidebarData,
+}: SidebarProps) {
   return (
     <>
       {/* Desktop sidebar */}
@@ -231,7 +246,7 @@ export default function Sidebar({ collapsed, onCollapse, mobileOpen, onMobileClo
             )}
           </button>
         </div>
-        {!collapsed && <SidebarContent />}
+        {!collapsed && <SidebarContent data={sidebarData} />}
       </aside>
 
       {/* Mobile drawer */}
@@ -252,7 +267,7 @@ export default function Sidebar({ collapsed, onCollapse, mobileOpen, onMobileClo
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <SidebarContent />
+            <SidebarContent data={sidebarData} />
           </aside>
         </div>
       )}
