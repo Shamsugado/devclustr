@@ -18,6 +18,7 @@ import {
   Settings,
   X,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import type { CollectionMeta } from "@/lib/db/collections";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -88,12 +89,14 @@ function SidebarContent({ data }: { data: SidebarData }) {
             {itemTypes.map((type) => {
               const Icon = iconMap[type.icon] ?? File;
               const slug = type.name.toLowerCase() + "s";
+              const isPro = type.name === "File" || type.name === "Image";
               return (
                 <NavItem
                   key={type.id}
                   href={`/items/${slug}`}
                   icon={<Icon className="h-4 w-4" style={{ color: type.color }} />}
                   label={type.name + "s"}
+                  pro={isPro}
                 />
               );
             })}
@@ -172,10 +175,12 @@ function NavItem({
   href,
   icon,
   label,
+  pro,
 }: {
   href: string;
   icon: React.ReactNode;
   label: string;
+  pro?: boolean;
 }) {
   return (
     <li>
@@ -184,7 +189,12 @@ function NavItem({
         className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-base text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
       >
         {icon}
-        <span>{label}</span>
+        <span className="flex-1">{label}</span>
+        {pro && (
+          <Badge variant="outline" className="text-[10px] tracking-wider text-muted-foreground">
+            PRO
+          </Badge>
+        )}
       </Link>
     </li>
   );
