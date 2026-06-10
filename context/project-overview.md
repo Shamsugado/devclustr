@@ -38,7 +38,7 @@ DevStash consolidates everything into **one fast, searchable, AI-enhanced hub**.
 
 | Layer            | Technology                                                                      |
 | ---------------- | ------------------------------------------------------------------------------- |
-| **Framework**    | [Next.js 15](https://nextjs.org) / [React 19](https://react.dev)                |
+| **Framework**    | [Next.js 16](https://nextjs.org) / [React 19](https://react.dev)                |
 | **Language**     | TypeScript                                                                      |
 | **Database**     | [Neon](https://neon.tech) (PostgreSQL)                                          |
 | **ORM**          | [Prisma 7](https://www.prisma.io/docs)                                          |
