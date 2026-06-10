@@ -1,20 +1,10 @@
-# Current Feature: Add Pro Badge To Sidebar
+# Current Feature
 
 ## Status
 
-In Progress
-
 ## Goals
 
-- Files and Images item types are for pro users only
-- Add a "Pro" badge to their links in the sidebar
-- Badge should be subtle but clear
-- "PRO" text should be all uppercase
-
 ## Notes
-
-- Use a ShadCN UI badge component
-- Spec source: context/features/add-pro-badge-to-sidebar.md
 
 ## History
 
@@ -27,3 +17,4 @@ In Progress
 - **2026-06-04** — Prisma 7 + Neon PostgreSQL setup complete. Full schema with all data models, NextAuth models, indexes, and cascade deletes. Initial migration applied to Neon dev branch. Singleton client at `src/lib/prisma.ts` using `PrismaNeon` adapter. System item types seeded. `db:*` npm scripts added.
 - **2026-06-04** — Seed data complete. Demo user (demo@devstash.io, bcrypt password) with `password` column added to `users` table via migration. 7 system item types, 5 collections (React Patterns, AI Workflows, DevOps, Terminal Commands, Design Resources), and 18 items seeded. `scripts/test-db.ts` updated to verify all seed data.
 - **2026-06-05** — Stats & Sidebar live data complete. Dashboard stats, pinned/recent items, and recent collections now sourced from Neon DB. `src/lib/db/items.ts` and `src/lib/db/collections.ts` created. Sidebar renders system item types from DB with icons/colors; favorite collections show a star, recent collections show a dominant-type colored circle. "View all collections" link added. Dashboard layout and page converted to async server components. UI font sizes bumped throughout for readability.
+- **2026-06-10** — Pro badge on sidebar complete. Added ShadCN `Badge` component (`src/components/ui/badge.tsx`). Sidebar `NavItem` now supports a `pro` flag that renders a subtle outline "PRO" badge; Files and Images item types are marked as pro-only.
