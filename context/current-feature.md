@@ -1,34 +1,10 @@
-# Current Feature: Auth Phase 2 - Email/Password Credentials Provider
+# Current Feature
 
 ## Status
 
-In Progress
-
 ## Goals
 
-- Add NextAuth Credentials provider for email/password authentication
-- Ensure `password` field exists on the `User` model (migration if needed — already added in Phase 1 seed work, verify)
-- Update `src/auth.config.ts` with a Credentials provider placeholder (`authorize: () => null`)
-- Update `src/auth.ts` to override the Credentials provider with real bcrypt validation against the DB
-- Create registration API route `POST /api/auth/register` that:
-  - Accepts name, email, password, confirmPassword
-  - Validates passwords match
-  - Checks if user already exists
-  - Hashes password with bcryptjs
-  - Creates user in database
-  - Returns success/error response
-
 ## Notes
-
-- Split config pattern: keep `auth.config.ts` edge-compatible with a placeholder Credentials provider; `auth.ts` overrides it with bcrypt-based `authorize`.
-- bcryptjs is already installed; `password` column already exists on `users` table from seed migration (verify still matches).
-- Testing:
-  1. `curl -X POST http://localhost:3000/api/auth/register -H "Content-Type: application/json" -d '{"name":"Test","email":"test@test.com","password":"password123","confirmPassword":"password123"}'`
-  2. Go to `/api/auth/signin`
-  3. Sign in with email/password
-  4. Verify redirect to `/dashboard`
-  5. Verify GitHub OAuth still works
-- Reference: https://authjs.dev/getting-started/authentication/credentials
 
 ## History
 
@@ -43,3 +19,4 @@ In Progress
 - **2026-06-05** — Stats & Sidebar live data complete. Dashboard stats, pinned/recent items, and recent collections now sourced from Neon DB. `src/lib/db/items.ts` and `src/lib/db/collections.ts` created. Sidebar renders system item types from DB with icons/colors; favorite collections show a star, recent collections show a dominant-type colored circle. "View all collections" link added. Dashboard layout and page converted to async server components. UI font sizes bumped throughout for readability.
 - **2026-06-10** — Pro badge on sidebar complete. Added ShadCN `Badge` component (`src/components/ui/badge.tsx`). Sidebar `NavItem` now supports a `pro` flag that renders a subtle outline "PRO" badge; Files and Images item types are marked as pro-only.
 - **2026-06-14** — Auth Phase 1 complete. NextAuth v5 (`next-auth@beta`) + `@auth/prisma-adapter` installed. Split config pattern: `src/auth.config.ts` (edge-compatible, GitHub provider) and `src/auth.ts` (Prisma adapter, JWT session, session callback adds `user.id`). Route handler at `src/app/api/auth/[...nextauth]/route.ts`. `src/proxy.ts` protects `/dashboard/*`, redirecting unauthenticated users to NextAuth's default sign-in page with `callbackUrl`. `src/types/next-auth.d.ts` extends `Session.user` with `id`.
+- **2026-06-14** — Auth Phase 2 complete. Added NextAuth Credentials provider for email/password: placeholder in `src/auth.config.ts`, real bcrypt-based `authorize` against the DB in `src/auth.ts`. New `POST /api/auth/register` route validates input, checks for existing users, hashes passwords with bcryptjs, and creates the user. Verified registration, sign-in/sign-out, `callbackUrl` redirect to `/dashboard`, wrong-password rejection, and that GitHub OAuth still works.
