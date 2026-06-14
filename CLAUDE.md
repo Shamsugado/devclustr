@@ -22,6 +22,13 @@ npm run lint     # Run ESLint
 
 No test runner is configured yet.
 
+## Database (Neon MCP)
+
+- The Neon project for this app is named **devclustr** (id `small-fog-21994349`), org `Shamsu`.
+- Always use the **development** branch (`br-divine-tree-ap7wvosc`) for any Neon MCP queries or operations, unless explicitly told otherwise.
+- **Never** read from, write to, or otherwise touch the **production** branch (`br-round-frog-apxz0nro`, the default branch) unless the user explicitly asks for production.
+- Before running any SQL via the Neon MCP, confirm you're targeting the development branch ID above.
+
 ## Stack
 
 - **Next.js 16** (App Router) with **React 19** and **TypeScript**
