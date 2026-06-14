@@ -1,37 +1,10 @@
-# Current Feature: Auth Setup - NextAuth + GitHub Provider (Phase 1)
+# Current Feature
 
 ## Status
 
-In Progress
-
 ## Goals
 
-- Install NextAuth v5 (`next-auth@beta`) and `@auth/prisma-adapter`
-- Set up split auth config pattern for edge compatibility
-- Add GitHub OAuth provider
-- Protect `/dashboard/*` routes using Next.js 16 proxy
-- Redirect unauthenticated users to sign-in
-
 ## Notes
-
-- Files to create:
-  - `src/auth.config.ts` - Edge-compatible config (providers only, no adapter)
-  - `src/auth.ts` - Full config with Prisma adapter and JWT strategy
-  - `src/app/api/auth/[...nextauth]/route.ts` - Export handlers from auth.ts
-  - `src/proxy.ts` - Route protection with redirect logic
-  - `src/types/next-auth.d.ts` - Extend Session type with user.id
-- Key gotchas:
-  - Use Context7 to verify newest config/conventions
-  - Use `next-auth@beta` (not `@latest`, which installs v4)
-  - Proxy file must be at `src/proxy.ts` (same level as `app/`)
-  - Use named export: `export const proxy = auth(...)`, not default export
-  - Use `session: { strategy: 'jwt' }` with split config pattern
-  - Don't set custom `pages.signIn` - use NextAuth's default page
-- Env vars needed: `AUTH_SECRET`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`
-- Testing: visiting `/dashboard` unauthenticated should redirect to sign-in; GitHub sign-in should redirect back to `/dashboard`
-- References:
-  - https://authjs.dev/getting-started/installation#edge-compatibility
-  - https://authjs.dev/getting-started/adapters/prisma
 
 ## History
 
@@ -45,3 +18,4 @@ In Progress
 - **2026-06-04** — Seed data complete. Demo user (demo@devstash.io, bcrypt password) with `password` column added to `users` table via migration. 7 system item types, 5 collections (React Patterns, AI Workflows, DevOps, Terminal Commands, Design Resources), and 18 items seeded. `scripts/test-db.ts` updated to verify all seed data.
 - **2026-06-05** — Stats & Sidebar live data complete. Dashboard stats, pinned/recent items, and recent collections now sourced from Neon DB. `src/lib/db/items.ts` and `src/lib/db/collections.ts` created. Sidebar renders system item types from DB with icons/colors; favorite collections show a star, recent collections show a dominant-type colored circle. "View all collections" link added. Dashboard layout and page converted to async server components. UI font sizes bumped throughout for readability.
 - **2026-06-10** — Pro badge on sidebar complete. Added ShadCN `Badge` component (`src/components/ui/badge.tsx`). Sidebar `NavItem` now supports a `pro` flag that renders a subtle outline "PRO" badge; Files and Images item types are marked as pro-only.
+- **2026-06-14** — Auth Phase 1 complete. NextAuth v5 (`next-auth@beta`) + `@auth/prisma-adapter` installed. Split config pattern: `src/auth.config.ts` (edge-compatible, GitHub provider) and `src/auth.ts` (Prisma adapter, JWT session, session callback adds `user.id`). Route handler at `src/app/api/auth/[...nextauth]/route.ts`. `src/proxy.ts` protects `/dashboard/*`, redirecting unauthenticated users to NextAuth's default sign-in page with `callbackUrl`. `src/types/next-auth.d.ts` extends `Session.user` with `id`.
