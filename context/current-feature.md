@@ -1,29 +1,16 @@
-# Current Feature: Auth UI - Sign In, Register & Sign Out
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Custom Sign In page at `/sign-in` with email/password fields, "Sign in with GitHub" button, link to register, and form validation/error display
-- Custom Register page at `/register` with name, email, password, confirm password fields; validates passwords match and email format; submits to `/api/auth/register`; redirects to sign-in on success
-- Bottom of sidebar shows user avatar (GitHub image or initials fallback), user name, and a dropdown/popup with "Sign out" link
-- Clicking the avatar/icon navigates to `/profile`
-- Reusable avatar component handling both GitHub image and initials fallback
+<!-- Add goals here when starting a new feature -->
 
 ## Notes
 
-- Avatar logic: if user has `image` (from GitHub), use it; otherwise generate initials from name (e.g., "Brad Traversy" → "BT")
-- Replace NextAuth's default sign-in/register pages with this custom UI
-- Testing checklist:
-  1. `/sign-in` renders custom page
-  2. GitHub sign-in flow works
-  3. Email/password sign-in flow works
-  4. Avatar shows in top bar/sidebar (GitHub image or initials)
-  5. Clicking avatar shows dropdown
-  6. "Sign out" logs out and redirects
-  7. `/register` creates a new account and redirects to sign-in
+<!-- Add notes here when starting a new feature -->
 
 ## History
 
@@ -39,3 +26,4 @@ In Progress
 - **2026-06-10** — Pro badge on sidebar complete. Added ShadCN `Badge` component (`src/components/ui/badge.tsx`). Sidebar `NavItem` now supports a `pro` flag that renders a subtle outline "PRO" badge; Files and Images item types are marked as pro-only.
 - **2026-06-14** — Auth Phase 1 complete. NextAuth v5 (`next-auth@beta`) + `@auth/prisma-adapter` installed. Split config pattern: `src/auth.config.ts` (edge-compatible, GitHub provider) and `src/auth.ts` (Prisma adapter, JWT session, session callback adds `user.id`). Route handler at `src/app/api/auth/[...nextauth]/route.ts`. `src/proxy.ts` protects `/dashboard/*`, redirecting unauthenticated users to NextAuth's default sign-in page with `callbackUrl`. `src/types/next-auth.d.ts` extends `Session.user` with `id`.
 - **2026-06-14** — Auth Phase 2 complete. Added NextAuth Credentials provider for email/password: placeholder in `src/auth.config.ts`, real bcrypt-based `authorize` against the DB in `src/auth.ts`. New `POST /api/auth/register` route validates input, checks for existing users, hashes passwords with bcryptjs, and creates the user. Verified registration, sign-in/sign-out, `callbackUrl` redirect to `/dashboard`, wrong-password rejection, and that GitHub OAuth still works.
+- **2026-06-14** — Auth Phase 3 complete. Custom `/sign-in` page (email/password + "Sign in with GitHub", error display, link to register) and `/register` page (name/email/password/confirm, email format + password match validation, posts to `/api/auth/register`, redirects to sign-in). New reusable `UserAvatar` component (GitHub image or initials fallback). Sidebar bottom area now shows a dropdown with "Profile" (links to new `/profile` route) and "Sign out". `src/proxy.ts` now protects `/profile/*` too and redirects unauthenticated users to `/sign-in`. Dashboard layout now uses the real session user instead of a hardcoded demo user.
