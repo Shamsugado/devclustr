@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import {
   Code,
   Sparkles,
@@ -15,10 +17,19 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
-  Settings,
+  User,
+  LogOut,
   X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import UserAvatar from "@/components/auth/UserAvatar";
 import type { CollectionMeta } from "@/lib/db/collections";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -53,17 +64,9 @@ interface SidebarProps {
   sidebarData: SidebarData;
 }
 
-function getUserInitials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
 function SidebarContent({ data }: { data: SidebarData }) {
   const { itemTypes, favoriteCollections, recentCollections, user } = data;
+  const router = useRouter();
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -148,23 +151,29 @@ function SidebarContent({ data }: { data: SidebarData }) {
       {/* User area */}
       {user && (
         <div className="shrink-0 border-t border-border px-3 py-3">
-          <div className="flex items-center gap-2.5">
-            <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary text-primary-foreground text-xs font-semibold shrink-0">
-              {user.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={user.image} alt={user.name} className="h-full w-full rounded-full object-cover" />
-              ) : (
-                getUserInitials(user.name)
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
-              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-            </div>
-            <button className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
-              <Settings className="h-4 w-4" />
-            </button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex w-full items-center gap-2.5 rounded-md p-1 -m-1 text-left hover:bg-accent transition-colors">
+              <UserAvatar name={user.name} image={user.image} />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="start">
+              <DropdownMenuItem onClick={() => router.push("/profile")}>
+                <User className="h-4 w-4" />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => signOut({ redirectTo: "/sign-in" })}
+              >
+                <LogOut className="h-4 w-4" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
     </div>

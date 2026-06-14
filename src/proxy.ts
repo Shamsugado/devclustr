@@ -6,15 +6,16 @@ const { auth } = NextAuth(authConfig);
 
 export const proxy = auth((req) => {
   const isLoggedIn = !!req.auth;
-  const isOnDashboard = req.nextUrl.pathname.startsWith("/dashboard");
+  const isProtected =
+    req.nextUrl.pathname.startsWith("/dashboard") || req.nextUrl.pathname.startsWith("/profile");
 
-  if (isOnDashboard && !isLoggedIn) {
-    const signInUrl = new URL("/api/auth/signin", req.nextUrl.origin);
+  if (isProtected && !isLoggedIn) {
+    const signInUrl = new URL("/sign-in", req.nextUrl.origin);
     signInUrl.searchParams.set("callbackUrl", req.nextUrl.href);
     return NextResponse.redirect(signInUrl);
   }
 });
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/profile/:path*"],
 };
