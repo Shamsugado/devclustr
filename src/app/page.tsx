@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <main>
-      <h1>Devstash</h1>
+      <h1>DevClustr</h1>
     </main>
   );
 }

@@ -1,4 +1,4 @@
-# DevStash — Project Overview
+# DevClustr — Project Overview
 
 > A fast, searchable, AI-enhanced hub for all developer knowledge & resources.
 
@@ -19,7 +19,7 @@ Developers keep their essentials scattered across too many places:
 | GitHub Gists           | Project templates   |
 | Bash history           | Terminal commands   |
 
-DevStash consolidates everything into **one fast, searchable, AI-enhanced hub**.
+DevClustr consolidates everything into **one fast, searchable, AI-enhanced hub**.
 
 ---
 

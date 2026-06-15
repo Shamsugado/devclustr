@@ -1,4 +1,4 @@
-# DevStash
+# DevClustr
 
 A developer knowledge hub for snippets, prompts, commands, notes, files, images, links and custom item types.
 

@@ -58,7 +58,7 @@ export default function SignInForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle className="text-xl">Sign in to DevStash</CardTitle>
+        <CardTitle className="text-xl">Sign in to DevClustr</CardTitle>
         <CardDescription>Enter your email and password to continue</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

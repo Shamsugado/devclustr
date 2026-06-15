@@ -64,7 +64,7 @@ export default function RegisterForm() {
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle className="text-xl">Create an account</CardTitle>
-        <CardDescription>Sign up to start using DevStash</CardDescription>
+        <CardDescription>Sign up to start using DevClustr</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">

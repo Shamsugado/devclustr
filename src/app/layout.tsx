@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DevStash",
+  title: "DevClustr",
   description: "A fast, searchable, AI-enhanced hub for all developer knowledge & resources.",
 };
 
