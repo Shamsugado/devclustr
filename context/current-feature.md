@@ -1,16 +1,25 @@
-# Current Feature
+# Current Feature: Forgot Password
 
 ## Status
 
-Not Started
+Complete
 
 ## Goals
 
-<!-- Add goals here when starting a new feature -->
+- Add "Forgot password?" link on the `/sign-in` page
+- Create `/forgot-password` page with an email input form
+- Create `/reset-password?token=...` page for entering a new password
+- `POST /api/auth/forgot-password`: validate email, create a `VerificationToken` (1-hour expiry), send reset link via Resend
+- `POST /api/auth/reset-password`: validate token, hash and save new password, delete token, redirect to `/sign-in?reset=1`
+- Show success banner on sign-in page when `?reset=1` is present
+- Handle edge cases: unknown email (silent — don't reveal user existence), expired/missing token, mismatched passwords
 
 ## Notes
 
-<!-- Add notes here when starting a new feature -->
+- Use the existing NextAuth `VerificationToken` model (no schema migration needed): `identifier` = user email, `token` = random UUID, `expires` = now + 1 hour
+- Resend is already wired up for email verification — reuse the same pattern
+- Tokens are one-time use; delete on successful reset
+- GitHub OAuth users have no password — the reset page should show a friendly message if the email has no password set
 
 ## History
 
