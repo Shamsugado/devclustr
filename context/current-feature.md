@@ -1,27 +1,16 @@
-# Current Feature: Email Verification on Register
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- On registration, send a verification email via Resend containing a unique verification link
-- Store a `emailVerificationToken` (and expiry) on the user record in the DB
-- Add a `/verify-email?token=...` route that validates the token and marks the user as verified
-- Block unverified users from accessing `/dashboard` — redirect them to a "check your email" page
-- Show a clear error on sign-in if the user's email is not yet verified
-- Handle expired tokens (show a "resend verification" option)
+<!-- Add goals here when starting a new feature -->
 
 ## Notes
 
-- Email provider: Resend (`resend` npm package), `RESEND_API_KEY` already in `.env`
-- From address: `onboarding@resend.dev`
-- Verification token: generate a cryptographically random token (e.g. `crypto.randomBytes(32).toString('hex')`)
-- Token expiry: 24 hours is reasonable
-- Schema changes needed: add `emailVerified DateTime?`, `emailVerificationToken String? @unique`, `emailVerificationTokenExpiry DateTime?` to `User` model (NextAuth already has `emailVerified` — confirm it's already in schema before adding)
-- The existing GitHub OAuth flow should be unaffected (GitHub-authed users are considered verified)
-- After verifying, redirect to `/sign-in` with a success message
+<!-- Add notes here when starting a new feature -->
 
 ## History
 
@@ -39,3 +28,4 @@ In Progress
 - **2026-06-14** — Auth Phase 2 complete. Added NextAuth Credentials provider for email/password: placeholder in `src/auth.config.ts`, real bcrypt-based `authorize` against the DB in `src/auth.ts`. New `POST /api/auth/register` route validates input, checks for existing users, hashes passwords with bcryptjs, and creates the user. Verified registration, sign-in/sign-out, `callbackUrl` redirect to `/dashboard`, wrong-password rejection, and that GitHub OAuth still works.
 - **2026-06-14** — Auth Phase 3 complete. Custom `/sign-in` page (email/password + "Sign in with GitHub", error display, link to register) and `/register` page (name/email/password/confirm, email format + password match validation, posts to `/api/auth/register`, redirects to sign-in). New reusable `UserAvatar` component (GitHub image or initials fallback). Sidebar bottom area now shows a dropdown with "Profile" (links to new `/profile` route) and "Sign out". `src/proxy.ts` now protects `/profile/*` too and redirects unauthenticated users to `/sign-in`. Dashboard layout now uses the real session user instead of a hardcoded demo user.
 - **2026-06-15** — Branding fix complete. Renamed remaining "DevStash" references to "DevClustr" in `src/app/layout.tsx` (page title), `src/app/page.tsx` (landing heading), `SignInForm.tsx`, `RegisterForm.tsx`, `CLAUDE.md`, and `context/project-overview.md`. Verified in browser (page title and sign-in card). `demo@devstash.io` seed data left unchanged.
+- **2026-06-15** — Email verification on register complete. New credentials users must verify their email before signing in. Resend sends a 24-hour token link on registration. `/verify-email?token=...` validates the token and sets `emailVerified`; redirects to `/sign-in?verified=1` on success. `/check-email` post-registration landing page. `/resend-verification` page + API route for resending. Sign-in blocks unverified users with a specific error (`email_not_verified` code from NextAuth). Prisma schema: `emailVerificationToken` + `emailVerificationTokenExpiry` added to `User` with migration. `scripts/purge-non-demo-users.ts` (`npm run db:purge-users`) added to reset test data. GitHub OAuth users unaffected.
