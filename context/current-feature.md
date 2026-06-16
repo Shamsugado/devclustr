@@ -1,24 +1,16 @@
-# Current Feature: Profile Page
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Profile page at `/profile` displays user info: name, email, avatar (GitHub or initials), account creation date
-- Usage stats section: total items, total collections, breakdown by item type (snippets, prompts, notes, commands, links, files, images)
-- Change password form visible only for email/password users (not GitHub OAuth users)
-- Delete account action with confirmation dialog to prevent accidental deletion
-- Route is protected (requires authentication)
+<!-- Add goals here when starting a new feature -->
 
 ## Notes
 
-- Avatar: use GitHub avatar if available (OAuth users), otherwise generate initials from name/email — reuse existing `UserAvatar` component
-- Change password: only shown when the user has a `password` set in the DB (i.e., not an OAuth-only account)
-- Delete account: show a confirmation dialog before proceeding; deleting the user cascades via Prisma schema
-- Item type breakdown pulls from DB — count items grouped by `itemType`
-- Follow existing data-fetching pattern: server component + `src/lib/db/` query helpers
+<!-- Add notes here when starting a new feature -->
 
 ## History
 
@@ -39,3 +31,4 @@ In Progress
 - **2026-06-15** — Email verification on register complete. New credentials users must verify their email before signing in. Resend sends a 24-hour token link on registration. `/verify-email?token=...` validates the token and sets `emailVerified`; redirects to `/sign-in?verified=1` on success. `/check-email` post-registration landing page. `/resend-verification` page + API route for resending. Sign-in blocks unverified users with a specific error (`email_not_verified` code from NextAuth). Prisma schema: `emailVerificationToken` + `emailVerificationTokenExpiry` added to `User` with migration. `scripts/purge-non-demo-users.ts` (`npm run db:purge-users`) added to reset test data. GitHub OAuth users unaffected.
 - **2026-06-16** — Email verification toggle complete. `EMAIL_VERIFICATION_ENABLED` env variable (default `false` in dev, `true` in prod) controls whether new registrations require email verification. When disabled: user is created with `emailVerified` set immediately, no Resend email sent, redirected to `/sign-in`. When enabled: existing Resend flow applies unchanged. Touch points: `src/app/api/auth/register/route.ts`, `src/auth.ts` (Credentials authorize), `src/components/auth/RegisterForm.tsx` (redirect based on API response).
 - **2026-06-16** — Forgot password complete. "Forgot password?" link on sign-in leads to `/forgot-password` (email form). `POST /api/auth/forgot-password` creates a `reset:`-prefixed `VerificationToken` (1-hour expiry, no schema migration) and sends a Resend email. `/reset-password?token=` validates the token server-side before rendering the form. `POST /api/auth/reset-password` validates, bcrypt-hashes, and updates the password + deletes the token in a transaction; redirects to `/sign-in?reset=1`. Success banner shown on sign-in. Unknown emails and OAuth-only accounts return 200 silently to prevent user enumeration.
+- **2026-06-16** — Profile page complete. `/profile` shows user info (name, email, avatar, join date), usage stats (total items/collections + per-type breakdown with Lucide icons), change password form (email users only), and delete account with confirmation dialog. New API routes: `POST /api/auth/change-password` and `POST /api/auth/delete-account`. New DB helpers in `src/lib/db/users.ts`. Shared `src/lib/item-type-icons.tsx` extracted from Sidebar. ShadCN Dialog component added.
