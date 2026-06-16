@@ -15,8 +15,10 @@ model User {
   email                String?   @unique
   emailVerified        DateTime?
   image                String?
-  password             String?
-  isPro                Boolean   @default(false)
+  password                      String?
+  emailVerificationToken        String?   @unique
+  emailVerificationTokenExpiry  DateTime?
+  isPro                         Boolean   @default(false)
   stripeCustomerId     String?   @unique
   stripeSubscriptionId String?   @unique
   createdAt            DateTime  @default(now())
