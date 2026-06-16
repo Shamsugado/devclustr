@@ -1,25 +1,16 @@
-# Current Feature: Forgot Password
+# Current Feature
 
 ## Status
 
-Complete
+Not Started
 
 ## Goals
 
-- Add "Forgot password?" link on the `/sign-in` page
-- Create `/forgot-password` page with an email input form
-- Create `/reset-password?token=...` page for entering a new password
-- `POST /api/auth/forgot-password`: validate email, create a `VerificationToken` (1-hour expiry), send reset link via Resend
-- `POST /api/auth/reset-password`: validate token, hash and save new password, delete token, redirect to `/sign-in?reset=1`
-- Show success banner on sign-in page when `?reset=1` is present
-- Handle edge cases: unknown email (silent — don't reveal user existence), expired/missing token, mismatched passwords
+<!-- Add goals here when starting a new feature -->
 
 ## Notes
 
-- Use the existing NextAuth `VerificationToken` model (no schema migration needed): `identifier` = user email, `token` = random UUID, `expires` = now + 1 hour
-- Resend is already wired up for email verification — reuse the same pattern
-- Tokens are one-time use; delete on successful reset
-- GitHub OAuth users have no password — the reset page should show a friendly message if the email has no password set
+<!-- Add notes here when starting a new feature -->
 
 ## History
 
@@ -39,3 +30,4 @@ Complete
 - **2026-06-15** — Branding fix complete. Renamed remaining "DevStash" references to "DevClustr" in `src/app/layout.tsx` (page title), `src/app/page.tsx` (landing heading), `SignInForm.tsx`, `RegisterForm.tsx`, `CLAUDE.md`, and `context/project-overview.md`. Verified in browser (page title and sign-in card). `demo@devstash.io` seed data left unchanged.
 - **2026-06-15** — Email verification on register complete. New credentials users must verify their email before signing in. Resend sends a 24-hour token link on registration. `/verify-email?token=...` validates the token and sets `emailVerified`; redirects to `/sign-in?verified=1` on success. `/check-email` post-registration landing page. `/resend-verification` page + API route for resending. Sign-in blocks unverified users with a specific error (`email_not_verified` code from NextAuth). Prisma schema: `emailVerificationToken` + `emailVerificationTokenExpiry` added to `User` with migration. `scripts/purge-non-demo-users.ts` (`npm run db:purge-users`) added to reset test data. GitHub OAuth users unaffected.
 - **2026-06-16** — Email verification toggle complete. `EMAIL_VERIFICATION_ENABLED` env variable (default `false` in dev, `true` in prod) controls whether new registrations require email verification. When disabled: user is created with `emailVerified` set immediately, no Resend email sent, redirected to `/sign-in`. When enabled: existing Resend flow applies unchanged. Touch points: `src/app/api/auth/register/route.ts`, `src/auth.ts` (Credentials authorize), `src/components/auth/RegisterForm.tsx` (redirect based on API response).
+- **2026-06-16** — Forgot password complete. "Forgot password?" link on sign-in leads to `/forgot-password` (email form). `POST /api/auth/forgot-password` creates a `reset:`-prefixed `VerificationToken` (1-hour expiry, no schema migration) and sends a Resend email. `/reset-password?token=` validates the token server-side before rendering the form. `POST /api/auth/reset-password` validates, bcrypt-hashes, and updates the password + deletes the token in a transaction; redirects to `/sign-in?reset=1`. Success banner shown on sign-in. Unknown emails and OAuth-only accounts return 200 silently to prevent user enumeration.
