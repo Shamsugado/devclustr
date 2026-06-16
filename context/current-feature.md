@@ -1,21 +1,16 @@
-# Current Feature: Email Verification Toggle
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Add a single toggle (env variable) to enable or disable email verification for new registrations
-- When disabled: users can sign in immediately after registering, no email is sent
-- When enabled: current flow applies — Resend sends a verification link, sign-in is blocked until verified
-- GitHub OAuth users are unaffected by the toggle either way
+<!-- Add goals here when starting a new feature -->
 
 ## Notes
 
-- Context: no custom domain is linked to Resend yet, so only `shamsudeengado@gmail.com` (the Resend account email) can receive verification emails during development. The toggle lets other testers register without being blocked.
-- Approach: use an env variable (e.g. `EMAIL_VERIFICATION_ENABLED=true`) — clean, zero-code-change to flip, and works across environments (dev off, prod on).
-- Touch points: `POST /api/auth/register` (skip token creation + email send when disabled), `src/auth.ts` Credentials `authorize` (skip the `emailVerified` check when disabled), and possibly `/check-email` redirect after registration.
+<!-- Add notes here when starting a new feature -->
 
 ## History
 
@@ -34,3 +29,4 @@ In Progress
 - **2026-06-14** — Auth Phase 3 complete. Custom `/sign-in` page (email/password + "Sign in with GitHub", error display, link to register) and `/register` page (name/email/password/confirm, email format + password match validation, posts to `/api/auth/register`, redirects to sign-in). New reusable `UserAvatar` component (GitHub image or initials fallback). Sidebar bottom area now shows a dropdown with "Profile" (links to new `/profile` route) and "Sign out". `src/proxy.ts` now protects `/profile/*` too and redirects unauthenticated users to `/sign-in`. Dashboard layout now uses the real session user instead of a hardcoded demo user.
 - **2026-06-15** — Branding fix complete. Renamed remaining "DevStash" references to "DevClustr" in `src/app/layout.tsx` (page title), `src/app/page.tsx` (landing heading), `SignInForm.tsx`, `RegisterForm.tsx`, `CLAUDE.md`, and `context/project-overview.md`. Verified in browser (page title and sign-in card). `demo@devstash.io` seed data left unchanged.
 - **2026-06-15** — Email verification on register complete. New credentials users must verify their email before signing in. Resend sends a 24-hour token link on registration. `/verify-email?token=...` validates the token and sets `emailVerified`; redirects to `/sign-in?verified=1` on success. `/check-email` post-registration landing page. `/resend-verification` page + API route for resending. Sign-in blocks unverified users with a specific error (`email_not_verified` code from NextAuth). Prisma schema: `emailVerificationToken` + `emailVerificationTokenExpiry` added to `User` with migration. `scripts/purge-non-demo-users.ts` (`npm run db:purge-users`) added to reset test data. GitHub OAuth users unaffected.
+- **2026-06-16** — Email verification toggle complete. `EMAIL_VERIFICATION_ENABLED` env variable (default `false` in dev, `true` in prod) controls whether new registrations require email verification. When disabled: user is created with `emailVerified` set immediately, no Resend email sent, redirected to `/sign-in`. When enabled: existing Resend flow applies unchanged. Touch points: `src/app/api/auth/register/route.ts`, `src/auth.ts` (Credentials authorize), `src/components/auth/RegisterForm.tsx` (redirect based on API response).
