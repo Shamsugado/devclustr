@@ -1,16 +1,21 @@
-# Current Feature
+# Current Feature: Email Verification Toggle
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here when starting a new feature -->
+- Add a single toggle (env variable) to enable or disable email verification for new registrations
+- When disabled: users can sign in immediately after registering, no email is sent
+- When enabled: current flow applies — Resend sends a verification link, sign-in is blocked until verified
+- GitHub OAuth users are unaffected by the toggle either way
 
 ## Notes
 
-<!-- Add notes here when starting a new feature -->
+- Context: no custom domain is linked to Resend yet, so only `shamsudeengado@gmail.com` (the Resend account email) can receive verification emails during development. The toggle lets other testers register without being blocked.
+- Approach: use an env variable (e.g. `EMAIL_VERIFICATION_ENABLED=true`) — clean, zero-code-change to flip, and works across environments (dev off, prod on).
+- Touch points: `POST /api/auth/register` (skip token creation + email send when disabled), `src/auth.ts` Credentials `authorize` (skip the `emailVerified` check when disabled), and possibly `/check-email` redirect after registration.
 
 ## History
 

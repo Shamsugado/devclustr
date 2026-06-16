@@ -51,13 +51,14 @@ export default function RegisterForm() {
 
     setIsLoading(false);
 
+    const data = await res.json().catch(() => null);
+
     if (!res.ok) {
-      const data = await res.json().catch(() => null);
       setError(data?.error ?? "Something went wrong. Please try again.");
       return;
     }
 
-    router.push("/check-email");
+    router.push(data?.requiresVerification ? "/check-email" : "/sign-in");
   }
 
   return (
