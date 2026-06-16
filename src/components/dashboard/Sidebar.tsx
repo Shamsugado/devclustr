@@ -4,18 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  Link2,
-  File,
-  Image as ImageIcon,
   Star,
   Clock,
   LayoutGrid,
   ChevronLeft,
   ChevronRight,
+  File,
   Plus,
   User,
   LogOut,
@@ -31,16 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import UserAvatar from "@/components/auth/UserAvatar";
 import type { CollectionMeta } from "@/lib/db/collections";
-
-const iconMap: Record<string, React.ElementType> = {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  Link: Link2,
-  File,
-  Image: ImageIcon,
-};
+import { itemTypeIconMap } from "@/lib/item-type-icons";
 
 export type SidebarItemType = {
   id: string;
@@ -90,7 +75,7 @@ function SidebarContent({ data }: { data: SidebarData }) {
           </p>
           <ul className="space-y-0.5">
             {itemTypes.map((type) => {
-              const Icon = iconMap[type.icon] ?? File;
+              const Icon = itemTypeIconMap[type.icon] ?? File;
               const slug = type.name.toLowerCase() + "s";
               const isPro = type.name === "File" || type.name === "Image";
               return (
