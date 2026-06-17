@@ -2,7 +2,7 @@
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
@@ -50,3 +50,4 @@ Token hashing pattern:
 - **2026-06-16** — Email verification toggle complete. `EMAIL_VERIFICATION_ENABLED` env variable (default `false` in dev, `true` in prod) controls whether new registrations require email verification. When disabled: user is created with `emailVerified` set immediately, no Resend email sent, redirected to `/sign-in`. When enabled: existing Resend flow applies unchanged. Touch points: `src/app/api/auth/register/route.ts`, `src/auth.ts` (Credentials authorize), `src/components/auth/RegisterForm.tsx` (redirect based on API response).
 - **2026-06-16** — Forgot password complete. "Forgot password?" link on sign-in leads to `/forgot-password` (email form). `POST /api/auth/forgot-password` creates a `reset:`-prefixed `VerificationToken` (1-hour expiry, no schema migration) and sends a Resend email. `/reset-password?token=` validates the token server-side before rendering the form. `POST /api/auth/reset-password` validates, bcrypt-hashes, and updates the password + deletes the token in a transaction; redirects to `/sign-in?reset=1`. Success banner shown on sign-in. Unknown emails and OAuth-only accounts return 200 silently to prevent user enumeration.
 - **2026-06-16** — Profile page complete. `/profile` shows user info (name, email, avatar, join date), usage stats (total items/collections + per-type breakdown with Lucide icons), change password form (email users only), and delete account with confirmation dialog. New API routes: `POST /api/auth/change-password` and `POST /api/auth/delete-account`. New DB helpers in `src/lib/db/users.ts`. Shared `src/lib/item-type-icons.tsx` extracted from Sidebar. ShadCN Dialog component added.
+- **2026-06-17** — Auth security hardening complete. Fixed: (1) `src/proxy.ts` changed to `export default` so Next.js actually applies edge middleware (was a no-op); (2) password-reset and email-verification tokens now stored as SHA-256 hashes — raw tokens only travel in email URLs; (3) `callbackUrl` in SignInForm validated to same-origin before redirect; (4) Zod schemas added to all auth API routes with email format, password max 72 chars, name max 100 chars; (5) bcrypt cost factor unified to 12. New `src/lib/token.ts` shared utility. Zod installed. Remaining items (rate limiting, registration enumeration, delete-account re-auth, sender domain) deferred.
