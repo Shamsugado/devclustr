@@ -27,7 +27,11 @@ function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
 export default function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const rawCallbackUrl = searchParams.get("callbackUrl") ?? "";
+  const callbackUrl =
+    rawCallbackUrl.startsWith("/") && !rawCallbackUrl.startsWith("//")
+      ? rawCallbackUrl
+      : "/dashboard";
   const verified = searchParams.get("verified") === "1";
   const reset = searchParams.get("reset") === "1";
 

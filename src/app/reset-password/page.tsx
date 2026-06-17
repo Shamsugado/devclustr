@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { hashToken } from "@/lib/token";
 import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
 import {
   Card,
@@ -21,7 +22,9 @@ export default async function ResetPasswordPage({ searchParams }: Props) {
     return <InvalidLink reason="missing" />;
   }
 
-  const record = await prisma.verificationToken.findUnique({ where: { token } });
+  const record = await prisma.verificationToken.findUnique({
+    where: { token: hashToken(token) },
+  });
 
   if (!record || !record.identifier.startsWith("reset:")) {
     return <InvalidLink reason="invalid" />;

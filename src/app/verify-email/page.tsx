@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { hashToken } from "@/lib/token";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Props {
@@ -15,7 +16,7 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
   }
 
   const user = await prisma.user.findUnique({
-    where: { emailVerificationToken: token },
+    where: { emailVerificationToken: hashToken(token) },
   });
 
   if (!user) {
