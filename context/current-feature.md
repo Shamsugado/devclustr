@@ -6,29 +6,7 @@ Completed
 
 ## Goals
 
-Fix auth security vulnerabilities identified by the auth-auditor agent (2026-06-17).
-
-**In scope (this session):**
-- CRIT-1: Wire up route-protection middleware (`src/proxy.ts` → `src/middleware.ts`)
-- HIGH-1: Hash password-reset tokens before storing in DB (store SHA-256 hash, send raw in email)
-- HIGH-2: Hash email-verification tokens before storing in DB (same pattern)
-- HIGH-3: Validate `callbackUrl` in `SignInForm` to prevent open redirect
-- MED-1: Standardize bcrypt cost factor to 12 at registration
-- MED-2: Add Zod validation (email format, password max 72 chars, name max 100 chars) to all auth API routes
-
-**Deferred (needs external infrastructure or UX discussion):**
-- CRIT-2: Rate limiting on auth endpoints (requires Upstash/Redis)
-- MED-3: Registration user enumeration (requires UX decision)
-- LOW-1: Delete account password re-confirmation
-- LOW-2: Email sender domain (needs custom Resend domain)
-
 ## Notes
-
-Token hashing pattern:
-- Generate raw token with `randomBytes(32).toString("hex")`
-- Store `SHA-256(raw)` in DB
-- Send raw token in email URL
-- On verification: hash URL token → look up by hash
 
 ## History
 
@@ -51,3 +29,4 @@ Token hashing pattern:
 - **2026-06-16** — Forgot password complete. "Forgot password?" link on sign-in leads to `/forgot-password` (email form). `POST /api/auth/forgot-password` creates a `reset:`-prefixed `VerificationToken` (1-hour expiry, no schema migration) and sends a Resend email. `/reset-password?token=` validates the token server-side before rendering the form. `POST /api/auth/reset-password` validates, bcrypt-hashes, and updates the password + deletes the token in a transaction; redirects to `/sign-in?reset=1`. Success banner shown on sign-in. Unknown emails and OAuth-only accounts return 200 silently to prevent user enumeration.
 - **2026-06-16** — Profile page complete. `/profile` shows user info (name, email, avatar, join date), usage stats (total items/collections + per-type breakdown with Lucide icons), change password form (email users only), and delete account with confirmation dialog. New API routes: `POST /api/auth/change-password` and `POST /api/auth/delete-account`. New DB helpers in `src/lib/db/users.ts`. Shared `src/lib/item-type-icons.tsx` extracted from Sidebar. ShadCN Dialog component added.
 - **2026-06-17** — Auth security hardening complete. Fixed: (1) `src/proxy.ts` changed to `export default` so Next.js actually applies edge middleware (was a no-op); (2) password-reset and email-verification tokens now stored as SHA-256 hashes — raw tokens only travel in email URLs; (3) `callbackUrl` in SignInForm validated to same-origin before redirect; (4) Zod schemas added to all auth API routes with email format, password max 72 chars, name max 100 chars; (5) bcrypt cost factor unified to 12. New `src/lib/token.ts` shared utility. Zod installed. Remaining items (rate limiting, registration enumeration, delete-account re-auth, sender domain) deferred.
+- **2026-06-17** — Rate limiting complete. `@upstash/ratelimit` + `@upstash/redis` installed. New `src/lib/rate-limit.ts` utility with sliding-window limiters for all 5 auth endpoints. Route handlers (register, forgot-password, reset-password, resend-verification) check rate limits before processing. Login rate limiting wired into NextAuth `authorize` via `RateLimitedError` (code `rate_limited`); SignInForm surfaces the error. Fails open when Upstash is unavailable. `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` added to `.env.example`.
