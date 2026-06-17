@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { generateToken } from "@/lib/token";
 import { sendVerificationEmail } from "@/lib/email";
+import { checkResendVerificationRateLimit } from "@/lib/rate-limit";
 
 const ResendVerificationSchema = z.object({
   email: z.string().email().max(254),
@@ -17,6 +18,9 @@ export async function POST(request: Request) {
   }
 
   const { email } = parsed.data;
+
+  const rateLimitRes = await checkResendVerificationRateLimit(request, email);
+  if (rateLimitRes) return rateLimitRes;
   const user = await prisma.user.findUnique({ where: { email } });
 
   // Return 200 even if user not found to avoid user enumeration

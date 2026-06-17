@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { generateToken } from "@/lib/token";
 import { sendVerificationEmail } from "@/lib/email";
+import { checkRegisterRateLimit } from "@/lib/rate-limit";
 
 const emailVerificationEnabled = process.env.EMAIL_VERIFICATION_ENABLED !== "false";
 
@@ -15,6 +16,9 @@ const RegisterSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const rateLimitRes = await checkRegisterRateLimit(request);
+  if (rateLimitRes) return rateLimitRes;
+
   const body = await request.json().catch(() => null);
   const parsed = RegisterSchema.safeParse(body);
 
