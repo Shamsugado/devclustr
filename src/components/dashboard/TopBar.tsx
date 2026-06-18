@@ -23,7 +23,7 @@ export default function TopBar({ onMobileMenuClick }: TopBarProps) {
       {/* Logo */}
       <div className="flex items-center gap-2 shrink-0 w-48">
         <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground text-xs font-bold">
-          DS
+          DC
         </div>
         <span className="font-semibold text-foreground text-base">DevClustr</span>
       </div>

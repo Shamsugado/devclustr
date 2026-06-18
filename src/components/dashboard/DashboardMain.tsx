@@ -62,7 +62,11 @@ function StatsCards({ stats }: { stats: DashboardStats }) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {cards.map(({ label, value, icon: Icon, color }) => (
-        <div key={label} className="bg-card border border-border rounded-lg px-4 py-3 flex items-center gap-3">
+        <div
+          key={label}
+          className="bg-card border border-border border-l-4 rounded-lg px-4 py-3 flex items-center gap-3"
+          style={{ borderLeftColor: color }}
+        >
           <div className="shrink-0 p-2 rounded-md bg-background">
             <Icon className="h-4 w-4" style={{ color }} />
           </div>
@@ -78,7 +82,10 @@ function StatsCards({ stats }: { stats: DashboardStats }) {
 
 function CollectionCard({ collection }: { collection: CollectionMeta }) {
   return (
-    <div className="bg-card border border-border rounded-lg p-4 flex flex-col gap-2 relative group cursor-pointer hover:border-border/80 hover:bg-card/80 transition-colors">
+    <div
+      className="bg-card border border-border border-l-4 rounded-lg p-4 flex flex-col gap-2 relative group cursor-pointer hover:bg-card/80 transition-colors"
+      style={{ borderLeftColor: collection.dominantTypeColor }}
+    >
       {collection.isFavorite && (
         <Star className="absolute top-3 right-3 h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
       )}
@@ -113,7 +120,10 @@ function PinnedItemCard({ item }: { item: DashboardItem }) {
   const isUrl = item.contentType === "URL";
 
   return (
-    <div className="bg-card border border-border rounded-lg p-4 flex flex-col gap-2 relative cursor-pointer hover:border-border/80 hover:bg-card/80 transition-colors min-w-0">
+    <div
+      className="bg-card border border-border border-l-4 rounded-lg p-4 flex flex-col gap-2 relative cursor-pointer hover:bg-card/80 transition-colors min-w-0"
+      style={{ borderLeftColor: itemType.color }}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <span
@@ -161,7 +171,10 @@ function RecentItemCard({ item }: { item: DashboardItem }) {
   const Icon = iconMap[itemType.icon] ?? File;
 
   return (
-    <div className="bg-card border border-border rounded-lg p-3 flex flex-col gap-2 cursor-pointer hover:border-border/80 hover:bg-card/80 transition-colors">
+    <div
+      className="bg-card border border-border border-l-4 rounded-lg p-3 flex flex-col gap-2 cursor-pointer hover:bg-card/80 transition-colors"
+      style={{ borderLeftColor: itemType.color }}
+    >
       <div className="flex items-center justify-between">
         <span
           className="flex items-center justify-center h-6 w-6 rounded-md shrink-0"
