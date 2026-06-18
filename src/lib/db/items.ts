@@ -39,3 +39,20 @@ export async function getSystemItemTypes() {
     select: { id: true, name: true, icon: true, color: true },
   });
 }
+
+export async function getItemsByTypeSlug(userId: string, typeSlug: string) {
+  const typeName = typeSlug.slice(0, -1); // "snippets" → "snippet"
+  return prisma.item.findMany({
+    where: {
+      userId,
+      itemType: { name: { equals: typeName, mode: "insensitive" } },
+    },
+    include: {
+      itemType: { select: { id: true, name: true, icon: true, color: true } },
+      tags: { include: { tag: { select: { name: true } } } },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+}
+
+export type ItemWithType = Awaited<ReturnType<typeof getItemsByTypeSlug>>[0];
