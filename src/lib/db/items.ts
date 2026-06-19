@@ -70,6 +70,10 @@ export async function getItemById(id: string, userId: string) {
 
 export type ItemDetail = Awaited<ReturnType<typeof getItemById>>;
 
+export async function deleteItem(id: string, userId: string) {
+  return prisma.item.delete({ where: { id, userId } });
+}
+
 export async function updateItem(
   id: string,
   userId: string,
