@@ -14,13 +14,15 @@ Read these for full project context:
 ## Commands
 
 ```bash
-npm run dev      # Start dev server at http://localhost:3000
-npm run build    # Production build
-npm run start    # Serve production build
-npm run lint     # Run ESLint
+npm run dev        # Start dev server at http://localhost:3000
+npm run build      # Production build
+npm run start      # Serve production build
+npm run lint       # Run ESLint
+npm test           # Run unit tests (Vitest, one-shot)
+npm run test:watch # Run unit tests in watch mode
 ```
 
-No test runner is configured yet.
+Unit tests cover server actions and utilities only (no component tests). Test files live alongside source in `__tests__/` directories or as `*.test.ts` files.
 
 ## Database (Neon MCP)
 
