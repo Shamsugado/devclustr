@@ -1,30 +1,12 @@
-# Current Feature: Item Drawer — Edit Mode
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Edit button in the item drawer action bar toggles inline edit mode (same drawer stays open)
-- In edit mode, Save and Cancel buttons replace the action bar
-- Save persists changes via server action, returns to view mode, refreshes drawer data, and shows a toast
-- Cancel discards changes and returns to view mode
-- Editable fields for all types: Title (required), Description (optional), Tags (comma-separated)
-- Type-specific editable fields: Content (snippet/prompt/command/note), Language (snippet/command), URL (link)
-- Non-editable in edit mode: item type, collections, created/updated dates
-- Zod validation in the server action before hitting the DB; errors surfaced to the client
-- `updateItem` server action in `src/actions/items.ts` with `{ success, data, error }` pattern
-- `updateItem` DB query in `src/lib/db/items.ts` — disconnect/connect-or-create tags; returns updated `ItemDetail`
-- After save, call `router.refresh()` so the card list reflects changes
-
 ## Notes
-
-- No form library — use controlled inputs with local state
-- Disable Save button client-side when title is empty (basic UX guard)
-- Zod is the server-side source of truth for validation
-- Content textarea is plain (no code editor — that comes later)
-- Collections management is out of scope for this feature
 
 ## History
 
@@ -51,3 +33,4 @@ In Progress
 - **2026-06-18** — Items list view complete. Dynamic route `/items/[type]` replaced placeholder with a real DB-backed page. New `getItemsByTypeSlug` DB helper queries items by type slug (case-insensitive name match). `ItemCard` component (`src/components/items/ItemCard.tsx`) shows colored left border, icon, content preview (code block or URL), tags, and relative time. `src/app/items/layout.tsx` wraps the route in `DashboardShell` with sidebar. `src/proxy.ts` extended to protect `/items/*`.
 - **2026-06-19** — Item list three-column layout complete. Grid on `/items/[type]` updated from `grid-cols-1 md:grid-cols-2` to `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` — one-line change in `src/app/items/[type]/page.tsx`.
 - **2026-06-19** — Item drawer complete. Clicking any `ItemCard` on `/dashboard` or `/items/[type]` opens a right-side shadcn Sheet. Full item detail (title, type/language badges, description, content, tags, collections, created/updated dates) fetched on click via `GET /api/items/[id]`. Action bar: Favorite, Pin, Copy, Edit, Delete (trash right-aligned). Skeleton loading state while fetching. `ItemListClient` and `DashboardMain` ("use client") are client wrappers managing drawer state so server pages stay server components. `getItemById` DB helper added to `src/lib/db/items.ts`. shadcn `Sheet` component added.
+- **2026-06-19** — Item drawer edit mode complete. Edit button in the action bar switches the drawer inline to edit mode (same Sheet stays open). Fields pre-populated from current item; type-specific fields shown per type (Content for snippet/prompt/command/note, Language for snippet/command, URL for link). Save/Cancel bar replaces the action bar. `updateItem` server action in `src/actions/items.ts` (Zod-validated, ownership-checked, `{ success, data, error }` pattern). `updateItem` DB helper in `src/lib/db/items.ts` (disconnect-all/connect-or-create tags, returns updated `ItemDetail`). `router.refresh()` syncs the card list after save. Sonner toast on save success/error. `sonner` installed; `<Toaster>` added to root layout. Save disabled client-side when title is empty. Unit tests for schema validation and action behavior in `src/actions/__tests__/items.test.ts`.
