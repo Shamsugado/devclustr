@@ -56,3 +56,16 @@ export async function getItemsByTypeSlug(userId: string, typeSlug: string) {
 }
 
 export type ItemWithType = Awaited<ReturnType<typeof getItemsByTypeSlug>>[0];
+
+export async function getItemById(id: string, userId: string) {
+  return prisma.item.findFirst({
+    where: { id, userId },
+    include: {
+      itemType: { select: { id: true, name: true, icon: true, color: true } },
+      tags: { include: { tag: { select: { name: true } } } },
+      collections: { include: { collection: { select: { id: true, name: true } } } },
+    },
+  });
+}
+
+export type ItemDetail = Awaited<ReturnType<typeof getItemById>>;
