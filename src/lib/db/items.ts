@@ -69,3 +69,43 @@ export async function getItemById(id: string, userId: string) {
 }
 
 export type ItemDetail = Awaited<ReturnType<typeof getItemById>>;
+
+export async function updateItem(
+  id: string,
+  userId: string,
+  data: {
+    title: string;
+    description: string | null;
+    content: string | null;
+    url: string | null;
+    language: string | null;
+    tags: string[];
+  }
+) {
+  return prisma.item.update({
+    where: { id, userId },
+    data: {
+      title: data.title,
+      description: data.description,
+      content: data.content,
+      url: data.url,
+      language: data.language,
+      tags: {
+        deleteMany: {},
+        create: data.tags.map((name) => ({
+          tag: {
+            connectOrCreate: {
+              where: { name },
+              create: { name },
+            },
+          },
+        })),
+      },
+    },
+    include: {
+      itemType: { select: { id: true, name: true, icon: true, color: true } },
+      tags: { include: { tag: { select: { name: true } } } },
+      collections: { include: { collection: { select: { id: true, name: true } } } },
+    },
+  });
+}
