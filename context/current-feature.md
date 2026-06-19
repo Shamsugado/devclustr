@@ -1,23 +1,12 @@
-# Current Feature: Item Drawer
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Clicking an `ItemCard` opens a right-side slide-in Sheet (shadcn) with that item's full data
-- Works on both the dashboard and items list pages
-- Action bar with: Favorite (star, yellow when active), Pin, Copy, Edit (pencil), and Delete (trash, right-aligned)
-- Drawer shows a skeleton/loading state while fetching; fetch happens on click (no page navigation)
-- Client wrapper component manages drawer state so server component pages remain server components
-- `GET /api/items/[id]` route returns full item detail; auth-checked; DB query in `lib/db/items.ts`
-- Card-level data (title, description, tags, etc.) stays fetched by the server component as before
-
 ## Notes
-
-- No code editor or item-specific extras yet — just drawer shell + detail display + action bar
-- Reference screenshot: `context/screenshots/dashboard-ui-drawer.png`
 
 ## History
 
@@ -43,3 +32,4 @@ In Progress
 - **2026-06-17** — Rate limiting complete. `@upstash/ratelimit` + `@upstash/redis` installed. New `src/lib/rate-limit.ts` utility with sliding-window limiters for all 5 auth endpoints. Route handlers (register, forgot-password, reset-password, resend-verification) check rate limits before processing. Login rate limiting wired into NextAuth `authorize` via `RateLimitedError` (code `rate_limited`); SignInForm surfaces the error. Fails open when Upstash is unavailable. `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` added to `.env.example`.
 - **2026-06-18** — Items list view complete. Dynamic route `/items/[type]` replaced placeholder with a real DB-backed page. New `getItemsByTypeSlug` DB helper queries items by type slug (case-insensitive name match). `ItemCard` component (`src/components/items/ItemCard.tsx`) shows colored left border, icon, content preview (code block or URL), tags, and relative time. `src/app/items/layout.tsx` wraps the route in `DashboardShell` with sidebar. `src/proxy.ts` extended to protect `/items/*`.
 - **2026-06-19** — Item list three-column layout complete. Grid on `/items/[type]` updated from `grid-cols-1 md:grid-cols-2` to `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` — one-line change in `src/app/items/[type]/page.tsx`.
+- **2026-06-19** — Item drawer complete. Clicking any `ItemCard` on `/dashboard` or `/items/[type]` opens a right-side shadcn Sheet. Full item detail (title, type/language badges, description, content, tags, collections, created/updated dates) fetched on click via `GET /api/items/[id]`. Action bar: Favorite, Pin, Copy, Edit, Delete (trash right-aligned). Skeleton loading state while fetching. `ItemListClient` and `DashboardMain` ("use client") are client wrappers managing drawer state so server pages stay server components. `getItemById` DB helper added to `src/lib/db/items.ts`. shadcn `Sheet` component added.
