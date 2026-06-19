@@ -1,23 +1,12 @@
-# Current Feature: Item Delete
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Clicking the delete (trash) button in the item drawer opens a ShadCN `AlertDialog` asking the user to confirm deletion
-- Confirming the dialog calls a `deleteItem` server action that removes the item from the DB
-- On success, the drawer closes, the item list refreshes, and a Sonner toast confirms deletion
-- On error, a Sonner toast surfaces the error message
-- The `deleteItem` server action is ownership-checked (user can only delete their own items) and Zod-validated
-
 ## Notes
-
-- ShadCN `AlertDialog` component may need to be added (`npx shadcn@latest add alert-dialog`)
-- Sonner `<Toaster>` is already in the root layout from the edit-mode feature
-- Follow the `{ success, data, error }` pattern used by `updateItem` in `src/actions/items.ts`
-- After deletion, call `router.refresh()` to sync the item list (same pattern as edit save)
 
 ## History
 
@@ -45,3 +34,4 @@ In Progress
 - **2026-06-19** — Item list three-column layout complete. Grid on `/items/[type]` updated from `grid-cols-1 md:grid-cols-2` to `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` — one-line change in `src/app/items/[type]/page.tsx`.
 - **2026-06-19** — Item drawer complete. Clicking any `ItemCard` on `/dashboard` or `/items/[type]` opens a right-side shadcn Sheet. Full item detail (title, type/language badges, description, content, tags, collections, created/updated dates) fetched on click via `GET /api/items/[id]`. Action bar: Favorite, Pin, Copy, Edit, Delete (trash right-aligned). Skeleton loading state while fetching. `ItemListClient` and `DashboardMain` ("use client") are client wrappers managing drawer state so server pages stay server components. `getItemById` DB helper added to `src/lib/db/items.ts`. shadcn `Sheet` component added.
 - **2026-06-19** — Item drawer edit mode complete. Edit button in the action bar switches the drawer inline to edit mode (same Sheet stays open). Fields pre-populated from current item; type-specific fields shown per type (Content for snippet/prompt/command/note, Language for snippet/command, URL for link). Save/Cancel bar replaces the action bar. `updateItem` server action in `src/actions/items.ts` (Zod-validated, ownership-checked, `{ success, data, error }` pattern). `updateItem` DB helper in `src/lib/db/items.ts` (disconnect-all/connect-or-create tags, returns updated `ItemDetail`). `router.refresh()` syncs the card list after save. Sonner toast on save success/error. `sonner` installed; `<Toaster>` added to root layout. Save disabled client-side when title is empty. Unit tests for schema validation and action behavior in `src/actions/__tests__/items.test.ts`.
+- **2026-06-19** — Item delete complete. Trash button in item drawer opens a Base UI `AlertDialog` asking for confirmation. Confirming calls `deleteItem` server action (ownership-checked), closes the drawer, refreshes the item list via `router.refresh()`, and shows a Sonner success toast. `deleteItem` DB helper added to `src/lib/db/items.ts`. `AlertDialogAction` in `src/components/ui/alert-dialog.tsx` fixed to wrap `AlertDialogPrimitive.Close` so it dismisses on click. `UpdateItemSchema` extracted to `src/actions/item-schemas.ts` to fix a latent "use server" non-function export violation. 4 unit tests added for `deleteItem` action.
