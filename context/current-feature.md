@@ -1,12 +1,23 @@
-# Current Feature
+# Current Feature: Item Delete
 
 ## Status
 
-Completed
+In Progress
 
 ## Goals
 
+- Clicking the delete (trash) button in the item drawer opens a ShadCN `AlertDialog` asking the user to confirm deletion
+- Confirming the dialog calls a `deleteItem` server action that removes the item from the DB
+- On success, the drawer closes, the item list refreshes, and a Sonner toast confirms deletion
+- On error, a Sonner toast surfaces the error message
+- The `deleteItem` server action is ownership-checked (user can only delete their own items) and Zod-validated
+
 ## Notes
+
+- ShadCN `AlertDialog` component may need to be added (`npx shadcn@latest add alert-dialog`)
+- Sonner `<Toaster>` is already in the root layout from the edit-mode feature
+- Follow the `{ success, data, error }` pattern used by `updateItem` in `src/actions/items.ts`
+- After deletion, call `router.refresh()` to sync the item list (same pattern as edit save)
 
 ## History
 

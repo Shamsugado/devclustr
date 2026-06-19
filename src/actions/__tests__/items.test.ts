@@ -1,11 +1,12 @@
 import { vi, describe, it, expect } from "vitest";
 
 vi.mock("@/auth", () => ({ auth: vi.fn() }));
-vi.mock("@/lib/db/items", () => ({ updateItem: vi.fn() }));
+vi.mock("@/lib/db/items", () => ({ updateItem: vi.fn(), deleteItem: vi.fn() }));
 
-const { UpdateItemSchema, updateItem } = await import("@/actions/items");
+const { UpdateItemSchema } = await import("@/actions/item-schemas");
+const { updateItem, deleteItem } = await import("@/actions/items");
 const { auth } = await import("@/auth");
-const { updateItem: updateItemInDb } = await import("@/lib/db/items");
+const { updateItem: updateItemInDb, deleteItem: deleteItemInDb } = await import("@/lib/db/items");
 
 const base = {
   title: "My Snippet",
@@ -131,5 +132,33 @@ describe("updateItem action", () => {
     vi.mocked(updateItemInDb).mockRejectedValueOnce(new Error("DB error"));
     const result = await updateItem("item-1", base);
     expect(result).toEqual({ success: false, error: "Failed to update item" });
+  });
+});
+
+describe("deleteItem action", () => {
+  it("returns Unauthorized when not authenticated", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null);
+    const result = await deleteItem("item-1");
+    expect(result).toEqual({ success: false, error: "Unauthorized" });
+  });
+
+  it("returns Invalid item ID when itemId is empty string", async () => {
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: "user-1" } } as never);
+    const result = await deleteItem("");
+    expect(result).toEqual({ success: false, error: "Invalid item ID" });
+  });
+
+  it("returns success on successful deletion", async () => {
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: "user-1" } } as never);
+    vi.mocked(deleteItemInDb).mockResolvedValueOnce(undefined as never);
+    const result = await deleteItem("item_abc");
+    expect(result).toEqual({ success: true });
+  });
+
+  it("returns error string when DB throws", async () => {
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: "user-1" } } as never);
+    vi.mocked(deleteItemInDb).mockRejectedValueOnce(new Error("DB error"));
+    const result = await deleteItem("item_abc");
+    expect(result).toEqual({ success: false, error: "Failed to delete item" });
   });
 });

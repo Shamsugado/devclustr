@@ -10,8 +10,19 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { itemTypeIconMap } from "@/lib/item-type-icons";
-import { updateItem } from "@/actions/items";
+import { updateItem, deleteItem } from "@/actions/items";
 import type { ItemDetail } from "@/lib/db/items";
 
 type ItemFull = NonNullable<ItemDetail>;
@@ -58,7 +69,17 @@ function DrawerSkeleton() {
   );
 }
 
-function ActionBar({ item, onEdit }: { item: ItemFull; onEdit: () => void }) {
+function ActionBar({
+  item,
+  onEdit,
+  onDelete,
+  isDeleting,
+}: {
+  item: ItemFull;
+  onEdit: () => void;
+  onDelete: () => void;
+  isDeleting: boolean;
+}) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -92,9 +113,31 @@ function ActionBar({ item, onEdit }: { item: ItemFull; onEdit: () => void }) {
         <Pencil className="h-4 w-4" />
         Edit
       </button>
-      <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-red-400 transition-colors ml-auto">
-        <Trash2 className="h-4 w-4" />
-      </button>
+      <AlertDialog>
+        <AlertDialogTrigger
+          disabled={isDeleting}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-red-400 transition-colors ml-auto disabled:opacity-50"
+        >
+          <Trash2 className="h-4 w-4" />
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              &ldquo;{item.title}&rdquo; will be permanently deleted. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -139,7 +182,17 @@ function DetailSection({ label, children }: { label: string; children: React.Rea
   );
 }
 
-function ItemDrawerContent({ item, onEdit }: { item: ItemFull; onEdit: () => void }) {
+function ItemDrawerContent({
+  item,
+  onEdit,
+  onDelete,
+  isDeleting,
+}: {
+  item: ItemFull;
+  onEdit: () => void;
+  onDelete: () => void;
+  isDeleting: boolean;
+}) {
   const { itemType } = item;
   const Icon = itemTypeIconMap[itemType.icon] ?? File;
   const isUrl = item.contentType === "URL";
@@ -174,7 +227,7 @@ function ItemDrawerContent({ item, onEdit }: { item: ItemFull; onEdit: () => voi
       </SheetHeader>
 
       <div className="px-6">
-        <ActionBar item={item} onEdit={onEdit} />
+        <ActionBar item={item} onEdit={onEdit} onDelete={onDelete} isDeleting={isDeleting} />
       </div>
 
       <div className="px-6 pb-6 flex flex-col gap-5 overflow-y-auto">
@@ -382,6 +435,7 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
     tags: "",
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!itemId) {
@@ -410,6 +464,20 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
 
   function handleFormChange(field: keyof EditForm, value: string) {
     setEditForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handleDelete() {
+    if (!itemId) return;
+    setIsDeleting(true);
+    const result = await deleteItem(itemId);
+    setIsDeleting(false);
+    if (result.success) {
+      toast.success("Item deleted");
+      onClose();
+      router.refresh();
+    } else {
+      toast.error(result.error ?? "Failed to delete item");
+    }
   }
 
   async function handleSave() {
@@ -450,7 +518,7 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
       >
         {loading && <DrawerSkeleton />}
         {!loading && item && !isEditing && (
-          <ItemDrawerContent item={item} onEdit={handleEdit} />
+          <ItemDrawerContent item={item} onEdit={handleEdit} onDelete={handleDelete} isDeleting={isDeleting} />
         )}
         {!loading && item && isEditing && (
           <ItemDrawerEditContent

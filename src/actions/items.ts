@@ -1,17 +1,26 @@
 "use server";
 
-import { z } from "zod";
 import { auth } from "@/auth";
-import { updateItem as updateItemInDb } from "@/lib/db/items";
+import { updateItem as updateItemInDb, deleteItem as deleteItemInDb } from "@/lib/db/items";
+import { UpdateItemSchema } from "@/actions/item-schemas";
 
-export const UpdateItemSchema = z.object({
-  title: z.string().trim().min(1, "Title is required"),
-  description: z.string().trim().nullable(),
-  content: z.string().nullable(),
-  url: z.url("Invalid URL").nullable(),
-  language: z.string().trim().nullable(),
-  tags: z.array(z.string().trim().min(1)),
-});
+export async function deleteItem(itemId: string) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false as const, error: "Unauthorized" };
+  }
+
+  if (!itemId) {
+    return { success: false as const, error: "Invalid item ID" };
+  }
+
+  try {
+    await deleteItemInDb(itemId, session.user.id);
+    return { success: true as const };
+  } catch {
+    return { success: false as const, error: "Failed to delete item" };
+  }
+}
 
 export async function updateItem(
   itemId: string,
