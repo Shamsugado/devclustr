@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   Code,
   Sparkles,
@@ -12,6 +15,7 @@ import {
   FolderOpen,
   Clock,
 } from "lucide-react";
+import ItemDrawer from "@/components/items/ItemDrawer";
 import type { CollectionMeta } from "@/lib/db/collections";
 import type { getPinnedItems, getRecentItems } from "@/lib/db/items";
 
@@ -114,7 +118,7 @@ function CollectionCard({ collection }: { collection: CollectionMeta }) {
   );
 }
 
-function PinnedItemCard({ item }: { item: DashboardItem }) {
+function PinnedItemCard({ item, onItemClick }: { item: DashboardItem; onItemClick: (id: string) => void }) {
   const { itemType } = item;
   const Icon = iconMap[itemType.icon] ?? File;
   const isUrl = item.contentType === "URL";
@@ -123,6 +127,7 @@ function PinnedItemCard({ item }: { item: DashboardItem }) {
     <div
       className="bg-card border border-border border-l-4 rounded-lg p-4 flex flex-col gap-2 relative cursor-pointer hover:bg-card/80 transition-colors min-w-0"
       style={{ borderLeftColor: itemType.color }}
+      onClick={() => onItemClick(item.id)}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
@@ -166,7 +171,7 @@ function PinnedItemCard({ item }: { item: DashboardItem }) {
   );
 }
 
-function RecentItemCard({ item }: { item: DashboardItem }) {
+function RecentItemCard({ item, onItemClick }: { item: DashboardItem; onItemClick: (id: string) => void }) {
   const { itemType } = item;
   const Icon = iconMap[itemType.icon] ?? File;
 
@@ -174,6 +179,7 @@ function RecentItemCard({ item }: { item: DashboardItem }) {
     <div
       className="bg-card border border-border border-l-4 rounded-lg p-3 flex flex-col gap-2 cursor-pointer hover:bg-card/80 transition-colors"
       style={{ borderLeftColor: itemType.color }}
+      onClick={() => onItemClick(item.id)}
     >
       <div className="flex items-center justify-between">
         <span
@@ -215,7 +221,10 @@ export default function DashboardMain({
   pinnedItems,
   recentItems,
 }: DashboardMainProps) {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
   return (
+    <>
     <div className="space-y-6 pb-6">
       {/* Stats */}
       <StatsCards stats={stats} />
@@ -239,7 +248,7 @@ export default function DashboardMain({
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {pinnedItems.map((item) => (
-              <PinnedItemCard key={item.id} item={item} />
+              <PinnedItemCard key={item.id} item={item} onItemClick={setSelectedId} />
             ))}
           </div>
         </section>
@@ -250,10 +259,12 @@ export default function DashboardMain({
         <h2 className="text-base font-semibold text-foreground mb-3">All Items</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {recentItems.map((item) => (
-            <RecentItemCard key={item.id} item={item} />
+            <RecentItemCard key={item.id} item={item} onItemClick={setSelectedId} />
           ))}
         </div>
       </section>
     </div>
+    <ItemDrawer itemId={selectedId} onClose={() => setSelectedId(null)} />
+    </>
   );
 }

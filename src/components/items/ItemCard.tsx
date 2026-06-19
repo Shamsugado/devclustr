@@ -11,7 +11,7 @@ function formatRelativeTime(date: Date | null): string {
   return `${days}d ago`;
 }
 
-export default function ItemCard({ item }: { item: ItemWithType }) {
+export default function ItemCard({ item, onClick }: { item: ItemWithType; onClick?: () => void }) {
   const { itemType } = item;
   const Icon = itemTypeIconMap[itemType.icon] ?? File;
   const isUrl = item.contentType === "URL";
@@ -20,6 +20,7 @@ export default function ItemCard({ item }: { item: ItemWithType }) {
     <div
       className="bg-card border border-border border-l-4 rounded-lg p-4 flex flex-col gap-2 cursor-pointer hover:bg-card/80 transition-colors"
       style={{ borderLeftColor: itemType.color }}
+      onClick={onClick}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
