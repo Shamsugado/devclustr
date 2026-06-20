@@ -15,6 +15,7 @@ import {
 import { itemTypeIconMap } from "@/lib/item-type-icons";
 import { createItem } from "@/actions/items";
 import CodeEditor from "@/components/items/CodeEditor";
+import MarkdownEditor from "@/components/items/MarkdownEditor";
 import type { SidebarItemType } from "@/components/dashboard/Sidebar";
 
 const ALLOWED_TYPES = ["snippet", "prompt", "command", "note", "link"];
@@ -66,6 +67,7 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
   const isLink = typeName === "link";
   const showContent = !isLink;
   const showLanguage = typeName === "snippet" || typeName === "command";
+  const showMarkdown = typeName === "note" || typeName === "prompt";
 
   function handleTypeSelect(id: string) {
     setSelectedTypeId(id);
@@ -180,6 +182,11 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
                   value={form.content}
                   onChange={(v) => handleChange("content", v)}
                   language={form.language || undefined}
+                />
+              ) : showMarkdown ? (
+                <MarkdownEditor
+                  value={form.content}
+                  onChange={(v) => handleChange("content", v)}
                 />
               ) : (
                 <textarea
