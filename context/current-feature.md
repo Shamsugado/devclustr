@@ -1,12 +1,25 @@
-# Current Feature
+# Current Feature: Code Editor
 
 ## Status
 
-Completed
+In Progress
 
 ## Goals
 
+- Create a `CodeEditor` component using Monaco Editor with dark theme
+- Replace `Textarea` with `CodeEditor` for snippet and command item types only
+- Keep `Textarea` for notes, prompts, and other non-code types
+- Add macOS-style window dots (red/yellow/green) at the top of the editor
+- Add a quick copy button in the editor header
+- Show the language label in the editor header next to the copy button
+- Support both display (readonly) and edit modes
+- Make editor height fluid with a max height of 400px and a styled scrollbar that matches the dark theme
+
 ## Notes
+
+- Monaco Editor should be loaded lazily (dynamic import) to avoid SSR issues in Next.js
+- The component must handle the read-only/editable toggle cleanly since the drawer uses both modes
+- Affects: `ItemCard` content preview, item drawer display view, and item drawer edit mode
 
 ## History
 

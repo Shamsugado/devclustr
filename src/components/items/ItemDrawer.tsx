@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { itemTypeIconMap } from "@/lib/item-type-icons";
 import { updateItem, deleteItem } from "@/actions/items";
+import CodeEditor from "@/components/items/CodeEditor";
 import type { ItemDetail } from "@/lib/db/items";
 
 type ItemFull = NonNullable<ItemDetail>;
@@ -196,6 +197,8 @@ function ItemDrawerContent({
   const { itemType } = item;
   const Icon = itemTypeIconMap[itemType.icon] ?? File;
   const isUrl = item.contentType === "URL";
+  const typeName = itemType.name.toLowerCase();
+  const isCodeType = typeName === "snippet" || typeName === "command";
 
   const formatDate = (d: Date) =>
     new Date(d).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -247,6 +250,12 @@ function ItemDrawerContent({
             >
               {item.url}
             </a>
+          ) : isCodeType ? (
+            <CodeEditor
+              value={item.content ?? ""}
+              language={item.language ?? undefined}
+              readOnly
+            />
           ) : (
             <pre className="text-xs text-muted-foreground bg-background rounded-md p-3 overflow-x-auto font-mono whitespace-pre-wrap break-all border border-border max-h-64">
               {item.content}
@@ -380,13 +389,21 @@ function ItemDrawerEditContent({
 
         {!isUrl && (
           <DetailSection label="Content">
-            <textarea
-              value={form.content}
-              onChange={(e) => onChange("content", e.target.value)}
-              placeholder="Content…"
-              rows={8}
-              className="w-full text-xs bg-background border border-border rounded-md px-3 py-2 text-foreground font-mono resize-none outline-none focus:border-primary placeholder:text-muted-foreground"
-            />
+            {showLanguage ? (
+              <CodeEditor
+                value={form.content}
+                onChange={(v) => onChange("content", v)}
+                language={form.language || undefined}
+              />
+            ) : (
+              <textarea
+                value={form.content}
+                onChange={(e) => onChange("content", e.target.value)}
+                placeholder="Content…"
+                rows={8}
+                className="w-full text-xs bg-background border border-border rounded-md px-3 py-2 text-foreground font-mono resize-none outline-none focus:border-primary placeholder:text-muted-foreground"
+              />
+            )}
           </DetailSection>
         )}
 
@@ -447,7 +464,7 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
     setItem(null);
     setIsEditing(false);
     fetch(`/api/items/${itemId}`)
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : null))
       .then((data) => setItem(data))
       .finally(() => setLoading(false));
   }, [itemId]);

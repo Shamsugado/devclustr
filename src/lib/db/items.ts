@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 
 export async function getDashboardStats(userId: string) {
@@ -33,12 +34,12 @@ export async function getRecentItems(userId: string, limit = 10) {
   });
 }
 
-export async function getSystemItemTypes() {
+export const getSystemItemTypes = cache(async () => {
   return prisma.itemType.findMany({
     where: { isSystem: true },
     select: { id: true, name: true, icon: true, color: true },
   });
-}
+});
 
 export async function getItemsByTypeSlug(userId: string, typeSlug: string) {
   const typeName = typeSlug.slice(0, -1); // "snippets" → "snippet"

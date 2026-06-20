@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { itemTypeIconMap } from "@/lib/item-type-icons";
 import { createItem } from "@/actions/items";
+import CodeEditor from "@/components/items/CodeEditor";
 import type { SidebarItemType } from "@/components/dashboard/Sidebar";
 
 const ALLOWED_TYPES = ["snippet", "prompt", "command", "note", "link"];
@@ -44,13 +45,19 @@ interface NewItemDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   itemTypes: SidebarItemType[];
+  initialTypeId?: string;
 }
 
-export default function NewItemDialog({ open, onOpenChange, itemTypes }: NewItemDialogProps) {
+export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTypeId }: NewItemDialogProps) {
   const router = useRouter();
   const allowedTypes = itemTypes.filter((t) => ALLOWED_TYPES.includes(t.name.toLowerCase()));
 
-  const [selectedTypeId, setSelectedTypeId] = useState<string>(() => allowedTypes[0]?.id ?? "");
+  const defaultTypeId = () => {
+    if (initialTypeId && allowedTypes.find((t) => t.id === initialTypeId)) return initialTypeId;
+    return allowedTypes[0]?.id ?? "";
+  };
+
+  const [selectedTypeId, setSelectedTypeId] = useState<string>(defaultTypeId);
   const [form, setForm] = useState<CreateForm>(emptyForm);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -72,7 +79,7 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes }: NewItem
   function handleOpenChange(next: boolean) {
     if (!next) {
       setForm(emptyForm());
-      setSelectedTypeId(allowedTypes[0]?.id ?? "");
+      setSelectedTypeId(defaultTypeId());
     }
     onOpenChange(next);
   }
@@ -168,13 +175,21 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes }: NewItem
           {/* Content (text types) */}
           {showContent && (
             <DetailSection label="Content">
-              <textarea
-                value={form.content}
-                onChange={(e) => handleChange("content", e.target.value)}
-                placeholder="Content…"
-                rows={5}
-                className="w-full text-xs bg-background border border-border rounded-md px-3 py-2 text-foreground font-mono resize-none outline-none focus:border-primary placeholder:text-muted-foreground"
-              />
+              {showLanguage ? (
+                <CodeEditor
+                  value={form.content}
+                  onChange={(v) => handleChange("content", v)}
+                  language={form.language || undefined}
+                />
+              ) : (
+                <textarea
+                  value={form.content}
+                  onChange={(e) => handleChange("content", e.target.value)}
+                  placeholder="Content…"
+                  rows={5}
+                  className="w-full text-xs bg-background border border-border rounded-md px-3 py-2 text-foreground font-mono resize-none outline-none focus:border-primary placeholder:text-muted-foreground"
+                />
+              )}
             </DetailSection>
           )}
 
