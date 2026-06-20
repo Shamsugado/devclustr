@@ -1,25 +1,12 @@
-# Current Feature: Code Editor
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Create a `CodeEditor` component using Monaco Editor with dark theme
-- Replace `Textarea` with `CodeEditor` for snippet and command item types only
-- Keep `Textarea` for notes, prompts, and other non-code types
-- Add macOS-style window dots (red/yellow/green) at the top of the editor
-- Add a quick copy button in the editor header
-- Show the language label in the editor header next to the copy button
-- Support both display (readonly) and edit modes
-- Make editor height fluid with a max height of 400px and a styled scrollbar that matches the dark theme
-
 ## Notes
-
-- Monaco Editor should be loaded lazily (dynamic import) to avoid SSR issues in Next.js
-- The component must handle the read-only/editable toggle cleanly since the drawer uses both modes
-- Affects: `ItemCard` content preview, item drawer display view, and item drawer edit mode
 
 ## History
 
@@ -47,5 +34,6 @@ In Progress
 - **2026-06-19** — Item list three-column layout complete. Grid on `/items/[type]` updated from `grid-cols-1 md:grid-cols-2` to `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` — one-line change in `src/app/items/[type]/page.tsx`.
 - **2026-06-19** — Item drawer complete. Clicking any `ItemCard` on `/dashboard` or `/items/[type]` opens a right-side shadcn Sheet. Full item detail (title, type/language badges, description, content, tags, collections, created/updated dates) fetched on click via `GET /api/items/[id]`. Action bar: Favorite, Pin, Copy, Edit, Delete (trash right-aligned). Skeleton loading state while fetching. `ItemListClient` and `DashboardMain` ("use client") are client wrappers managing drawer state so server pages stay server components. `getItemById` DB helper added to `src/lib/db/items.ts`. shadcn `Sheet` component added.
 - **2026-06-19** — Item drawer edit mode complete. Edit button in the action bar switches the drawer inline to edit mode (same Sheet stays open). Fields pre-populated from current item; type-specific fields shown per type (Content for snippet/prompt/command/note, Language for snippet/command, URL for link). Save/Cancel bar replaces the action bar. `updateItem` server action in `src/actions/items.ts` (Zod-validated, ownership-checked, `{ success, data, error }` pattern). `updateItem` DB helper in `src/lib/db/items.ts` (disconnect-all/connect-or-create tags, returns updated `ItemDetail`). `router.refresh()` syncs the card list after save. Sonner toast on save success/error. `sonner` installed; `<Toaster>` added to root layout. Save disabled client-side when title is empty. Unit tests for schema validation and action behavior in `src/actions/__tests__/items.test.ts`.
-- **2026-06-20** — Item create complete. "New Item" button in top bar opens a Base UI Dialog modal. Type selector (snippet, prompt, command, note, link — pro types excluded) toggles type-specific fields: content/language for snippets/commands, content-only for prompts/notes, URL (required) for links. `createItem` server action (Zod-validated, auth-checked, `{ success, data, error }` pattern) and `createItem` DB helper in `src/lib/db/items.ts` (connect-or-create tags). `CreateItemSchema` added to `src/actions/item-schemas.ts`. `TopBar` now accepts `itemTypes` prop threaded from `DashboardShell`. Toast on success, dialog resets/closes, item list refreshes via `router.refresh()`. 18 unit tests added for schema and action.
 - **2026-06-19** — Item delete complete. Trash button in item drawer opens a Base UI `AlertDialog` asking for confirmation. Confirming calls `deleteItem` server action (ownership-checked), closes the drawer, refreshes the item list via `router.refresh()`, and shows a Sonner success toast. `deleteItem` DB helper added to `src/lib/db/items.ts`. `AlertDialogAction` in `src/components/ui/alert-dialog.tsx` fixed to wrap `AlertDialogPrimitive.Close` so it dismisses on click. `UpdateItemSchema` extracted to `src/actions/item-schemas.ts` to fix a latent "use server" non-function export violation. 4 unit tests added for `deleteItem` action.
+- **2026-06-20** — Item create complete. "New Item" button in top bar opens a Base UI Dialog modal. Type selector (snippet, prompt, command, note, link — pro types excluded) toggles type-specific fields: content/language for snippets/commands, content-only for prompts/notes, URL (required) for links. `createItem` server action (Zod-validated, auth-checked, `{ success, data, error }` pattern) and `createItem` DB helper in `src/lib/db/items.ts` (connect-or-create tags). `CreateItemSchema` added to `src/actions/item-schemas.ts`. `TopBar` now accepts `itemTypes` prop threaded from `DashboardShell`. Toast on success, dialog resets/closes, item list refreshes via `router.refresh()`. 18 unit tests added for schema and action.
+- **2026-06-20** — Code editor complete. `CodeEditor` component (`src/components/items/CodeEditor.tsx`) uses Monaco Editor (dark theme, lazy-loaded via `next/dynamic`) with a macOS-style header (red/yellow/green dots, language label, copy button). Replaces `textarea`/`pre` for snippet and command types in item drawer display and edit modes; other types keep `textarea`. Height is fluid up to 360px (400px including header) with a slim themed scrollbar. `AddTypeButton` client component added — each `/items/[type]` page shows a type-specific "Add X" button that opens `NewItemDialog` pre-selecting the correct type via new `initialTypeId` prop. `getSystemItemTypes` wrapped with `React.cache` to deduplicate the DB call between layout and page.
