@@ -24,6 +24,7 @@ import {
 import { itemTypeIconMap } from "@/lib/item-type-icons";
 import { updateItem, deleteItem } from "@/actions/items";
 import CodeEditor from "@/components/items/CodeEditor";
+import MarkdownEditor from "@/components/items/MarkdownEditor";
 import type { ItemDetail } from "@/lib/db/items";
 
 type ItemFull = NonNullable<ItemDetail>;
@@ -199,6 +200,7 @@ function ItemDrawerContent({
   const isUrl = item.contentType === "URL";
   const typeName = itemType.name.toLowerCase();
   const isCodeType = typeName === "snippet" || typeName === "command";
+  const isMarkdownType = typeName === "note" || typeName === "prompt";
 
   const formatDate = (d: Date) =>
     new Date(d).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -256,6 +258,8 @@ function ItemDrawerContent({
               language={item.language ?? undefined}
               readOnly
             />
+          ) : isMarkdownType ? (
+            <MarkdownEditor value={item.content ?? ""} readOnly />
           ) : (
             <pre className="text-xs text-muted-foreground bg-background rounded-md p-3 overflow-x-auto font-mono whitespace-pre-wrap break-all border border-border max-h-64">
               {item.content}
@@ -334,6 +338,7 @@ function ItemDrawerEditContent({
   const isUrl = item.contentType === "URL";
   const typeName = itemType.name.toLowerCase();
   const showLanguage = typeName === "snippet" || typeName === "command";
+  const showMarkdown = typeName === "note" || typeName === "prompt";
 
   return (
     <>
@@ -394,6 +399,11 @@ function ItemDrawerEditContent({
                 value={form.content}
                 onChange={(v) => onChange("content", v)}
                 language={form.language || undefined}
+              />
+            ) : showMarkdown ? (
+              <MarkdownEditor
+                value={form.content}
+                onChange={(v) => onChange("content", v)}
               />
             ) : (
               <textarea
