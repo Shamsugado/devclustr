@@ -1,26 +1,12 @@
-# Current Feature: Markdown Editor
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Create `MarkdownEditor` component with tabbed Write/Preview interface
-- Replace `Textarea` with `MarkdownEditor` for notes and prompts only (CodeEditor stays for snippets/commands)
-- Use `react-markdown` + `remark-gfm` for GitHub Flavored Markdown rendering
-- Match existing dark theme styling (bg-[#1e1e1e] container, bg-[#2d2d2d] header)
-- Add copy button in header (same style as CodeEditor)
-- Support both display (readonly) and edit modes — readonly shows Preview tab only, edit mode defaults to Write
-- Proper markdown styling: headings, code blocks, inline code, lists, blockquotes, links, tables
-- Use `.markdown-preview` custom CSS class for reliable dark mode styling
-- Fluid height up to 400px matching CodeEditor
-
 ## Notes
-
-- Integration points: NewItemDialog (note/prompt content), ItemDrawer edit mode (note/prompt content), ItemDrawer view mode (readonly)
-- No changes to CodeEditor or snippet/command types
-- Spec: context/features/markdown-editor-spec.md
 
 ## History
 
@@ -51,3 +37,4 @@ In Progress
 - **2026-06-19** — Item delete complete. Trash button in item drawer opens a Base UI `AlertDialog` asking for confirmation. Confirming calls `deleteItem` server action (ownership-checked), closes the drawer, refreshes the item list via `router.refresh()`, and shows a Sonner success toast. `deleteItem` DB helper added to `src/lib/db/items.ts`. `AlertDialogAction` in `src/components/ui/alert-dialog.tsx` fixed to wrap `AlertDialogPrimitive.Close` so it dismisses on click. `UpdateItemSchema` extracted to `src/actions/item-schemas.ts` to fix a latent "use server" non-function export violation. 4 unit tests added for `deleteItem` action.
 - **2026-06-20** — Item create complete. "New Item" button in top bar opens a Base UI Dialog modal. Type selector (snippet, prompt, command, note, link — pro types excluded) toggles type-specific fields: content/language for snippets/commands, content-only for prompts/notes, URL (required) for links. `createItem` server action (Zod-validated, auth-checked, `{ success, data, error }` pattern) and `createItem` DB helper in `src/lib/db/items.ts` (connect-or-create tags). `CreateItemSchema` added to `src/actions/item-schemas.ts`. `TopBar` now accepts `itemTypes` prop threaded from `DashboardShell`. Toast on success, dialog resets/closes, item list refreshes via `router.refresh()`. 18 unit tests added for schema and action.
 - **2026-06-20** — Code editor complete. `CodeEditor` component (`src/components/items/CodeEditor.tsx`) uses Monaco Editor (dark theme, lazy-loaded via `next/dynamic`) with a macOS-style header (red/yellow/green dots, language label, copy button). Replaces `textarea`/`pre` for snippet and command types in item drawer display and edit modes; other types keep `textarea`. Height is fluid up to 360px (400px including header) with a slim themed scrollbar. `AddTypeButton` client component added — each `/items/[type]` page shows a type-specific "Add X" button that opens `NewItemDialog` pre-selecting the correct type via new `initialTypeId` prop. `getSystemItemTypes` wrapped with `React.cache` to deduplicate the DB call between layout and page.
+- **2026-06-20** — Markdown editor complete. `MarkdownEditor` component (`src/components/items/MarkdownEditor.tsx`) with Write/Preview tabs, macOS-style header (red/yellow/green dots, copy button), and `react-markdown` + `remark-gfm` for GitHub Flavored Markdown rendering. Readonly mode shows Preview tab only; edit mode defaults to Write. Replaces plain `textarea` for note and prompt types in `NewItemDialog` and `ItemDrawer` (view + edit modes). Custom `.markdown-preview` CSS added to `globals.css` for headings, code blocks, inline code, lists, blockquotes, links, and tables. Snippet and command types unchanged (still use `CodeEditor`).
