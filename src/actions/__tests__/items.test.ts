@@ -1,12 +1,16 @@
 import { vi, describe, it, expect } from "vitest";
 
 vi.mock("@/auth", () => ({ auth: vi.fn() }));
-vi.mock("@/lib/db/items", () => ({ updateItem: vi.fn(), deleteItem: vi.fn() }));
+vi.mock("@/lib/db/items", () => ({ createItem: vi.fn(), updateItem: vi.fn(), deleteItem: vi.fn() }));
 
-const { UpdateItemSchema } = await import("@/actions/item-schemas");
-const { updateItem, deleteItem } = await import("@/actions/items");
+const { CreateItemSchema, UpdateItemSchema } = await import("@/actions/item-schemas");
+const { createItem, updateItem, deleteItem } = await import("@/actions/items");
 const { auth } = await import("@/auth");
-const { updateItem: updateItemInDb, deleteItem: deleteItemInDb } = await import("@/lib/db/items");
+const {
+  createItem: createItemInDb,
+  updateItem: updateItemInDb,
+  deleteItem: deleteItemInDb,
+} = await import("@/lib/db/items");
 
 const base = {
   title: "My Snippet",
@@ -132,6 +136,98 @@ describe("updateItem action", () => {
     vi.mocked(updateItemInDb).mockRejectedValueOnce(new Error("DB error"));
     const result = await updateItem("item-1", base);
     expect(result).toEqual({ success: false, error: "Failed to update item" });
+  });
+});
+
+const createBase = {
+  typeId: "type-snippet",
+  typeName: "snippet",
+  title: "My Snippet",
+  description: null as string | null,
+  content: "console.log('hello')",
+  url: null as string | null,
+  language: "typescript",
+  tags: ["react"],
+};
+
+describe("CreateItemSchema", () => {
+  const schemaBase = {
+    typeId: "type-snippet",
+    title: "My Snippet",
+    description: null,
+    content: "console.log('hello')",
+    url: null,
+    language: "typescript",
+    tags: ["react"],
+  };
+
+  it("accepts valid snippet data", () => {
+    expect(CreateItemSchema.safeParse(schemaBase).success).toBe(true);
+  });
+
+  it("rejects missing typeId", () => {
+    const result = CreateItemSchema.safeParse({ ...schemaBase, typeId: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects empty title", () => {
+    const result = CreateItemSchema.safeParse({ ...schemaBase, title: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects whitespace-only title after trim", () => {
+    const result = CreateItemSchema.safeParse({ ...schemaBase, title: "   " });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts null url for non-link types", () => {
+    expect(CreateItemSchema.safeParse({ ...schemaBase, url: null }).success).toBe(true);
+  });
+
+  it("accepts a valid url", () => {
+    expect(CreateItemSchema.safeParse({ ...schemaBase, url: "https://example.com" }).success).toBe(true);
+  });
+
+  it("rejects an invalid url string", () => {
+    expect(CreateItemSchema.safeParse({ ...schemaBase, url: "not-a-url" }).success).toBe(false);
+  });
+});
+
+describe("createItem action", () => {
+  it("returns Unauthorized when not authenticated", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
+    const result = await createItem(createBase);
+    expect(result).toEqual({ success: false, error: "Unauthorized" });
+  });
+
+  it("returns field errors when Zod validation fails", async () => {
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: "user-1" } } as never);
+    const result = await createItem({ ...createBase, title: "" });
+    expect(result.success).toBe(false);
+    if (!result.success && typeof result.error === "object") {
+      expect(result.error).toHaveProperty("title");
+    }
+  });
+
+  it("returns error when link type has no URL", async () => {
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: "user-1" } } as never);
+    const result = await createItem({ ...createBase, typeName: "link", url: null });
+    expect(result).toEqual({ success: false, error: "URL is required for links" });
+  });
+
+  it("returns created item on success", async () => {
+    const fakeItem = { id: "item-new", title: "My Snippet" };
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: "user-1" } } as never);
+    vi.mocked(createItemInDb).mockResolvedValueOnce(fakeItem as never);
+    const result = await createItem(createBase);
+    expect(result).toEqual({ success: true, data: fakeItem });
+  });
+
+  it("returns error string when DB throws", async () => {
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: "user-1" } } as never);
+    vi.mocked(createItemInDb).mockRejectedValueOnce(new Error("DB error"));
+    const result = await createItem(createBase);
+    expect(result).toEqual({ success: false, error: "Failed to create item" });
   });
 });
 
