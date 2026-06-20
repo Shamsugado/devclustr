@@ -15,7 +15,7 @@ export default function DashboardShell({ children, sidebarData }: DashboardShell
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <TopBar onMobileMenuClick={() => setMobileOpen(true)} />
+      <TopBar onMobileMenuClick={() => setMobileOpen(true)} itemTypes={sidebarData.itemTypes} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
           collapsed={collapsed}

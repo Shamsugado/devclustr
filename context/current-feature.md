@@ -1,12 +1,28 @@
-# Current Feature
+# Current Feature: Item Create
 
 ## Status
 
-Completed
+In Progress
 
 ## Goals
 
+- "New Item" button in top bar opens a shadcn Dialog modal
+- Type selector lets user pick from: snippet, prompt, command, note, link
+- Fields shown are type-specific:
+  - All types: title (required), description, tags
+  - snippet/command: content, language
+  - prompt/note: content
+  - link: URL (required)
+- Server action `createItem` with Zod validation
+- DB query function `createItem` in `lib/db/items.ts`
+- Toast on success; modal closes and item list refreshes
+
 ## Notes
+
+- Pro types (files, images) are not in scope
+- Follow the same Zod + server action pattern used in `src/actions/items.ts`
+- Tag handling: disconnect-all / connect-or-create pattern (matches `updateItem`)
+- Dialog component already available via shadcn; Sheet is already used for drawer — use Dialog for this modal
 
 ## History
 

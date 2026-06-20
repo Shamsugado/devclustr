@@ -74,6 +74,48 @@ export async function deleteItem(id: string, userId: string) {
   return prisma.item.delete({ where: { id, userId } });
 }
 
+export async function createItem(
+  userId: string,
+  data: {
+    typeId: string;
+    title: string;
+    description: string | null;
+    content: string | null;
+    url: string | null;
+    language: string | null;
+    tags: string[];
+    contentType: "TEXT" | "URL";
+  }
+) {
+  return prisma.item.create({
+    data: {
+      userId,
+      itemTypeId: data.typeId,
+      title: data.title,
+      description: data.description,
+      content: data.content,
+      url: data.url,
+      language: data.language,
+      contentType: data.contentType,
+      tags: {
+        create: data.tags.map((name) => ({
+          tag: {
+            connectOrCreate: {
+              where: { name },
+              create: { name },
+            },
+          },
+        })),
+      },
+    },
+    include: {
+      itemType: { select: { id: true, name: true, icon: true, color: true } },
+      tags: { include: { tag: { select: { name: true } } } },
+      collections: { include: { collection: { select: { id: true, name: true } } } },
+    },
+  });
+}
+
 export async function updateItem(
   id: string,
   userId: string,
