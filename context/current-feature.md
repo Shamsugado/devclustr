@@ -1,28 +1,12 @@
-# Current Feature: Item Create
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- "New Item" button in top bar opens a shadcn Dialog modal
-- Type selector lets user pick from: snippet, prompt, command, note, link
-- Fields shown are type-specific:
-  - All types: title (required), description, tags
-  - snippet/command: content, language
-  - prompt/note: content
-  - link: URL (required)
-- Server action `createItem` with Zod validation
-- DB query function `createItem` in `lib/db/items.ts`
-- Toast on success; modal closes and item list refreshes
-
 ## Notes
-
-- Pro types (files, images) are not in scope
-- Follow the same Zod + server action pattern used in `src/actions/items.ts`
-- Tag handling: disconnect-all / connect-or-create pattern (matches `updateItem`)
-- Dialog component already available via shadcn; Sheet is already used for drawer — use Dialog for this modal
 
 ## History
 
@@ -50,4 +34,5 @@ In Progress
 - **2026-06-19** — Item list three-column layout complete. Grid on `/items/[type]` updated from `grid-cols-1 md:grid-cols-2` to `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` — one-line change in `src/app/items/[type]/page.tsx`.
 - **2026-06-19** — Item drawer complete. Clicking any `ItemCard` on `/dashboard` or `/items/[type]` opens a right-side shadcn Sheet. Full item detail (title, type/language badges, description, content, tags, collections, created/updated dates) fetched on click via `GET /api/items/[id]`. Action bar: Favorite, Pin, Copy, Edit, Delete (trash right-aligned). Skeleton loading state while fetching. `ItemListClient` and `DashboardMain` ("use client") are client wrappers managing drawer state so server pages stay server components. `getItemById` DB helper added to `src/lib/db/items.ts`. shadcn `Sheet` component added.
 - **2026-06-19** — Item drawer edit mode complete. Edit button in the action bar switches the drawer inline to edit mode (same Sheet stays open). Fields pre-populated from current item; type-specific fields shown per type (Content for snippet/prompt/command/note, Language for snippet/command, URL for link). Save/Cancel bar replaces the action bar. `updateItem` server action in `src/actions/items.ts` (Zod-validated, ownership-checked, `{ success, data, error }` pattern). `updateItem` DB helper in `src/lib/db/items.ts` (disconnect-all/connect-or-create tags, returns updated `ItemDetail`). `router.refresh()` syncs the card list after save. Sonner toast on save success/error. `sonner` installed; `<Toaster>` added to root layout. Save disabled client-side when title is empty. Unit tests for schema validation and action behavior in `src/actions/__tests__/items.test.ts`.
+- **2026-06-20** — Item create complete. "New Item" button in top bar opens a Base UI Dialog modal. Type selector (snippet, prompt, command, note, link — pro types excluded) toggles type-specific fields: content/language for snippets/commands, content-only for prompts/notes, URL (required) for links. `createItem` server action (Zod-validated, auth-checked, `{ success, data, error }` pattern) and `createItem` DB helper in `src/lib/db/items.ts` (connect-or-create tags). `CreateItemSchema` added to `src/actions/item-schemas.ts`. `TopBar` now accepts `itemTypes` prop threaded from `DashboardShell`. Toast on success, dialog resets/closes, item list refreshes via `router.refresh()`. 18 unit tests added for schema and action.
 - **2026-06-19** — Item delete complete. Trash button in item drawer opens a Base UI `AlertDialog` asking for confirmation. Confirming calls `deleteItem` server action (ownership-checked), closes the drawer, refreshes the item list via `router.refresh()`, and shows a Sonner success toast. `deleteItem` DB helper added to `src/lib/db/items.ts`. `AlertDialogAction` in `src/components/ui/alert-dialog.tsx` fixed to wrap `AlertDialogPrimitive.Close` so it dismisses on click. `UpdateItemSchema` extracted to `src/actions/item-schemas.ts` to fix a latent "use server" non-function export violation. 4 unit tests added for `deleteItem` action.
