@@ -2,11 +2,15 @@
 
 ## Status
 
-Completed
+Not Started
 
 ## Goals
 
+<!-- Add goals here -->
+
 ## Notes
+
+<!-- Add notes here -->
 
 ## History
 
@@ -38,3 +42,4 @@ Completed
 - **2026-06-20** — Item create complete. "New Item" button in top bar opens a Base UI Dialog modal. Type selector (snippet, prompt, command, note, link — pro types excluded) toggles type-specific fields: content/language for snippets/commands, content-only for prompts/notes, URL (required) for links. `createItem` server action (Zod-validated, auth-checked, `{ success, data, error }` pattern) and `createItem` DB helper in `src/lib/db/items.ts` (connect-or-create tags). `CreateItemSchema` added to `src/actions/item-schemas.ts`. `TopBar` now accepts `itemTypes` prop threaded from `DashboardShell`. Toast on success, dialog resets/closes, item list refreshes via `router.refresh()`. 18 unit tests added for schema and action.
 - **2026-06-20** — Code editor complete. `CodeEditor` component (`src/components/items/CodeEditor.tsx`) uses Monaco Editor (dark theme, lazy-loaded via `next/dynamic`) with a macOS-style header (red/yellow/green dots, language label, copy button). Replaces `textarea`/`pre` for snippet and command types in item drawer display and edit modes; other types keep `textarea`. Height is fluid up to 360px (400px including header) with a slim themed scrollbar. `AddTypeButton` client component added — each `/items/[type]` page shows a type-specific "Add X" button that opens `NewItemDialog` pre-selecting the correct type via new `initialTypeId` prop. `getSystemItemTypes` wrapped with `React.cache` to deduplicate the DB call between layout and page.
 - **2026-06-20** — Markdown editor complete. `MarkdownEditor` component (`src/components/items/MarkdownEditor.tsx`) with Write/Preview tabs, macOS-style header (red/yellow/green dots, copy button), and `react-markdown` + `remark-gfm` for GitHub Flavored Markdown rendering. Readonly mode shows Preview tab only; edit mode defaults to Write. Replaces plain `textarea` for note and prompt types in `NewItemDialog` and `ItemDrawer` (view + edit modes). Custom `.markdown-preview` CSS added to `globals.css` for headings, code blocks, inline code, lists, blockquotes, links, and tables. Snippet and command types unchanged (still use `CodeEditor`).
+- **2026-06-22** — Image gallery view complete. `ImageCard` component (`src/components/items/ImageCard.tsx`) shows image thumbnails via download proxy (`/api/items/[id]/download`) with 16:9 `aspect-video` ratio, `object-cover`, and a 5% hover zoom (300ms transition). `ItemListClient` switches to a 3-column gallery grid for image item types; all other types keep the existing 4-column card grid. `"image"` added to `ALLOWED_TYPES` in `/items/[type]` page.
