@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -8,13 +8,15 @@ import { updateItem, deleteItem } from "@/actions/items";
 import { DrawerSkeleton, type ItemFull } from "@/components/items/ItemDrawerParts";
 import ItemDrawerView from "@/components/items/ItemDrawerView";
 import ItemDrawerEdit, { type EditForm, initEditForm } from "@/components/items/ItemDrawerEdit";
+import type { ItemWithType } from "@/lib/db/items";
 
 interface ItemDrawerProps {
   itemId: string | null;
+  initialData?: ItemWithType;
   onClose: () => void;
 }
 
-export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
+export default function ItemDrawer({ itemId, initialData, onClose }: ItemDrawerProps) {
   const router = useRouter();
   const [item, setItem] = useState<ItemFull | null>(null);
   const [loading, setLoading] = useState(false);
@@ -30,18 +32,28 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Capture initialData without adding it to effect deps
+  const initialDataRef = useRef(initialData);
+  initialDataRef.current = initialData;
+
   useEffect(() => {
     if (!itemId) {
       setItem(null);
       setIsEditing(false);
       return;
     }
-    setLoading(true);
-    setItem(null);
     setIsEditing(false);
+    const seed = initialDataRef.current;
+    if (seed) {
+      // Render immediately from card data; fetch updates collections in background
+      setItem({ ...seed, collections: [] } as ItemFull);
+    } else {
+      setLoading(true);
+      setItem(null);
+    }
     fetch(`/api/items/${itemId}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => setItem(data))
+      .then((data) => { if (data) setItem(data); })
       .finally(() => setLoading(false));
   }, [itemId]);
 
