@@ -4,7 +4,7 @@ import { getItemsByTypeSlug, getSystemItemTypes } from "@/lib/db/items";
 import ItemListClient from "@/components/items/ItemListClient";
 import AddTypeButton from "@/components/items/AddTypeButton";
 
-const ALLOWED_TYPES = ["snippet", "prompt", "command", "note", "link"];
+const ALLOWED_TYPES = ["snippet", "prompt", "command", "note", "link", "image"];
 
 export default async function ItemTypePage({
   params,
