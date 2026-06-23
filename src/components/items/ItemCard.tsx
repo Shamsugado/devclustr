@@ -4,15 +4,7 @@ import { useState } from "react";
 import { Star, Clock, File, Copy, Check } from "lucide-react";
 import { itemTypeIconMap } from "@/lib/item-type-icons";
 import type { ItemWithType } from "@/lib/db/items";
-
-function formatRelativeTime(date: Date | null): string {
-  if (!date) return "never";
-  const diff = Date.now() - date.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days === 0) return "today";
-  if (days === 1) return "yesterday";
-  return `${days}d ago`;
-}
+import { formatRelativeTime } from "@/lib/format";
 
 export default function ItemCard({ item, onClick }: { item: ItemWithType; onClick?: () => void }) {
   const { itemType } = item;

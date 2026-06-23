@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Upload, X, File as FileIcon, Image as ImageIcon } from "lucide-react";
+import { formatBytes } from "@/lib/format";
 
 export interface UploadedFile {
   key: string;
@@ -15,12 +16,6 @@ interface FileUploadProps {
   accept: "image" | "file";
   value: UploadedFile | null;
   onChange: (file: UploadedFile | null) => void;
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 const IMAGE_ACCEPT = ".png,.jpg,.jpeg,.gif,.webp,.svg";

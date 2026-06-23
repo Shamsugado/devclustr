@@ -1,5 +1,6 @@
 import { Download, File, FileText, FileCode, FileImage, FileArchive, FileAudio, FileVideo } from "lucide-react";
 import type { ItemWithType } from "@/lib/db/items";
+import { formatBytes, formatDate } from "@/lib/format";
 
 function getExtension(fileName: string | null): string {
   if (!fileName) return "";
@@ -15,19 +16,6 @@ function fileIconForExt(ext: string) {
   if (["mp3", "wav", "ogg", "flac", "aac"].includes(ext)) return FileAudio;
   if (["mp4", "mov", "avi", "mkv", "webm"].includes(ext)) return FileVideo;
   return File;
-}
-
-function formatBytes(bytes: number | null): string {
-  if (bytes === null || bytes === undefined) return "";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
-}
-
-function formatDate(date: Date | string | null): string {
-  if (!date) return "";
-  return new Date(date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
 
 export default function FileRow({

@@ -415,7 +415,7 @@ model TagsOnItems {
 
 ## Key External Docs
 
-- [Next.js 15 Docs](https://nextjs.org/docs)
+- [Next.js 16 Docs](https://nextjs.org/docs)
 - [Prisma 7 Docs](https://www.prisma.io/docs)
 - [NextAuth v5 Docs](https://authjs.dev/getting-started)
 - [Neon Docs](https://neon.tech/docs)
@@ -434,5 +434,4 @@ model TagsOnItems {
 - [ ] Custom item types — scoped to Pro, build after core launch
 - [ ] Search — basic string match first, consider [pg_trgm](https://www.postgresql.org/docs/current/pgtrgm.html) or a dedicated search solution later
 - [ ] Rate limiting on AI routes
-- [ ] Email provider for magic links / transactional email (e.g. [Resend](https://resend.com))
 - [ ] Analytics (e.g. [PostHog](https://posthog.com))

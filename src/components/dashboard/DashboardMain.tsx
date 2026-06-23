@@ -18,6 +18,7 @@ import {
 import ItemDrawer from "@/components/items/ItemDrawer";
 import type { CollectionMeta } from "@/lib/db/collections";
 import type { getPinnedItems, getRecentItems } from "@/lib/db/items";
+import { formatRelativeTime } from "@/lib/format";
 
 type DashboardItem = Awaited<ReturnType<typeof getPinnedItems>>[0];
 type DashboardStats = {
@@ -43,15 +44,6 @@ const iconMap: Record<string, React.ElementType> = {
   File,
   Image: ImageIcon,
 };
-
-function formatRelativeTime(date: Date | null): string {
-  if (!date) return "never";
-  const diff = Date.now() - date.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days === 0) return "today";
-  if (days === 1) return "yesterday";
-  return `${days}d ago`;
-}
 
 // --- Sub-components ---
 
