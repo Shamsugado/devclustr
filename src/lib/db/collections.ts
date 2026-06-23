@@ -1,5 +1,21 @@
 import { prisma } from "@/lib/prisma";
 
+export type CollectionCreated = {
+  id: string;
+  name: string;
+  description: string | null;
+};
+
+export async function createCollection(
+  userId: string,
+  data: { name: string; description: string | null }
+): Promise<CollectionCreated> {
+  return prisma.collection.create({
+    data: { userId, name: data.name, description: data.description },
+    select: { id: true, name: true, description: true },
+  });
+}
+
 export type CollectionMeta = {
   id: string;
   name: string;

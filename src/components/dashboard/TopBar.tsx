@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FolderPlus, Menu, Plus, Search } from "lucide-react";
 import NewItemDialog from "@/components/items/NewItemDialog";
+import NewCollectionDialog from "@/components/collections/NewCollectionDialog";
 import type { SidebarItemType } from "@/components/dashboard/Sidebar";
 
 interface TopBarProps {
@@ -14,6 +15,7 @@ interface TopBarProps {
 
 export default function TopBar({ onMobileMenuClick, itemTypes = [] }: TopBarProps) {
   const [newItemOpen, setNewItemOpen] = useState(false);
+  const [newCollectionOpen, setNewCollectionOpen] = useState(false);
 
   return (
     <>
@@ -43,7 +45,11 @@ export default function TopBar({ onMobileMenuClick, itemTypes = [] }: TopBarProp
 
         {/* Actions */}
         <div className="flex items-center gap-2 shrink-0 justify-end">
-          <Button variant="secondary" className="bg-foreground text-background hover:bg-foreground/90">
+          <Button
+            variant="secondary"
+            className="bg-foreground text-background hover:bg-foreground/90"
+            onClick={() => setNewCollectionOpen(true)}
+          >
             <FolderPlus className="h-4 w-4" />
             New Collection
           </Button>
@@ -55,6 +61,7 @@ export default function TopBar({ onMobileMenuClick, itemTypes = [] }: TopBarProp
       </header>
 
       <NewItemDialog open={newItemOpen} onOpenChange={setNewItemOpen} itemTypes={itemTypes} />
+      <NewCollectionDialog open={newCollectionOpen} onOpenChange={setNewCollectionOpen} />
     </>
   );
 }

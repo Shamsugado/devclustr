@@ -15,7 +15,7 @@ export async function getPinnedItems(userId: string) {
   return prisma.item.findMany({
     where: { userId, isPinned: true },
     include: {
-      itemType: { select: { id: true, icon: true, color: true } },
+      itemType: { select: { id: true, name: true, icon: true, color: true } },
       tags: { include: { tag: { select: { name: true } } } },
     },
     orderBy: { updatedAt: "desc" },
@@ -26,7 +26,7 @@ export async function getRecentItems(userId: string, limit = 10) {
   return prisma.item.findMany({
     where: { userId },
     include: {
-      itemType: { select: { id: true, icon: true, color: true } },
+      itemType: { select: { id: true, name: true, icon: true, color: true } },
       tags: { include: { tag: { select: { name: true } } } },
     },
     orderBy: { lastUsedAt: "desc" },

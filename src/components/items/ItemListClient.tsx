@@ -8,7 +8,7 @@ import ItemDrawer from "@/components/items/ItemDrawer";
 import type { ItemWithType } from "@/lib/db/items";
 
 export default function ItemListClient({ items }: { items: ItemWithType[] }) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<ItemWithType | null>(null);
 
   const typeName = items[0]?.itemType.name.toLowerCase();
   const isImageGallery = typeName === "image";
@@ -19,10 +19,10 @@ export default function ItemListClient({ items }: { items: ItemWithType[] }) {
       <>
         <div className="flex flex-col gap-2">
           {items.map((item) => (
-            <FileRow key={item.id} item={item} onClick={() => setSelectedId(item.id)} />
+            <FileRow key={item.id} item={item} onClick={() => setSelectedItem(item)} />
           ))}
         </div>
-        <ItemDrawer itemId={selectedId} onClose={() => setSelectedId(null)} />
+        <ItemDrawer itemId={selectedItem?.id ?? null} initialData={selectedItem ?? undefined} onClose={() => setSelectedItem(null)} />
       </>
     );
   }
@@ -36,13 +36,13 @@ export default function ItemListClient({ items }: { items: ItemWithType[] }) {
       <div className={gridClass}>
         {items.map((item) =>
           isImageGallery ? (
-            <ImageCard key={item.id} item={item} onClick={() => setSelectedId(item.id)} />
+            <ImageCard key={item.id} item={item} onClick={() => setSelectedItem(item)} />
           ) : (
-            <ItemCard key={item.id} item={item} onClick={() => setSelectedId(item.id)} />
+            <ItemCard key={item.id} item={item} onClick={() => setSelectedItem(item)} />
           )
         )}
       </div>
-      <ItemDrawer itemId={selectedId} onClose={() => setSelectedId(null)} />
+      <ItemDrawer itemId={selectedItem?.id ?? null} initialData={selectedItem ?? undefined} onClose={() => setSelectedItem(null)} />
     </>
   );
 }
