@@ -16,9 +16,10 @@ import { itemTypeIconMap } from "@/lib/item-type-icons";
 import { createItem } from "@/actions/items";
 import CodeEditor from "@/components/items/CodeEditor";
 import MarkdownEditor from "@/components/items/MarkdownEditor";
+import FileUpload, { type UploadedFile } from "@/components/items/FileUpload";
 import type { SidebarItemType } from "@/components/dashboard/Sidebar";
 
-const ALLOWED_TYPES = ["snippet", "prompt", "command", "note", "link"];
+const ALLOWED_TYPES = ["snippet", "prompt", "command", "note", "link", "file", "image"];
 
 interface CreateForm {
   title: string;
@@ -27,10 +28,11 @@ interface CreateForm {
   url: string;
   language: string;
   tags: string;
+  uploadedFile: UploadedFile | null;
 }
 
 function emptyForm(): CreateForm {
-  return { title: "", description: "", content: "", url: "", language: "", tags: "" };
+  return { title: "", description: "", content: "", url: "", language: "", tags: "", uploadedFile: null };
 }
 
 function DetailSection({ label, children }: { label: string; children: React.ReactNode }) {
@@ -65,7 +67,8 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
   const selectedType = allowedTypes.find((t) => t.id === selectedTypeId) ?? allowedTypes[0];
   const typeName = selectedType?.name.toLowerCase() ?? "";
   const isLink = typeName === "link";
-  const showContent = !isLink;
+  const isFileType = typeName === "file" || typeName === "image";
+  const showContent = !isLink && !isFileType;
   const showLanguage = typeName === "snippet" || typeName === "command";
   const showMarkdown = typeName === "note" || typeName === "prompt";
 
@@ -74,8 +77,12 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
     setForm(emptyForm());
   }
 
-  function handleChange(field: keyof CreateForm, value: string) {
+  function handleChange(field: Exclude<keyof CreateForm, "uploadedFile">, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function handleFileChange(file: UploadedFile | null) {
+    setForm((prev) => ({ ...prev, uploadedFile: file }));
   }
 
   function handleOpenChange(next: boolean) {
@@ -104,6 +111,9 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
       url: form.url.trim() || null,
       language: form.language.trim() || null,
       tags,
+      fileKey: form.uploadedFile?.key ?? null,
+      fileName: form.uploadedFile?.fileName ?? null,
+      fileSize: form.uploadedFile?.fileSize ?? null,
     });
 
     setIsSaving(false);
@@ -118,7 +128,10 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
     }
   }
 
-  const canSave = form.title.trim().length > 0 && (!isLink || form.url.trim().length > 0);
+  const canSave =
+    form.title.trim().length > 0 &&
+    (!isLink || form.url.trim().length > 0) &&
+    (!isFileType || form.uploadedFile !== null);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -173,6 +186,17 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
               className="w-full text-sm bg-background border border-border rounded-md px-3 py-2 text-foreground resize-none outline-none focus:border-primary placeholder:text-muted-foreground"
             />
           </DetailSection>
+
+          {/* File / Image upload */}
+          {isFileType && (
+            <DetailSection label={typeName === "image" ? "Image" : "File"}>
+              <FileUpload
+                accept={typeName === "image" ? "image" : "file"}
+                value={form.uploadedFile}
+                onChange={handleFileChange}
+              />
+            </DetailSection>
+          )}
 
           {/* Content (text types) */}
           {showContent && (

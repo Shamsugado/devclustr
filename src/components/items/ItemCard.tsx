@@ -1,4 +1,7 @@
-import { Star, Clock, File } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Star, Clock, File, Copy, Check } from "lucide-react";
 import { itemTypeIconMap } from "@/lib/item-type-icons";
 import type { ItemWithType } from "@/lib/db/items";
 
@@ -15,10 +18,22 @@ export default function ItemCard({ item, onClick }: { item: ItemWithType; onClic
   const { itemType } = item;
   const Icon = itemTypeIconMap[itemType.icon] ?? File;
   const isUrl = item.contentType === "URL";
+  const [copied, setCopied] = useState(false);
+
+  function handleCopy(e: React.MouseEvent) {
+    e.stopPropagation();
+    const text = isUrl ? (item.url ?? "") : (item.content ?? "");
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  }
+
+  const CopyIcon = copied ? Check : Copy;
 
   return (
     <div
-      className="bg-card border border-border border-l-4 rounded-lg p-4 flex flex-col gap-2 cursor-pointer hover:bg-card/80 transition-colors"
+      className="bg-card border border-border border-l-4 rounded-lg p-4 flex flex-col gap-2 cursor-pointer hover:bg-card/80 transition-colors group"
       style={{ borderLeftColor: itemType.color }}
       onClick={onClick}
     >
@@ -32,9 +47,18 @@ export default function ItemCard({ item, onClick }: { item: ItemWithType; onClic
           </span>
           <p className="text-base font-semibold text-foreground truncate">{item.title}</p>
         </div>
-        {item.isFavorite && (
-          <Star className="h-3.5 w-3.5 shrink-0 fill-yellow-400 text-yellow-400" />
-        )}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={handleCopy}
+            className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded text-muted-foreground hover:text-foreground"
+            title="Copy"
+          >
+            <CopyIcon className={`h-3.5 w-3.5 ${copied ? "text-green-400" : ""}`} />
+          </button>
+          {item.isFavorite && (
+            <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+          )}
+        </div>
       </div>
 
       {isUrl ? (

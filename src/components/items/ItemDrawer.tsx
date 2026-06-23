@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Star, Pin, Copy, Pencil, Trash2, File, Calendar } from "lucide-react";
+import { Star, Pin, Copy, Pencil, Trash2, File, Calendar, Download } from "lucide-react";
 import { toast } from "sonner";
 import {
   Sheet,
@@ -71,6 +71,12 @@ function DrawerSkeleton() {
   );
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 function ActionBar({
   item,
   onEdit,
@@ -83,6 +89,7 @@ function ActionBar({
   isDeleting: boolean;
 }) {
   const [copied, setCopied] = useState(false);
+  const isFile = item.contentType === "FILE";
 
   async function handleCopy() {
     const text = item.contentType === "URL" ? (item.url ?? "") : (item.content ?? "");
@@ -93,32 +100,41 @@ function ActionBar({
 
   return (
     <div className="flex items-center gap-1 py-3 border-b border-border">
-      <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
+      <button title="Favorite" className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
         <Star className={`h-4 w-4 ${item.isFavorite ? "fill-yellow-400 text-yellow-400" : ""}`} />
-        Favorite
       </button>
-      <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
+      <button title="Pin" className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
         <Pin className={`h-4 w-4 ${item.isPinned ? "fill-foreground text-foreground" : ""}`} />
-        Pin
       </button>
-      <button
-        onClick={handleCopy}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
-      >
-        <Copy className="h-4 w-4" />
-        {copied ? "Copied!" : "Copy"}
-      </button>
+      {isFile ? (
+        <a
+          href={`/api/items/${item.id}/download`}
+          title="Download"
+          className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+        >
+          <Download className="h-4 w-4" />
+        </a>
+      ) : (
+        <button
+          onClick={handleCopy}
+          title={copied ? "Copied!" : "Copy"}
+          className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+        >
+          <Copy className={`h-4 w-4 ${copied ? "text-green-400" : ""}`} />
+        </button>
+      )}
       <button
         onClick={onEdit}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+        title="Edit"
+        className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
       >
         <Pencil className="h-4 w-4" />
-        Edit
       </button>
       <AlertDialog>
         <AlertDialogTrigger
           disabled={isDeleting}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-red-400 transition-colors ml-auto disabled:opacity-50"
+          title="Delete"
+          className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-red-400 transition-colors ml-auto disabled:opacity-50"
         >
           <Trash2 className="h-4 w-4" />
         </AlertDialogTrigger>
@@ -198,9 +214,11 @@ function ItemDrawerContent({
   const { itemType } = item;
   const Icon = itemTypeIconMap[itemType.icon] ?? File;
   const isUrl = item.contentType === "URL";
+  const isFileContent = item.contentType === "FILE";
   const typeName = itemType.name.toLowerCase();
   const isCodeType = typeName === "snippet" || typeName === "command";
   const isMarkdownType = typeName === "note" || typeName === "prompt";
+  const isImageType = typeName === "image";
 
   const formatDate = (d: Date) =>
     new Date(d).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -252,6 +270,27 @@ function ItemDrawerContent({
             >
               {item.url}
             </a>
+          ) : isFileContent ? (
+            isImageType ? (
+              <div className="rounded-md overflow-hidden border border-border bg-muted">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/api/items/${item.id}/download`}
+                  alt={item.title}
+                  className="w-full max-h-80 object-contain"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 border border-border rounded-md p-3 bg-background">
+                <File className="h-8 w-8 text-muted-foreground shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{item.fileName}</p>
+                  {item.fileSize != null && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{formatBytes(item.fileSize)}</p>
+                  )}
+                </div>
+              </div>
+            )
           ) : isCodeType ? (
             <CodeEditor
               value={item.content ?? ""}

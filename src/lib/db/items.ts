@@ -72,7 +72,12 @@ export async function getItemById(id: string, userId: string) {
 export type ItemDetail = Awaited<ReturnType<typeof getItemById>>;
 
 export async function deleteItem(id: string, userId: string) {
-  return prisma.item.delete({ where: { id, userId } });
+  const item = await prisma.item.findFirst({
+    where: { id, userId },
+    select: { contentType: true, fileUrl: true },
+  });
+  await prisma.item.delete({ where: { id, userId } });
+  return item;
 }
 
 export async function createItem(
@@ -85,7 +90,10 @@ export async function createItem(
     url: string | null;
     language: string | null;
     tags: string[];
-    contentType: "TEXT" | "URL";
+    contentType: "TEXT" | "URL" | "FILE";
+    fileKey: string | null;
+    fileName: string | null;
+    fileSize: number | null;
   }
 ) {
   return prisma.item.create({
@@ -98,6 +106,9 @@ export async function createItem(
       url: data.url,
       language: data.language,
       contentType: data.contentType,
+      fileUrl: data.fileKey,
+      fileName: data.fileName,
+      fileSize: data.fileSize,
       tags: {
         create: data.tags.map((name) => ({
           tag: {

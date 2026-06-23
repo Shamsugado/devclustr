@@ -1,11 +1,13 @@
 "use server";
 
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { auth } from "@/auth";
 import {
   createItem as createItemInDb,
   updateItem as updateItemInDb,
   deleteItem as deleteItemInDb,
 } from "@/lib/db/items";
+import { r2, R2_BUCKET } from "@/lib/r2";
 import { CreateItemSchema, UpdateItemSchema } from "@/actions/item-schemas";
 
 export async function createItem(formData: {
@@ -17,6 +19,9 @@ export async function createItem(formData: {
   url: string | null;
   language: string | null;
   tags: string[];
+  fileKey: string | null;
+  fileName: string | null;
+  fileSize: number | null;
 }) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -28,12 +33,18 @@ export async function createItem(formData: {
     return { success: false as const, error: parsed.error.flatten((e) => e.message).fieldErrors };
   }
 
-  const isLink = formData.typeName.toLowerCase() === "link";
+  const typeName = formData.typeName.toLowerCase();
+  const isLink = typeName === "link";
+  const isFileType = typeName === "file" || typeName === "image";
+
   if (isLink && !parsed.data.url) {
     return { success: false as const, error: "URL is required for links" };
   }
+  if (isFileType && !parsed.data.fileKey) {
+    return { success: false as const, error: "A file is required" };
+  }
 
-  const contentType = isLink ? "URL" : "TEXT";
+  const contentType = isLink ? "URL" : isFileType ? "FILE" : "TEXT";
 
   try {
     const item = await createItemInDb(session.user.id, { ...parsed.data, contentType });
@@ -54,7 +65,10 @@ export async function deleteItem(itemId: string) {
   }
 
   try {
-    await deleteItemInDb(itemId, session.user.id);
+    const deleted = await deleteItemInDb(itemId, session.user.id);
+    if (deleted?.contentType === "FILE" && deleted.fileUrl) {
+      await r2.send(new DeleteObjectCommand({ Bucket: R2_BUCKET, Key: deleted.fileUrl }));
+    }
     return { success: true as const };
   } catch {
     return { success: false as const, error: "Failed to delete item" };
