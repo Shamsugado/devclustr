@@ -1,27 +1,16 @@
-# Current Feature: Collection Management Actions
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- On `/collections/[id]`: Add Edit, Delete, and Favorite buttons in the collection header area
-  - Edit opens a modal to edit collection Name and Description
-  - Delete opens a confirmation dialog; on confirm, removes the collection (items are NOT deleted, just unlinked)
-  - Favorite shows the icon/button only — no functionality yet
-- On `/collections` grid: Each collection card has a 3-dots (⋮) dropdown menu with Edit, Delete, and Favorite options (same behavior as above)
+<!-- Add goals here -->
 
 ## Notes
 
-- **Delete behavior**: Deleting a collection removes the collection record and its join-table entries. The items themselves are NOT deleted.
-- **Favorites**: Button/icon rendered in both places but no backend or state logic yet.
-- **Edit modal**: Only edits collection metadata (Name, Description) — same fields as `NewCollectionDialog`.
-- Reuse existing patterns: server actions in `src/actions/collections.ts`, schemas in `src/actions/collection-schemas.ts`, DB helpers in `src/lib/db/collections.ts`.
-- Use existing `AlertDialog` pattern (from item delete) for the delete confirmation.
-- Use existing `Dialog`/modal pattern (from `NewCollectionDialog`) for the edit modal.
-- On `/collections/[id]`, actions live in the page header area (next to the collection title).
-- On `/collections`, the 3-dots trigger sits on the card — clicking it should NOT navigate to the collection page.
+<!-- Add notes here -->
 
 ## History
 
@@ -59,3 +48,4 @@ In Progress
 - **2026-06-23** — Collection create complete. "New Collection" button in TopBar opens `NewCollectionDialog` modal with Name (required, max 100 chars) and Description (optional, max 500 chars). `createCollection` server action (Zod-validated, auth-checked, `{ success, data, error }` pattern) in `src/actions/collections.ts`. `createCollection` DB helper in `src/lib/db/collections.ts`. `CreateCollectionSchema` in `src/actions/collection-schemas.ts`. Toast on success/error; sidebar refreshes via `router.refresh()`. 12 unit tests added. Also: `ItemDrawer` now accepts `initialData` from card lists for instant render before API fetch; loading skeleton added for `/items/[type]`.
 - **2026-06-23** — Add item to collections complete. `CollectionMultiSelect` component (`src/components/items/CollectionMultiSelect.tsx`) — checkbox dropdown showing user's collections. Added to `NewItemDialog` (fetches collections on open) and `ItemDrawer` edit mode (fetches lazily on first edit, pre-populates from item's current collections). `GET /api/collections` route returns `{ id, name }[]` for the authenticated user. `getUserCollections` helper added to `src/lib/db/collections.ts`. `collectionIds` added to `CreateItemSchema` and `UpdateItemSchema`. `createItem` and `updateItem` DB helpers connect/disconnect the join table with ownership validation. Fixed pre-existing `null as never` TypeScript errors in test fixtures.
 - **2026-06-24** — Collections pages complete. `/collections` lists all user collections as clickable cards (sorted alphabetically). `/collections/[id]` shows collection name, description, and all items via `ItemListClient` (reuses `ItemCard`, `ImageCard`, `FileRow`). Dashboard `CollectionCard` changed from `<div>` to `<Link>` to `/collections/[id]`. New `CollectionCard` component in `src/components/collections/`. New DB helpers: `getAllCollections`, `getCollectionById`, `getItemsByCollectionId`. `src/proxy.ts` updated to protect `/collections/*`.
+- **2026-06-24** — Collection management actions complete. `/collections` card: 3-dots (⋮) dropdown (hover-visible) with Edit, Delete, Favorite options. `/collections/[id]` header: Star (disabled/stub), Edit (pencil), Delete (trash) icon buttons. Edit opens `EditCollectionDialog` pre-populated with name/description; saves via `updateCollection` action. Delete shows `AlertDialog` confirmation — removes collection and join-table entries, items untouched; navigates to `/collections` with `router.push + router.refresh` to bust layout cache. `updateCollection` and `deleteCollection` server actions + DB helpers (Zod-validated, ownership-guarded). `UpdateCollectionSchema` added. `CollectionCard` converted to client component. 12 new unit tests (67 total).
