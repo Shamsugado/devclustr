@@ -90,12 +90,20 @@ export async function createItem(
     url: string | null;
     language: string | null;
     tags: string[];
+    collectionIds: string[];
     contentType: "TEXT" | "URL" | "FILE";
     fileKey: string | null;
     fileName: string | null;
     fileSize: number | null;
   }
 ) {
+  const ownedCollectionIds = data.collectionIds.length > 0
+    ? (await prisma.collection.findMany({
+        where: { id: { in: data.collectionIds }, userId },
+        select: { id: true },
+      })).map((c) => c.id)
+    : [];
+
   return prisma.item.create({
     data: {
       userId,
@@ -119,6 +127,9 @@ export async function createItem(
           },
         })),
       },
+      collections: {
+        create: ownedCollectionIds.map((collectionId) => ({ collectionId })),
+      },
     },
     include: {
       itemType: { select: { id: true, name: true, icon: true, color: true } },
@@ -138,8 +149,16 @@ export async function updateItem(
     url: string | null;
     language: string | null;
     tags: string[];
+    collectionIds: string[];
   }
 ) {
+  const ownedCollectionIds = data.collectionIds.length > 0
+    ? (await prisma.collection.findMany({
+        where: { id: { in: data.collectionIds }, userId },
+        select: { id: true },
+      })).map((c) => c.id)
+    : [];
+
   return prisma.item.update({
     where: { id, userId },
     data: {
@@ -158,6 +177,10 @@ export async function updateItem(
             },
           },
         })),
+      },
+      collections: {
+        deleteMany: {},
+        create: ownedCollectionIds.map((collectionId) => ({ collectionId })),
       },
     },
     include: {

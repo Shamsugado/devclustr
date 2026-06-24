@@ -7,6 +7,7 @@ export const UpdateItemSchema = z.object({
   url: z.url("Invalid URL").nullable(),
   language: z.string().trim().nullable(),
   tags: z.array(z.string().trim().min(1)),
+  collectionIds: z.array(z.string()).default([]),
 });
 
 export const CreateItemSchema = z.object({
@@ -17,6 +18,7 @@ export const CreateItemSchema = z.object({
   url: z.url("Invalid URL").nullable(),
   language: z.string().trim().nullable(),
   tags: z.array(z.string().trim().min(1)),
+  collectionIds: z.array(z.string()).default([]),
   fileKey: z.string().nullable().default(null),
   fileName: z.string().nullable().default(null),
   fileSize: z.number().nullable().default(null),
