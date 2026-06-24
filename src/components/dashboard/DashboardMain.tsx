@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Code,
   Sparkles,
@@ -78,8 +79,9 @@ function StatsCards({ stats }: { stats: DashboardStats }) {
 
 function CollectionCard({ collection }: { collection: CollectionMeta }) {
   return (
-    <div
-      className="bg-card border border-border border-l-4 rounded-lg p-4 flex flex-col gap-2 relative group cursor-pointer hover:bg-card/80 transition-colors"
+    <Link
+      href={`/collections/${collection.id}`}
+      className="bg-card border border-border border-l-4 rounded-lg p-4 flex flex-col gap-2 relative group hover:bg-card/80 transition-colors"
       style={{ borderLeftColor: collection.dominantTypeColor }}
     >
       {collection.isFavorite && (
@@ -87,7 +89,9 @@ function CollectionCard({ collection }: { collection: CollectionMeta }) {
       )}
       <div className="pr-5">
         <p className="text-base font-semibold text-foreground truncate">{collection.name}</p>
-        <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{collection.description}</p>
+        {collection.description && (
+          <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{collection.description}</p>
+        )}
       </div>
       <div className="flex items-center justify-between mt-auto pt-1">
         <div className="flex items-center gap-1">
@@ -106,7 +110,7 @@ function CollectionCard({ collection }: { collection: CollectionMeta }) {
         </div>
         <span className="text-xs text-muted-foreground">{collection.itemCount} items</span>
       </div>
-    </div>
+    </Link>
   );
 }
 

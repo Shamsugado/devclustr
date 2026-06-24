@@ -104,3 +104,19 @@ export async function getSidebarCollections(
     recents: sorted.filter((c) => !c.isFavorite).slice(0, 3),
   };
 }
+
+export async function getAllCollections(userId: string): Promise<CollectionMeta[]> {
+  const collections = await fetchCollectionsWithMeta(userId);
+  return collections.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export type CollectionWithDetail = CollectionMeta & { description: string | null };
+
+export async function getCollectionById(
+  userId: string,
+  collectionId: string
+): Promise<CollectionWithDetail | null> {
+  const all = await fetchCollectionsWithMeta(userId);
+  const found = all.find((c) => c.id === collectionId);
+  return found ?? null;
+}
