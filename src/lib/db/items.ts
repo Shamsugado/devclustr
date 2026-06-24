@@ -139,6 +139,20 @@ export async function createItem(
   });
 }
 
+export async function getItemsByCollectionId(userId: string, collectionId: string) {
+  return prisma.item.findMany({
+    where: {
+      userId,
+      collections: { some: { collectionId } },
+    },
+    include: {
+      itemType: { select: { id: true, name: true, icon: true, color: true } },
+      tags: { include: { tag: { select: { name: true } } } },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+}
+
 export async function updateItem(
   id: string,
   userId: string,

@@ -1,16 +1,24 @@
-# Current Feature
+# Current Feature: Collections Pages
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Create `/collections` page listing all user collections with existing collection cards
+- Create `/collections/[id]` page showing all items in a specific collection using existing item cards
+- Link "View all collections" in the sidebar to `/collections`
+- Link all collection cards (dashboard + collections list) to `/collections/[id]`
 
 ## Notes
 
-<!-- Add notes here -->
+- Use existing `ItemCard`, `ImageCard`, and `FileRow` components for items inside a collection
+- Use the existing collection card style from the dashboard for the collections list page
+- Branch from main as `feature/collections-pages`
+- Sidebar already has a "View all collections" link — update its `href`
+- The `/collections/[id]` page should follow the same layout as `/items/[type]` (DashboardShell + sidebar)
+- Protect `/collections/*` in `src/proxy.ts`
 
 ## History
 
