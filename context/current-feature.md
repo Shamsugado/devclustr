@@ -1,24 +1,16 @@
-# Current Feature: Collections Pages
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Create `/collections` page listing all user collections with existing collection cards
-- Create `/collections/[id]` page showing all items in a specific collection using existing item cards
-- Link "View all collections" in the sidebar to `/collections`
-- Link all collection cards (dashboard + collections list) to `/collections/[id]`
+<!-- Add goals here -->
 
 ## Notes
 
-- Use existing `ItemCard`, `ImageCard`, and `FileRow` components for items inside a collection
-- Use the existing collection card style from the dashboard for the collections list page
-- Branch from main as `feature/collections-pages`
-- Sidebar already has a "View all collections" link — update its `href`
-- The `/collections/[id]` page should follow the same layout as `/items/[type]` (DashboardShell + sidebar)
-- Protect `/collections/*` in `src/proxy.ts`
+<!-- Add notes here -->
 
 ## History
 
@@ -55,3 +47,4 @@ In Progress
 - **2026-06-23** — Code organization refactor complete. Decomposed `ItemDrawer.tsx` (603 lines) into four focused files: `ItemDrawerParts.tsx` (DrawerSkeleton, ActionBar, EditBar, DetailSection, ItemFull type), `ItemDrawerView.tsx` (view-mode body), `ItemDrawerEdit.tsx` (edit-mode body, EditForm type, initEditForm), and a thin `ItemDrawer.tsx` coordinator (~100 lines). Consolidated duplicated `formatBytes` (4 copies, including a diverged GB branch) and `formatRelativeTime` (2 copies) into `src/lib/format.ts` with `formatDate`; updated FileRow, FileUpload, ItemCard, and DashboardMain to import from the shared utility.
 - **2026-06-23** — Collection create complete. "New Collection" button in TopBar opens `NewCollectionDialog` modal with Name (required, max 100 chars) and Description (optional, max 500 chars). `createCollection` server action (Zod-validated, auth-checked, `{ success, data, error }` pattern) in `src/actions/collections.ts`. `createCollection` DB helper in `src/lib/db/collections.ts`. `CreateCollectionSchema` in `src/actions/collection-schemas.ts`. Toast on success/error; sidebar refreshes via `router.refresh()`. 12 unit tests added. Also: `ItemDrawer` now accepts `initialData` from card lists for instant render before API fetch; loading skeleton added for `/items/[type]`.
 - **2026-06-23** — Add item to collections complete. `CollectionMultiSelect` component (`src/components/items/CollectionMultiSelect.tsx`) — checkbox dropdown showing user's collections. Added to `NewItemDialog` (fetches collections on open) and `ItemDrawer` edit mode (fetches lazily on first edit, pre-populates from item's current collections). `GET /api/collections` route returns `{ id, name }[]` for the authenticated user. `getUserCollections` helper added to `src/lib/db/collections.ts`. `collectionIds` added to `CreateItemSchema` and `UpdateItemSchema`. `createItem` and `updateItem` DB helpers connect/disconnect the join table with ownership validation. Fixed pre-existing `null as never` TypeScript errors in test fixtures.
+- **2026-06-24** — Collections pages complete. `/collections` lists all user collections as clickable cards (sorted alphabetically). `/collections/[id]` shows collection name, description, and all items via `ItemListClient` (reuses `ItemCard`, `ImageCard`, `FileRow`). Dashboard `CollectionCard` changed from `<div>` to `<Link>` to `/collections/[id]`. New `CollectionCard` component in `src/components/collections/`. New DB helpers: `getAllCollections`, `getCollectionById`, `getItemsByCollectionId`. `src/proxy.ts` updated to protect `/collections/*`.
