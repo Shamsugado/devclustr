@@ -120,3 +120,25 @@ export async function getCollectionById(
   const found = all.find((c) => c.id === collectionId);
   return found ?? null;
 }
+
+export async function updateCollection(
+  userId: string,
+  collectionId: string,
+  data: { name: string; description: string | null }
+): Promise<{ id: string; name: string; description: string | null }> {
+  const existing = await prisma.collection.findFirst({ where: { id: collectionId, userId } });
+  if (!existing) throw new Error("Not found");
+
+  return prisma.collection.update({
+    where: { id: collectionId },
+    data: { name: data.name, description: data.description },
+    select: { id: true, name: true, description: true },
+  });
+}
+
+export async function deleteCollection(userId: string, collectionId: string): Promise<void> {
+  const existing = await prisma.collection.findFirst({ where: { id: collectionId, userId } });
+  if (!existing) throw new Error("Not found");
+
+  await prisma.collection.delete({ where: { id: collectionId } });
+}
