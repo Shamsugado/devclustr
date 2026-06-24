@@ -1,16 +1,27 @@
-# Current Feature
+# Current Feature: Collection Management Actions
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- On `/collections/[id]`: Add Edit, Delete, and Favorite buttons in the collection header area
+  - Edit opens a modal to edit collection Name and Description
+  - Delete opens a confirmation dialog; on confirm, removes the collection (items are NOT deleted, just unlinked)
+  - Favorite shows the icon/button only — no functionality yet
+- On `/collections` grid: Each collection card has a 3-dots (⋮) dropdown menu with Edit, Delete, and Favorite options (same behavior as above)
 
 ## Notes
 
-<!-- Add notes here -->
+- **Delete behavior**: Deleting a collection removes the collection record and its join-table entries. The items themselves are NOT deleted.
+- **Favorites**: Button/icon rendered in both places but no backend or state logic yet.
+- **Edit modal**: Only edits collection metadata (Name, Description) — same fields as `NewCollectionDialog`.
+- Reuse existing patterns: server actions in `src/actions/collections.ts`, schemas in `src/actions/collection-schemas.ts`, DB helpers in `src/lib/db/collections.ts`.
+- Use existing `AlertDialog` pattern (from item delete) for the delete confirmation.
+- Use existing `Dialog`/modal pattern (from `NewCollectionDialog`) for the edit modal.
+- On `/collections/[id]`, actions live in the page header area (next to the collection title).
+- On `/collections`, the 3-dots trigger sits on the card — clicking it should NOT navigate to the collection page.
 
 ## History
 

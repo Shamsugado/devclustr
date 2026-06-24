@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { getCollectionById } from "@/lib/db/collections";
 import { getItemsByCollectionId } from "@/lib/db/items";
 import ItemListClient from "@/components/items/ItemListClient";
+import CollectionDetailActions from "@/components/collections/CollectionDetailActions";
 
 export default async function CollectionPage({
   params,
@@ -24,11 +25,14 @@ export default async function CollectionPage({
 
   return (
     <div className="space-y-4 pb-6">
-      <div>
-        <h1 className="text-lg font-semibold text-foreground">{collection.name}</h1>
-        {collection.description && (
-          <p className="text-sm text-muted-foreground mt-0.5">{collection.description}</p>
-        )}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-lg font-semibold text-foreground">{collection.name}</h1>
+          {collection.description && (
+            <p className="text-sm text-muted-foreground mt-0.5">{collection.description}</p>
+          )}
+        </div>
+        <CollectionDetailActions collection={collection} />
       </div>
 
       {items.length === 0 ? (
