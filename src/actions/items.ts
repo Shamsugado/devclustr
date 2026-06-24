@@ -19,6 +19,7 @@ export async function createItem(formData: {
   url: string | null;
   language: string | null;
   tags: string[];
+  collectionIds: string[];
   fileKey: string | null;
   fileName: string | null;
   fileSize: number | null;
@@ -47,7 +48,7 @@ export async function createItem(formData: {
   const contentType = isLink ? "URL" : isFileType ? "FILE" : "TEXT";
 
   try {
-    const item = await createItemInDb(session.user.id, { ...parsed.data, contentType });
+    const item = await createItemInDb(session.user.id, { ...parsed.data, contentType, collectionIds: parsed.data.collectionIds });
     return { success: true as const, data: item };
   } catch {
     return { success: false as const, error: "Failed to create item" };
@@ -84,6 +85,7 @@ export async function updateItem(
     url: string | null;
     language: string | null;
     tags: string[];
+    collectionIds: string[];
   }
 ) {
   const session = await auth();

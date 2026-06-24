@@ -8,6 +8,7 @@ import { updateItem, deleteItem } from "@/actions/items";
 import { DrawerSkeleton, type ItemFull } from "@/components/items/ItemDrawerParts";
 import ItemDrawerView from "@/components/items/ItemDrawerView";
 import ItemDrawerEdit, { type EditForm, initEditForm } from "@/components/items/ItemDrawerEdit";
+import type { CollectionOption } from "@/components/items/CollectionMultiSelect";
 import type { ItemWithType } from "@/lib/db/items";
 
 interface ItemDrawerProps {
@@ -28,9 +29,11 @@ export default function ItemDrawer({ itemId, initialData, onClose }: ItemDrawerP
     url: "",
     language: "",
     tags: "",
+    collectionIds: [],
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [availableCollections, setAvailableCollections] = useState<CollectionOption[]>([]);
 
   // Capture initialData without adding it to effect deps
   const initialDataRef = useRef(initialData);
@@ -61,10 +64,19 @@ export default function ItemDrawer({ itemId, initialData, onClose }: ItemDrawerP
     if (!item) return;
     setEditForm(initEditForm(item));
     setIsEditing(true);
+    if (availableCollections.length === 0) {
+      fetch("/api/collections")
+        .then((r) => (r.ok ? r.json() : []))
+        .then((data) => setAvailableCollections(data));
+    }
   }
 
-  function handleFormChange(field: keyof EditForm, value: string) {
+  function handleFormChange(field: Exclude<keyof EditForm, "collectionIds">, value: string) {
     setEditForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function handleCollectionsChange(ids: string[]) {
+    setEditForm((prev) => ({ ...prev, collectionIds: ids }));
   }
 
   async function handleDelete() {
@@ -97,6 +109,7 @@ export default function ItemDrawer({ itemId, initialData, onClose }: ItemDrawerP
       url: editForm.url.trim() || null,
       language: editForm.language.trim() || null,
       tags,
+      collectionIds: editForm.collectionIds,
     });
 
     setIsSaving(false);
@@ -126,6 +139,8 @@ export default function ItemDrawer({ itemId, initialData, onClose }: ItemDrawerP
             item={item}
             form={editForm}
             onChange={handleFormChange}
+            onCollectionsChange={handleCollectionsChange}
+            availableCollections={availableCollections}
             onSave={handleSave}
             onCancel={() => setIsEditing(false)}
             isSaving={isSaving}

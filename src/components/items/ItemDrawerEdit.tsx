@@ -5,6 +5,7 @@ import { SheetHeader } from "@/components/ui/sheet";
 import { itemTypeIconMap } from "@/lib/item-type-icons";
 import CodeEditor from "@/components/items/CodeEditor";
 import MarkdownEditor from "@/components/items/MarkdownEditor";
+import CollectionMultiSelect, { type CollectionOption } from "@/components/items/CollectionMultiSelect";
 import { EditBar, DetailSection, type ItemFull } from "@/components/items/ItemDrawerParts";
 
 export interface EditForm {
@@ -14,6 +15,7 @@ export interface EditForm {
   url: string;
   language: string;
   tags: string;
+  collectionIds: string[];
 }
 
 export function initEditForm(item: ItemFull): EditForm {
@@ -24,6 +26,7 @@ export function initEditForm(item: ItemFull): EditForm {
     url: item.url ?? "",
     language: item.language ?? "",
     tags: item.tags.map(({ tag }) => tag.name).join(", "),
+    collectionIds: item.collections.map(({ collection }) => collection.id),
   };
 }
 
@@ -31,13 +34,17 @@ export default function ItemDrawerEdit({
   item,
   form,
   onChange,
+  onCollectionsChange,
+  availableCollections,
   onSave,
   onCancel,
   isSaving,
 }: {
   item: ItemFull;
   form: EditForm;
-  onChange: (field: keyof EditForm, value: string) => void;
+  onChange: (field: Exclude<keyof EditForm, "collectionIds">, value: string) => void;
+  onCollectionsChange: (ids: string[]) => void;
+  availableCollections: CollectionOption[];
   onSave: () => void;
   onCancel: () => void;
   isSaving: boolean;
@@ -146,6 +153,14 @@ export default function ItemDrawerEdit({
             className="w-full text-sm bg-background border border-border rounded-md px-3 py-2 text-foreground outline-none focus:border-primary placeholder:text-muted-foreground"
           />
           <p className="text-xs text-muted-foreground mt-1">Separate tags with commas</p>
+        </DetailSection>
+
+        <DetailSection label="Collections">
+          <CollectionMultiSelect
+            collections={availableCollections}
+            selected={form.collectionIds}
+            onChange={onCollectionsChange}
+          />
         </DetailSection>
       </div>
     </>

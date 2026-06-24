@@ -76,7 +76,7 @@ describe("createCollection action", () => {
   });
 
   it("returns unauthorized when no session", async () => {
-    mockAuth.mockResolvedValue(null);
+    mockAuth.mockResolvedValue(null as never);
     const result = await createCollection(baseForm);
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error).toBe("Unauthorized");

@@ -19,6 +19,7 @@ const base = {
   url: null,
   language: "typescript",
   tags: ["react", "hooks"],
+  collectionIds: [] as string[],
 };
 
 describe("UpdateItemSchema", () => {
@@ -109,7 +110,7 @@ describe("UpdateItemSchema", () => {
 
 describe("updateItem action", () => {
   it("returns Unauthorized when not authenticated", async () => {
-    vi.mocked(auth).mockResolvedValueOnce(null);
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
     const result = await updateItem("item-1", base);
     expect(result).toEqual({ success: false, error: "Unauthorized" });
   });
@@ -148,6 +149,10 @@ const createBase = {
   url: null as string | null,
   language: "typescript",
   tags: ["react"],
+  collectionIds: [] as string[],
+  fileKey: null as string | null,
+  fileName: null as string | null,
+  fileSize: null as number | null,
 };
 
 describe("CreateItemSchema", () => {
@@ -233,7 +238,7 @@ describe("createItem action", () => {
 
 describe("deleteItem action", () => {
   it("returns Unauthorized when not authenticated", async () => {
-    vi.mocked(auth).mockResolvedValueOnce(null);
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
     const result = await deleteItem("item-1");
     expect(result).toEqual({ success: false, error: "Unauthorized" });
   });

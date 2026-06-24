@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { File } from "lucide-react";
@@ -17,6 +17,7 @@ import { createItem } from "@/actions/items";
 import CodeEditor from "@/components/items/CodeEditor";
 import MarkdownEditor from "@/components/items/MarkdownEditor";
 import FileUpload, { type UploadedFile } from "@/components/items/FileUpload";
+import CollectionMultiSelect, { type CollectionOption } from "@/components/items/CollectionMultiSelect";
 import type { SidebarItemType } from "@/components/dashboard/Sidebar";
 
 const ALLOWED_TYPES = ["snippet", "prompt", "command", "note", "link", "file", "image"];
@@ -28,11 +29,12 @@ interface CreateForm {
   url: string;
   language: string;
   tags: string;
+  collectionIds: string[];
   uploadedFile: UploadedFile | null;
 }
 
 function emptyForm(): CreateForm {
-  return { title: "", description: "", content: "", url: "", language: "", tags: "", uploadedFile: null };
+  return { title: "", description: "", content: "", url: "", language: "", tags: "", collectionIds: [], uploadedFile: null };
 }
 
 function DetailSection({ label, children }: { label: string; children: React.ReactNode }) {
@@ -63,6 +65,17 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
   const [selectedTypeId, setSelectedTypeId] = useState<string>(defaultTypeId);
   const [form, setForm] = useState<CreateForm>(emptyForm);
   const [isSaving, setIsSaving] = useState(false);
+  const [collections, setCollections] = useState<CollectionOption[]>([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setCollectionsLoading(true);
+    fetch("/api/collections")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => setCollections(data))
+      .finally(() => setCollectionsLoading(false));
+  }, [open]);
 
   const selectedType = allowedTypes.find((t) => t.id === selectedTypeId) ?? allowedTypes[0];
   const typeName = selectedType?.name.toLowerCase() ?? "";
@@ -111,6 +124,7 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
       url: form.url.trim() || null,
       language: form.language.trim() || null,
       tags,
+      collectionIds: form.collectionIds,
       fileKey: form.uploadedFile?.key ?? null,
       fileName: form.uploadedFile?.fileName ?? null,
       fileSize: form.uploadedFile?.fileSize ?? null,
@@ -261,6 +275,16 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
               className="w-full text-sm bg-background border border-border rounded-md px-3 py-2 text-foreground outline-none focus:border-primary placeholder:text-muted-foreground"
             />
             <p className="text-xs text-muted-foreground mt-1">Separate tags with commas</p>
+          </DetailSection>
+
+          {/* Collections */}
+          <DetailSection label="Collections">
+            <CollectionMultiSelect
+              collections={collections}
+              selected={form.collectionIds}
+              onChange={(ids) => setForm((prev) => ({ ...prev, collectionIds: ids }))}
+              loading={collectionsLoading}
+            />
           </DetailSection>
         </div>
 
