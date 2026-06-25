@@ -1,25 +1,16 @@
-# Current Feature: Pagination
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Add pagination to `/items/[type]` with `ITEMS_PER_PAGE = 21`
-- Add pagination to `/collections/[id]` with `COLLECTIONS_PER_PAGE = 21`
-- Add pagination to `/collections` (all-collections list) with `COLLECTIONS_PER_PAGE = 21`
-- Pagination controls at the bottom: numbered page links + prev/next
-- Prev/next disabled (greyed out) when at the first/last page
-- Only fetch the items for the current page (no loading all records)
-- Dashboard limits remain separate: `DASHBOARD_COLLECTIONS_LIMIT = 6`, `DASHBOARD_RECENT_ITEMS_LIMIT = 10`
+<!-- Add goals here -->
 
 ## Notes
 
-- Constants: `ITEMS_PER_PAGE = 21`, `COLLECTIONS_PER_PAGE = 21`
-- Use URL search params (`?page=N`) so pages are shareable/bookmarkable
-- DB helpers need `skip`/`take` (offset pagination) and a total count query for page count
-- `/collections` (all-collections list) uses `getAllCollectionsPaginated` — DB-level `skip/take` with alphabetical sort
+<!-- Add notes here -->
 
 ## History
 
@@ -58,4 +49,5 @@ In Progress
 - **2026-06-23** — Add item to collections complete. `CollectionMultiSelect` component (`src/components/items/CollectionMultiSelect.tsx`) — checkbox dropdown showing user's collections. Added to `NewItemDialog` (fetches collections on open) and `ItemDrawer` edit mode (fetches lazily on first edit, pre-populates from item's current collections). `GET /api/collections` route returns `{ id, name }[]` for the authenticated user. `getUserCollections` helper added to `src/lib/db/collections.ts`. `collectionIds` added to `CreateItemSchema` and `UpdateItemSchema`. `createItem` and `updateItem` DB helpers connect/disconnect the join table with ownership validation. Fixed pre-existing `null as never` TypeScript errors in test fixtures.
 - **2026-06-24** — Collections pages complete. `/collections` lists all user collections as clickable cards (sorted alphabetically). `/collections/[id]` shows collection name, description, and all items via `ItemListClient` (reuses `ItemCard`, `ImageCard`, `FileRow`). Dashboard `CollectionCard` changed from `<div>` to `<Link>` to `/collections/[id]`. New `CollectionCard` component in `src/components/collections/`. New DB helpers: `getAllCollections`, `getCollectionById`, `getItemsByCollectionId`. `src/proxy.ts` updated to protect `/collections/*`.
 - **2026-06-24** — Collection management actions complete. `/collections` card: 3-dots (⋮) dropdown (hover-visible) with Edit, Delete, Favorite options. `/collections/[id]` header: Star (disabled/stub), Edit (pencil), Delete (trash) icon buttons. Edit opens `EditCollectionDialog` pre-populated with name/description; saves via `updateCollection` action. Delete shows `AlertDialog` confirmation — removes collection and join-table entries, items untouched; navigates to `/collections` with `router.push + router.refresh` to bust layout cache. `updateCollection` and `deleteCollection` server actions + DB helpers (Zod-validated, ownership-guarded). `UpdateCollectionSchema` added. `CollectionCard` converted to client component. 12 new unit tests (67 total).
-- **2026-06-25** — Global search / command palette complete. Cmd+K (Mac) / Ctrl+K (Windows) opens a `cmdk`-based command palette. Fuzzy search across all user items and collections with client-side filtering (no per-keystroke server round-trips). Results grouped as Items (type icon + name + content preview + type label) and Collections (folder icon + name + item count). Keyboard navigation built-in; Enter on item opens `ItemDrawer` inline; Enter on collection navigates to `/collections/[id]`. TopBar search input replaced with a styled button trigger showing `⌘K` hint. `GET /api/search` route returns all items and collections for the authenticated user. `getSearchItems` and `getSearchCollections` DB helpers added. `CommandPalette` component in `src/components/search/`. `cmdk` installed via `shadcn add command`; `src/components/ui/command.tsx` added. `DashboardShell` mounts the palette and listens for the keyboard shortcut globally.
+- **2026-06-25** — Global search / command palette complete.
+- **2026-06-25** — Pagination complete. `/items/[type]`, `/collections/[id]`, and `/collections` pages now paginate at 21 items/collections per page. `Pagination` component (`src/components/ui/Pagination.tsx`) renders numbered links with ellipsis for large ranges; prev/next greyed out at boundaries. DB helpers (`getItemsByTypeSlug`, `getItemsByCollectionId`, `getAllCollectionsPaginated`) use `skip`/`take` + parallel `count` — only the current page is fetched. Page driven by `?page=N` URL param. Constants extracted to `src/lib/constants.ts`. `pageNumbers` utility in `src/lib/pagination.ts` with 14 unit tests (81 total). Dashboard limits (6 collections, 10 items) unchanged. Cmd+K (Mac) / Ctrl+K (Windows) opens a `cmdk`-based command palette. Fuzzy search across all user items and collections with client-side filtering (no per-keystroke server round-trips). Results grouped as Items (type icon + name + content preview + type label) and Collections (folder icon + name + item count). Keyboard navigation built-in; Enter on item opens `ItemDrawer` inline; Enter on collection navigates to `/collections/[id]`. TopBar search input replaced with a styled button trigger showing `⌘K` hint. `GET /api/search` route returns all items and collections for the authenticated user. `getSearchItems` and `getSearchCollections` DB helpers added. `CommandPalette` component in `src/components/search/`. `cmdk` installed via `shadcn add command`; `src/components/ui/command.tsx` added. `DashboardShell` mounts the palette and listens for the keyboard shortcut globally.
