@@ -5,8 +5,6 @@ import { getProfileUser, getItemTypeCounts } from "@/lib/db/users";
 import { getDashboardStats } from "@/lib/db/items";
 import { itemTypeIconMap } from "@/lib/item-type-icons";
 import UserAvatar from "@/components/auth/UserAvatar";
-import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
-import DeleteAccountDialog from "@/components/profile/DeleteAccountDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function ProfilePage() {
@@ -21,7 +19,6 @@ export default async function ProfilePage() {
 
   if (!user) redirect("/sign-in");
 
-  const isEmailUser = !!user.password;
   const joinDate = new Intl.DateTimeFormat("en-US", {
     month: "long",
     year: "numeric",
@@ -89,30 +86,6 @@ export default async function ProfilePage() {
           </CardContent>
         </Card>
 
-        {/* Change password — email users only */}
-        {isEmailUser && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Change password</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChangePasswordForm />
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Danger zone */}
-        <Card className="border-destructive/40">
-          <CardHeader>
-            <CardTitle className="text-destructive">Danger zone</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Permanently delete your account and all associated data. This cannot be undone.
-            </p>
-            <DeleteAccountDialog />
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

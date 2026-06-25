@@ -13,6 +13,7 @@ import {
   Plus,
   User,
   LogOut,
+  Settings,
   X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -136,29 +137,38 @@ function SidebarContent({ data }: { data: SidebarData }) {
       {/* User area */}
       {user && (
         <div className="shrink-0 border-t border-border px-3 py-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex w-full items-center gap-2.5 rounded-md p-1 -m-1 text-left hover:bg-accent transition-colors">
-              <UserAvatar name={user.name} image={user.image} />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="top" align="start">
-              <DropdownMenuItem onClick={() => router.push("/profile")}>
-                <User className="h-4 w-4" />
-                Profile
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => signOut({ redirectTo: "/sign-in" })}
-              >
-                <LogOut className="h-4 w-4" />
-                Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex flex-1 min-w-0 items-center gap-2.5 rounded-md p-1 text-left hover:bg-accent transition-colors">
+                <UserAvatar name={user.name} image={user.image} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" align="start">
+                <DropdownMenuItem onClick={() => router.push("/profile")}>
+                  <User className="h-4 w-4" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => signOut({ redirectTo: "/sign-in" })}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Link
+              href="/settings"
+              className="shrink-0 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              aria-label="Settings"
+            >
+              <Settings className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       )}
     </div>
