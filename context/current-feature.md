@@ -1,16 +1,25 @@
-# Current Feature
+# Current Feature: Pagination
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Add pagination to `/items/[type]` with `ITEMS_PER_PAGE = 21`
+- Add pagination to `/collections/[id]` with `COLLECTIONS_PER_PAGE = 21`
+- Add pagination to `/collections` (all-collections list) with `COLLECTIONS_PER_PAGE = 21`
+- Pagination controls at the bottom: numbered page links + prev/next
+- Prev/next disabled (greyed out) when at the first/last page
+- Only fetch the items for the current page (no loading all records)
+- Dashboard limits remain separate: `DASHBOARD_COLLECTIONS_LIMIT = 6`, `DASHBOARD_RECENT_ITEMS_LIMIT = 10`
 
 ## Notes
 
-<!-- Add notes here -->
+- Constants: `ITEMS_PER_PAGE = 21`, `COLLECTIONS_PER_PAGE = 21`
+- Use URL search params (`?page=N`) so pages are shareable/bookmarkable
+- DB helpers need `skip`/`take` (offset pagination) and a total count query for page count
+- `/collections` (all-collections list) uses `getAllCollectionsPaginated` — DB-level `skip/take` with alphabetical sort
 
 ## History
 
