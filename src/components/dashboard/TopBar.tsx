@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { FolderPlus, Menu, Plus, Search } from "lucide-react";
 import NewItemDialog from "@/components/items/NewItemDialog";
 import NewCollectionDialog from "@/components/collections/NewCollectionDialog";
@@ -10,10 +10,11 @@ import type { SidebarItemType } from "@/components/dashboard/Sidebar";
 
 interface TopBarProps {
   onMobileMenuClick?: () => void;
+  onSearchClick?: () => void;
   itemTypes?: SidebarItemType[];
 }
 
-export default function TopBar({ onMobileMenuClick, itemTypes = [] }: TopBarProps) {
+export default function TopBar({ onMobileMenuClick, onSearchClick, itemTypes = [] }: TopBarProps) {
   const [newItemOpen, setNewItemOpen] = useState(false);
   const [newCollectionOpen, setNewCollectionOpen] = useState(false);
 
@@ -30,18 +31,24 @@ export default function TopBar({ onMobileMenuClick, itemTypes = [] }: TopBarProp
         </button>
 
         {/* Logo */}
-        <div className="flex items-center gap-2 shrink-0 w-48">
+        <Link href="/dashboard" className="flex items-center gap-2 shrink-0 w-48">
           <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground text-xs font-bold">
             DC
           </div>
           <span className="font-semibold text-foreground text-base">DevClustr</span>
-        </div>
+        </Link>
 
-        {/* Search — centred */}
-        <div className="relative flex-1 max-w-md mx-auto">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <Input placeholder="Search..." className="pl-9 w-full" />
-        </div>
+        {/* Search trigger — centred */}
+        <button
+          onClick={onSearchClick}
+          className="relative flex-1 max-w-md mx-auto flex items-center gap-2 rounded-md border border-input bg-muted/50 px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
+        >
+          <Search className="h-4 w-4 shrink-0" />
+          <span className="flex-1 text-left">Search...</span>
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-border bg-background px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
+            <span className="text-base leading-none">⌘</span>K
+          </kbd>
+        </button>
 
         {/* Actions */}
         <div className="flex items-center gap-2 shrink-0 justify-end">
