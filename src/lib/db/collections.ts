@@ -136,6 +136,21 @@ export async function updateCollection(
   });
 }
 
+export type SearchCollection = { id: string; name: string; itemCount: number };
+
+export async function getSearchCollections(userId: string): Promise<SearchCollection[]> {
+  const collections = await prisma.collection.findMany({
+    where: { userId },
+    select: {
+      id: true,
+      name: true,
+      _count: { select: { items: true } },
+    },
+    orderBy: { name: "asc" },
+  });
+  return collections.map((c) => ({ id: c.id, name: c.name, itemCount: c._count.items }));
+}
+
 export async function deleteCollection(userId: string, collectionId: string): Promise<void> {
   const existing = await prisma.collection.findFirst({ where: { id: collectionId, userId } });
   if (!existing) throw new Error("Not found");
