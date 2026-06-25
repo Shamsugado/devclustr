@@ -110,6 +110,67 @@ export async function getAllCollections(userId: string): Promise<CollectionMeta[
   return collections.sort((a, b) => a.name.localeCompare(b.name));
 }
 
+export async function getAllCollectionsPaginated(
+  userId: string,
+  { page, pageSize }: { page: number; pageSize: number }
+): Promise<{ collections: CollectionMeta[]; total: number }> {
+  const [total, rawCollections] = await Promise.all([
+    prisma.collection.count({ where: { userId } }),
+    prisma.collection.findMany({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            item: {
+              select: {
+                itemTypeId: true,
+                lastUsedAt: true,
+                itemType: { select: { icon: true, color: true } },
+              },
+            },
+          },
+        },
+        _count: { select: { items: true } },
+      },
+      orderBy: { name: "asc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+  ]);
+
+  const collections = rawCollections.map((col) => {
+    const typeMap = new Map<string, { typeId: string; icon: string; color: string }>();
+    const typeCounts = new Map<string, number>();
+
+    for (const ic of col.items) {
+      const typeId = ic.item.itemTypeId;
+      typeMap.set(typeId, { typeId, icon: ic.item.itemType.icon, color: ic.item.itemType.color });
+      typeCounts.set(typeId, (typeCounts.get(typeId) ?? 0) + 1);
+    }
+
+    let dominantTypeColor = "#6b7280";
+    if (typeCounts.size > 0) {
+      const dominantTypeId = [...typeCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+      dominantTypeColor = typeMap.get(dominantTypeId)?.color ?? "#6b7280";
+    }
+
+    return {
+      id: col.id,
+      name: col.name,
+      description: col.description,
+      isFavorite: col.isFavorite,
+      itemCount: col._count.items,
+      itemTypes: [...typeMap.values()],
+      dominantTypeColor,
+      latestItemUsedAt: col.items
+        .map((ic) => ic.item.lastUsedAt?.getTime() ?? 0)
+        .reduce((max, t) => Math.max(max, t), 0),
+    };
+  });
+
+  return { collections, total };
+}
+
 export type CollectionWithDetail = CollectionMeta & { description: string | null };
 
 export async function getCollectionById(

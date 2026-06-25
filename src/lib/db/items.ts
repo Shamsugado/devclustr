@@ -41,22 +41,33 @@ export const getSystemItemTypes = cache(async () => {
   });
 });
 
-export async function getItemsByTypeSlug(userId: string, typeSlug: string) {
+export async function getItemsByTypeSlug(
+  userId: string,
+  typeSlug: string,
+  { page, pageSize }: { page: number; pageSize: number }
+) {
   const typeName = typeSlug.slice(0, -1); // "snippets" → "snippet"
-  return prisma.item.findMany({
-    where: {
-      userId,
-      itemType: { name: { equals: typeName, mode: "insensitive" } },
-    },
-    include: {
-      itemType: { select: { id: true, name: true, icon: true, color: true } },
-      tags: { include: { tag: { select: { name: true } } } },
-    },
-    orderBy: { updatedAt: "desc" },
-  });
+  const where = {
+    userId,
+    itemType: { name: { equals: typeName, mode: "insensitive" as const } },
+  };
+  const [items, total] = await Promise.all([
+    prisma.item.findMany({
+      where,
+      include: {
+        itemType: { select: { id: true, name: true, icon: true, color: true } },
+        tags: { include: { tag: { select: { name: true } } } },
+      },
+      orderBy: { updatedAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.item.count({ where }),
+  ]);
+  return { items, total };
 }
 
-export type ItemWithType = Awaited<ReturnType<typeof getItemsByTypeSlug>>[0];
+export type ItemWithType = Awaited<ReturnType<typeof getItemsByTypeSlug>>["items"][0];
 
 export async function getItemById(id: string, userId: string) {
   return prisma.item.findFirst({
@@ -139,18 +150,29 @@ export async function createItem(
   });
 }
 
-export async function getItemsByCollectionId(userId: string, collectionId: string) {
-  return prisma.item.findMany({
-    where: {
-      userId,
-      collections: { some: { collectionId } },
-    },
-    include: {
-      itemType: { select: { id: true, name: true, icon: true, color: true } },
-      tags: { include: { tag: { select: { name: true } } } },
-    },
-    orderBy: { updatedAt: "desc" },
-  });
+export async function getItemsByCollectionId(
+  userId: string,
+  collectionId: string,
+  { page, pageSize }: { page: number; pageSize: number }
+) {
+  const where = {
+    userId,
+    collections: { some: { collectionId } },
+  };
+  const [items, total] = await Promise.all([
+    prisma.item.findMany({
+      where,
+      include: {
+        itemType: { select: { id: true, name: true, icon: true, color: true } },
+        tags: { include: { tag: { select: { name: true } } } },
+      },
+      orderBy: { updatedAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.item.count({ where }),
+  ]);
+  return { items, total };
 }
 
 export type SearchItem = {
