@@ -21,6 +21,9 @@ model User {
   isPro                         Boolean   @default(false)
   stripeCustomerId     String?   @unique
   stripeSubscriptionId String?   @unique
+  editorFontSize       Int?
+  editorTabSize        Int?
+  editorTheme          String?
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 

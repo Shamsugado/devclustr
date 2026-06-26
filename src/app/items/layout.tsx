@@ -2,17 +2,19 @@ import DashboardShell from "@/components/dashboard/DashboardShell";
 import { auth } from "@/auth";
 import { getSidebarCollections } from "@/lib/db/collections";
 import { getSystemItemTypes } from "@/lib/db/items";
+import { getEditorSettings, EDITOR_SETTINGS_DEFAULTS } from "@/lib/db/users";
 
 export default async function ItemsLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   const user = session?.user;
 
-  const [itemTypes, sidebarCollections] = user
+  const [itemTypes, sidebarCollections, editorSettings] = user
     ? await Promise.all([
         getSystemItemTypes(),
         getSidebarCollections(user.id),
+        getEditorSettings(user.id),
       ])
-    : [[], { favorites: [], recents: [] }];
+    : [[], { favorites: [], recents: [] }, EDITOR_SETTINGS_DEFAULTS];
 
   const sidebarData = {
     itemTypes,
@@ -23,5 +25,5 @@ export default async function ItemsLayout({ children }: { children: React.ReactN
       : null,
   };
 
-  return <DashboardShell sidebarData={sidebarData}>{children}</DashboardShell>;
+  return <DashboardShell sidebarData={sidebarData} editorSettings={editorSettings}>{children}</DashboardShell>;
 }

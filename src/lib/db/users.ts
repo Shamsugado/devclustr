@@ -1,5 +1,40 @@
 import { prisma } from "@/lib/prisma";
 
+export const EDITOR_SETTINGS_DEFAULTS = {
+  fontSize: 12,
+  tabSize: 2,
+  theme: "vs-dark",
+} as const;
+
+export type EditorSettings = {
+  fontSize: number;
+  tabSize: number;
+  theme: string;
+};
+
+export async function getEditorSettings(userId: string): Promise<EditorSettings> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { editorFontSize: true, editorTabSize: true, editorTheme: true },
+  });
+  return {
+    fontSize: user?.editorFontSize ?? EDITOR_SETTINGS_DEFAULTS.fontSize,
+    tabSize: user?.editorTabSize ?? EDITOR_SETTINGS_DEFAULTS.tabSize,
+    theme: user?.editorTheme ?? EDITOR_SETTINGS_DEFAULTS.theme,
+  };
+}
+
+export async function saveEditorSettings(userId: string, settings: EditorSettings): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      editorFontSize: settings.fontSize,
+      editorTabSize: settings.tabSize,
+      editorTheme: settings.theme,
+    },
+  });
+}
+
 export async function getProfileUser(userId: string) {
   return prisma.user.findUnique({
     where: { id: userId },
