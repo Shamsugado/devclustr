@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { FolderPlus, Menu, Plus, Search } from "lucide-react";
+import { FolderPlus, Menu, Plus, Search, Star } from "lucide-react";
 import NewItemDialog from "@/components/items/NewItemDialog";
 import NewCollectionDialog from "@/components/collections/NewCollectionDialog";
 import type { SidebarItemType } from "@/components/dashboard/Sidebar";
@@ -52,6 +52,13 @@ export default function TopBar({ onMobileMenuClick, onSearchClick, itemTypes = [
 
         {/* Actions */}
         <div className="flex items-center gap-2 shrink-0 justify-end">
+          <Link
+            href="/favorites"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            aria-label="Favorites"
+          >
+            <Star className="h-5 w-5" />
+          </Link>
           <Button
             variant="secondary"
             className="bg-foreground text-background hover:bg-foreground/90"

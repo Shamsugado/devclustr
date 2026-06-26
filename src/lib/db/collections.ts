@@ -212,6 +212,32 @@ export async function getSearchCollections(userId: string): Promise<SearchCollec
   return collections.map((c) => ({ id: c.id, name: c.name, itemCount: c._count.items }));
 }
 
+export type FavoriteCollection = {
+  id: string;
+  name: string;
+  itemCount: number;
+  updatedAt: Date;
+};
+
+export async function getFavoriteCollections(userId: string): Promise<FavoriteCollection[]> {
+  const collections = await prisma.collection.findMany({
+    where: { userId, isFavorite: true },
+    select: {
+      id: true,
+      name: true,
+      updatedAt: true,
+      _count: { select: { items: true } },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+  return collections.map((c) => ({
+    id: c.id,
+    name: c.name,
+    itemCount: c._count.items,
+    updatedAt: c.updatedAt,
+  }));
+}
+
 export async function deleteCollection(userId: string, collectionId: string): Promise<void> {
   const existing = await prisma.collection.findFirst({ where: { id: collectionId, userId } });
   if (!existing) throw new Error("Not found");
