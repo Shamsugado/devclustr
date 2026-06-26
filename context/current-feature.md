@@ -1,25 +1,16 @@
-# Current Feature: Pinned Items
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Create `toggleItemPin` server action (Zod-validated, ownership-checked, `{ success, isPinned }` return)
-- Wire up Pin button in `ItemDrawer` `ActionBar` (currently has no `onClick`)
-- Optimistic UI + `router.refresh()` + Sonner toast on success/error
-- Pinned items sort to top of item listings (`/items/[type]` and `/collections/[id]`)
-- Dashboard "Pinned Items" section reflects live pinned state
-- Pin icon on `ItemCard` remains a static read-only indicator (no change)
-- Items only — no pin feature for collections
+<!-- Add goals here -->
 
 ## Notes
 
-- Follow the Favorite button pattern (see `toggleItemFavorite` action and `ItemDrawer` star wiring)
-- `isPinned` field already exists on the `Item` model in Prisma schema
-- Pin button already rendered in `ItemDrawer` `ActionBar` — just needs `onClick` and state
-- Sort pinned items first within existing pagination (DB-level `orderBy` change)
+<!-- Add notes here -->
 
 ## History
 
@@ -65,3 +56,4 @@ In Progress
 - **2026-06-26** — Favorites page complete.
 - **2026-06-26** — Favorite toggle button complete.
 - **2026-06-26** — Favorites page sorting complete. Client-side sort controls added to `FavoritesClient`. Items sort by date (newest/oldest), name (A→Z/Z→A), type (A→Z/Z→A). Collections sort by date or name. Clicking the active button toggles direction (↑/↓); switching sorts resets to natural default. Type badges on item rows now colored with `itemType.color`. No DB or server changes. `toggleItemFavorite` and `toggleCollectionFavorite` server actions + DB helpers (ownership-checked, `{ success, isFavorite }` return). `ItemDrawer` `ActionBar` star button wired up (was a stub); syncs to new item via `useEffect`. `ItemCard` static star replaced with a clickable toggle (hidden on hover when not favorited, always visible when favorited). `CollectionCard` "Favorite/Unfavorite" dropdown item wired up. `CollectionDetailActions` star button enabled with filled/outline state. All surfaces use optimistic UI + `router.refresh()`. 8 unit tests added (106 total). `/favorites` route (protected) shows all favorited items and collections in a compact, VS Code-style monospace list. Star icon in TopBar links to the page. Two sections: Items (type icon + title + type badge + relative date) and Collections (folder icon + name + item count + relative date), each with counts. Sorted by `updatedAt` desc. Clicking an item opens `ItemDrawer`; clicking a collection navigates to `/collections/[id]`. Empty state when nothing is favorited. `getFavoriteItems` and `getFavoriteCollections` DB helpers added. `FavoritesClient` component in `src/components/favorites/`.
+- **2026-06-26** — Pinned items complete. `toggleItemPin` server action + DB helper (ownership-checked, `{ success, isPinned }` return). Pin button in `ItemDrawer` `ActionBar` wired with optimistic UI and `useEffect` sync; Sonner toast on error. Pinned items float to top of `/items/[type]` and `/collections/[id]` listings via DB-level `orderBy: [{ isPinned: "desc" }, { updatedAt: "desc" }]`. Dashboard "Pinned" section reflects live state. Pin icon on `ItemCard` remains a static indicator. 4 unit tests added (110 total).
