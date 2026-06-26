@@ -1,23 +1,16 @@
-# Current Feature: Editor Settings
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- User can configure Monaco editor settings that apply to all snippet and command editors
-- Settings include: font size, tab size, and theme (at minimum)
-- Settings are persisted per-user in the database
-- Settings are applied to the Monaco editor in `CodeEditor.tsx` wherever it's used (item drawer view/edit, new item dialog)
+<!-- Add goals here -->
 
 ## Notes
 
-- Monaco editor is already in use via `src/components/items/CodeEditor.tsx`
-- Settings UI likely lives in `/settings` (the existing settings page)
-- Settings should be stored in the DB (user-scoped), not localStorage, to persist across devices
-- Monaco supports: `fontSize`, `tabSize`, `theme` (built-in themes: `vs-dark`, `vs`, `hc-black`), and many more — start with the three listed
-- The `CodeEditor` component should read from user settings rather than hardcoded defaults
+<!-- Add notes here -->
 
 ## History
 
@@ -59,3 +52,4 @@ In Progress
 - **2026-06-25** — Global search / command palette complete.
 - **2026-06-25** — Pagination complete. `/items/[type]`, `/collections/[id]`, and `/collections` pages now paginate at 21 items/collections per page. `Pagination` component (`src/components/ui/Pagination.tsx`) renders numbered links with ellipsis for large ranges; prev/next greyed out at boundaries. DB helpers (`getItemsByTypeSlug`, `getItemsByCollectionId`, `getAllCollectionsPaginated`) use `skip`/`take` + parallel `count` — only the current page is fetched. Page driven by `?page=N` URL param. Constants extracted to `src/lib/constants.ts`. `pageNumbers` utility in `src/lib/pagination.ts` with 14 unit tests (81 total). Dashboard limits (6 collections, 10 items) unchanged. Cmd+K (Mac) / Ctrl+K (Windows) opens a `cmdk`-based command palette. Fuzzy search across all user items and collections with client-side filtering (no per-keystroke server round-trips). Results grouped as Items (type icon + name + content preview + type label) and Collections (folder icon + name + item count). Keyboard navigation built-in; Enter on item opens `ItemDrawer` inline; Enter on collection navigates to `/collections/[id]`. TopBar search input replaced with a styled button trigger showing `⌘K` hint. `GET /api/search` route returns all items and collections for the authenticated user. `getSearchItems` and `getSearchCollections` DB helpers added. `CommandPalette` component in `src/components/search/`. `cmdk` installed via `shadcn add command`; `src/components/ui/command.tsx` added. `DashboardShell` mounts the palette and listens for the keyboard shortcut globally.
 - **2026-06-25** — Settings page complete. New `/settings` route (protected in `src/proxy.ts`) with an Account section containing Change Password (email users only) and Delete Account (danger zone). Lucide `Settings` gear icon added to the right of the user info in the sidebar footer — a `Link` to `/settings` alongside the existing dropdown trigger. `ChangePasswordForm` and `DeleteAccountDialog` moved from `/profile` to `/settings`; `/profile` now shows user info and usage stats only. No API route changes.
+- **2026-06-26** — Editor settings complete. Users can configure Monaco editor font size (8–32px), tab size (1–8 spaces), and theme (Dark/Light/High Contrast) from `/settings`. Settings stored per-user in DB (`editorFontSize`, `editorTabSize`, `editorTheme` on `User`). `EditorSettingsContext` provides settings via `DashboardShell` to all `CodeEditor` instances (item drawer view/edit, new item dialog). `updateEditorSettings` server action (Zod-validated). 17 unit tests added (98 total).
