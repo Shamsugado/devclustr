@@ -205,6 +205,19 @@ export async function getSearchItems(userId: string): Promise<SearchItem[]> {
   }));
 }
 
+export async function getFavoriteItems(userId: string) {
+  return prisma.item.findMany({
+    where: { userId, isFavorite: true },
+    include: {
+      itemType: { select: { id: true, name: true, icon: true, color: true } },
+      tags: { include: { tag: { select: { name: true } } } },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+}
+
+export type FavoriteItem = Awaited<ReturnType<typeof getFavoriteItems>>[0];
+
 export async function updateItem(
   id: string,
   userId: string,

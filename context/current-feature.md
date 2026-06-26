@@ -1,16 +1,25 @@
-# Current Feature
+# Current Feature: Favorites Page
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Add star icon button to TopBar linking to `/favorites`
+- Create `/favorites` route protected by `src/proxy.ts`
+- Fetch all user favorited items and collections sorted by most recently favorited (`updatedAt`)
+- Compact list view (VS Code/terminal style — no cards, no heavy borders)
+- Each row: type icon, title, type badge, date added
+- Separate sections for Items and Collections with counts
+- Click item opens `ItemDrawer`; click collection navigates to `/collections/[id]`
+- Empty state when no favorites
 
 ## Notes
 
-<!-- Add notes here -->
+- UI style: monospace/semi-monospace font, minimal padding, high density, subtle hover states
+- Reuse `ItemDrawer` for item click (same pattern as `ItemListClient`)
+- Sort order: most recently favorited (`updatedAt` on `userFavoriteItems` / `userFavoriteCollections`)
 
 ## History
 
