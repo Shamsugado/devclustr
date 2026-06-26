@@ -44,25 +44,34 @@ export function ActionBar({
   onEdit,
   onDelete,
   onFavorite,
+  onPin,
   isDeleting,
 }: {
   item: ItemFull;
   onEdit: () => void;
   onDelete: () => void;
   onFavorite: () => Promise<void>;
+  onPin: () => Promise<void>;
   isDeleting: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const [isFav, setIsFav] = useState(item.isFavorite);
+  const [isPinned, setIsPinned] = useState(item.isPinned);
   const isFile = item.contentType === "FILE";
 
   useEffect(() => {
     setIsFav(item.isFavorite);
-  }, [item.id, item.isFavorite]);
+    setIsPinned(item.isPinned);
+  }, [item.id, item.isFavorite, item.isPinned]);
 
   async function handleFavorite() {
     setIsFav((prev) => !prev);
     await onFavorite();
+  }
+
+  async function handlePin() {
+    setIsPinned((prev) => !prev);
+    await onPin();
   }
 
   async function handleCopy() {
@@ -77,8 +86,8 @@ export function ActionBar({
       <button onClick={handleFavorite} title={isFav ? "Remove from favorites" : "Add to favorites"} className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
         <Star className={`h-4 w-4 ${isFav ? "fill-yellow-400 text-yellow-400" : ""}`} />
       </button>
-      <button title="Pin" className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
-        <Pin className={`h-4 w-4 ${item.isPinned ? "fill-foreground text-foreground" : ""}`} />
+      <button onClick={handlePin} title={isPinned ? "Unpin" : "Pin"} className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
+        <Pin className={`h-4 w-4 ${isPinned ? "fill-foreground text-foreground" : ""}`} />
       </button>
       {isFile ? (
         <a

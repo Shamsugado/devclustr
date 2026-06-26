@@ -1,16 +1,25 @@
-# Current Feature
+# Current Feature: Pinned Items
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Create `toggleItemPin` server action (Zod-validated, ownership-checked, `{ success, isPinned }` return)
+- Wire up Pin button in `ItemDrawer` `ActionBar` (currently has no `onClick`)
+- Optimistic UI + `router.refresh()` + Sonner toast on success/error
+- Pinned items sort to top of item listings (`/items/[type]` and `/collections/[id]`)
+- Dashboard "Pinned Items" section reflects live pinned state
+- Pin icon on `ItemCard` remains a static read-only indicator (no change)
+- Items only — no pin feature for collections
 
 ## Notes
 
-<!-- Add notes here -->
+- Follow the Favorite button pattern (see `toggleItemFavorite` action and `ItemDrawer` star wiring)
+- `isPinned` field already exists on the `Item` model in Prisma schema
+- Pin button already rendered in `ItemDrawer` `ActionBar` — just needs `onClick` and state
+- Sort pinned items first within existing pagination (DB-level `orderBy` change)
 
 ## History
 

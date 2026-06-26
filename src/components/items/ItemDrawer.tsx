@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { updateItem, deleteItem, toggleItemFavorite } from "@/actions/items";
+import { updateItem, deleteItem, toggleItemFavorite, toggleItemPin } from "@/actions/items";
 import { DrawerSkeleton, type ItemFull } from "@/components/items/ItemDrawerParts";
 import ItemDrawerView from "@/components/items/ItemDrawerView";
 import ItemDrawerEdit, { type EditForm, initEditForm } from "@/components/items/ItemDrawerEdit";
@@ -90,6 +90,17 @@ export default function ItemDrawer({ itemId, initialData, onClose }: ItemDrawerP
     }
   }
 
+  async function handlePin() {
+    if (!itemId) return;
+    const result = await toggleItemPin(itemId);
+    if (result.success) {
+      setItem((prev) => prev ? { ...prev, isPinned: result.isPinned } : prev);
+      router.refresh();
+    } else {
+      toast.error(result.error ?? "Failed to update pin");
+    }
+  }
+
   async function handleDelete() {
     if (!itemId) return;
     setIsDeleting(true);
@@ -143,7 +154,7 @@ export default function ItemDrawer({ itemId, initialData, onClose }: ItemDrawerP
       >
         {loading && <DrawerSkeleton />}
         {!loading && item && !isEditing && (
-          <ItemDrawerView item={item} onEdit={handleEdit} onDelete={handleDelete} onFavorite={handleFavorite} isDeleting={isDeleting} />
+          <ItemDrawerView item={item} onEdit={handleEdit} onDelete={handleDelete} onFavorite={handleFavorite} onPin={handlePin} isDeleting={isDeleting} />
         )}
         {!loading && item && isEditing && (
           <ItemDrawerEdit
