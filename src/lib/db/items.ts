@@ -58,7 +58,7 @@ export async function getItemsByTypeSlug(
         itemType: { select: { id: true, name: true, icon: true, color: true } },
         tags: { include: { tag: { select: { name: true } } } },
       },
-      orderBy: { updatedAt: "desc" },
+      orderBy: [{ isPinned: "desc" }, { updatedAt: "desc" }],
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
@@ -166,7 +166,7 @@ export async function getItemsByCollectionId(
         itemType: { select: { id: true, name: true, icon: true, color: true } },
         tags: { include: { tag: { select: { name: true } } } },
       },
-      orderBy: { updatedAt: "desc" },
+      orderBy: [{ isPinned: "desc" }, { updatedAt: "desc" }],
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
@@ -225,6 +225,16 @@ export async function toggleItemFavorite(id: string, userId: string) {
     where: { id, userId },
     data: { isFavorite: !item.isFavorite },
     select: { isFavorite: true },
+  });
+}
+
+export async function toggleItemPin(id: string, userId: string) {
+  const item = await prisma.item.findFirst({ where: { id, userId }, select: { isPinned: true } });
+  if (!item) throw new Error("Not found");
+  return prisma.item.update({
+    where: { id, userId },
+    data: { isPinned: !item.isPinned },
+    select: { isPinned: true },
   });
 }
 
