@@ -64,7 +64,7 @@ function SidebarContent({ data }: { data: SidebarData }) {
           </p>
           <ul className="space-y-0.5">
             <NavItem href="/dashboard" icon={<LayoutGrid className="h-4 w-4" />} label="All Items" />
-            <NavItem href="/dashboard/favorites" icon={<Star className="h-4 w-4" />} label="Favorites" />
+            <NavItem href="/favorites" icon={<Star className="h-4 w-4" />} label="Favorites" />
             <NavItem href="/dashboard/recent" icon={<Clock className="h-4 w-4" />} label="Recent" />
           </ul>
         </section>
