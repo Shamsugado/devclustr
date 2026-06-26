@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { OnMount } from "@monaco-editor/react";
 import { Copy, Check } from "lucide-react";
+import { useEditorSettings } from "@/contexts/EditorSettingsContext";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -18,6 +19,7 @@ interface CodeEditorProps {
 }
 
 export default function CodeEditor({ value, onChange, language, readOnly = false }: CodeEditorProps) {
+  const { fontSize, tabSize, theme } = useEditorSettings();
   const [copied, setCopied] = useState(false);
   const [editorHeight, setEditorHeight] = useState(MIN_HEIGHT);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +67,7 @@ export default function CodeEditor({ value, onChange, language, readOnly = false
         value={value}
         onChange={(v) => onChange?.(v ?? "")}
         language={monacoLang}
-        theme="vs-dark"
+        theme={theme}
         height={editorHeight}
         onMount={handleMount}
         options={{
@@ -75,8 +77,8 @@ export default function CodeEditor({ value, onChange, language, readOnly = false
           lineNumbers: "on",
           folding: false,
           wordWrap: "on",
-          fontSize: 12,
-          tabSize: 2,
+          fontSize,
+          tabSize,
           automaticLayout: true,
           padding: { top: 8, bottom: 8 },
           renderLineHighlight: readOnly ? "none" : "line",

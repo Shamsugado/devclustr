@@ -1,15 +1,19 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { getProfileUser } from "@/lib/db/users";
+import { getProfileUser, getEditorSettings } from "@/lib/db/users";
 import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
 import DeleteAccountDialog from "@/components/profile/DeleteAccountDialog";
+import EditorSettingsForm from "@/components/settings/EditorSettingsForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function SettingsPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/sign-in");
 
-  const user = await getProfileUser(session.user.id);
+  const [user, editorSettings] = await Promise.all([
+    getProfileUser(session.user.id),
+    getEditorSettings(session.user.id),
+  ]);
   if (!user) redirect("/sign-in");
 
   const isEmailUser = !!user.password;
@@ -18,6 +22,21 @@ export default async function SettingsPage() {
     <div className="min-h-screen bg-background p-6 md:p-10">
       <div className="mx-auto max-w-2xl space-y-6">
         <h1 className="text-2xl font-semibold">Settings</h1>
+
+        {/* Editor section */}
+        <section className="space-y-4">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            Editor
+          </h2>
+          <Card>
+            <CardHeader>
+              <CardTitle>Code editor</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EditorSettingsForm initial={editorSettings} />
+            </CardContent>
+          </Card>
+        </section>
 
         {/* Account section */}
         <section className="space-y-4">

@@ -1,16 +1,23 @@
-# Current Feature
+# Current Feature: Editor Settings
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- User can configure Monaco editor settings that apply to all snippet and command editors
+- Settings include: font size, tab size, and theme (at minimum)
+- Settings are persisted per-user in the database
+- Settings are applied to the Monaco editor in `CodeEditor.tsx` wherever it's used (item drawer view/edit, new item dialog)
 
 ## Notes
 
-<!-- Add notes here -->
+- Monaco editor is already in use via `src/components/items/CodeEditor.tsx`
+- Settings UI likely lives in `/settings` (the existing settings page)
+- Settings should be stored in the DB (user-scoped), not localStorage, to persist across devices
+- Monaco supports: `fontSize`, `tabSize`, `theme` (built-in themes: `vs-dark`, `vs`, `hc-black`), and many more — start with the three listed
+- The `CodeEditor` component should read from user settings rather than hardcoded defaults
 
 ## History
 
