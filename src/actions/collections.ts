@@ -5,6 +5,7 @@ import {
   createCollection as createCollectionInDb,
   updateCollection as updateCollectionInDb,
   deleteCollection as deleteCollectionInDb,
+  toggleCollectionFavorite as toggleCollectionFavoriteInDb,
 } from "@/lib/db/collections";
 import { CreateCollectionSchema, UpdateCollectionSchema } from "@/actions/collection-schemas";
 
@@ -47,6 +48,18 @@ export async function updateCollection(formData: {
     return { success: true as const, data: collection };
   } catch {
     return { success: false as const, error: "Failed to update collection" };
+  }
+}
+
+export async function toggleCollectionFavorite(collectionId: string) {
+  const session = await auth();
+  if (!session?.user?.id) return { success: false as const, error: "Unauthorized" };
+  if (!collectionId) return { success: false as const, error: "Invalid ID" };
+  try {
+    const { isFavorite } = await toggleCollectionFavoriteInDb(collectionId, session.user.id);
+    return { success: true as const, isFavorite };
+  } catch {
+    return { success: false as const, error: "Failed to update favorite" };
   }
 }
 

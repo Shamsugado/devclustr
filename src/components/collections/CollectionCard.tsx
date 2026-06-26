@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Star, File, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import type { CollectionMeta } from "@/lib/db/collections";
 import { itemTypeIconMap } from "@/lib/item-type-icons";
-import { deleteCollection } from "@/actions/collections";
+import { deleteCollection, toggleCollectionFavorite } from "@/actions/collections";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -33,6 +33,17 @@ export default function CollectionCard({ collection }: { collection: CollectionM
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isFav, setIsFav] = useState(collection.isFavorite);
+
+  async function handleFavorite() {
+    setIsFav((prev) => !prev);
+    const result = await toggleCollectionFavorite(collection.id);
+    if (!result.success) {
+      setIsFav((prev) => !prev);
+    } else {
+      router.refresh();
+    }
+  }
 
   async function handleDelete() {
     setIsDeleting(true);
@@ -55,7 +66,7 @@ export default function CollectionCard({ collection }: { collection: CollectionM
         className="bg-card border border-border border-l-4 rounded-lg p-4 flex flex-col gap-2 relative group hover:bg-card/80 transition-colors"
         style={{ borderLeftColor: collection.dominantTypeColor }}
       >
-        {collection.isFavorite && (
+        {isFav && (
           <Star className="absolute top-3 right-8 h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
         )}
 
@@ -76,9 +87,9 @@ export default function CollectionCard({ collection }: { collection: CollectionM
                 <Pencil />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => {}}>
-                <Star />
-                Favorite
+              <DropdownMenuItem onClick={handleFavorite}>
+                <Star className={isFav ? "fill-yellow-400 text-yellow-400" : ""} />
+                {isFav ? "Unfavorite" : "Favorite"}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>

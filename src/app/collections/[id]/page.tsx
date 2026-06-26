@@ -42,7 +42,7 @@ export default async function CollectionPage({
             <p className="text-sm text-muted-foreground mt-0.5">{collection.description}</p>
           )}
         </div>
-        <CollectionDetailActions collection={collection} />
+        <CollectionDetailActions collection={{ id: collection.id, name: collection.name, description: collection.description, isFavorite: collection.isFavorite }} />
       </div>
 
       {items.length === 0 ? (

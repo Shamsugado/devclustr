@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Star, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { deleteCollection } from "@/actions/collections";
+import { deleteCollection, toggleCollectionFavorite } from "@/actions/collections";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -20,7 +20,7 @@ import {
 import EditCollectionDialog from "@/components/collections/EditCollectionDialog";
 
 interface CollectionDetailActionsProps {
-  collection: { id: string; name: string; description: string | null };
+  collection: { id: string; name: string; description: string | null; isFavorite: boolean };
 }
 
 export default function CollectionDetailActions({ collection }: CollectionDetailActionsProps) {
@@ -28,6 +28,17 @@ export default function CollectionDetailActions({ collection }: CollectionDetail
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isFav, setIsFav] = useState(collection.isFavorite);
+
+  async function handleFavorite() {
+    setIsFav((prev) => !prev);
+    const result = await toggleCollectionFavorite(collection.id);
+    if (!result.success) {
+      setIsFav((prev) => !prev);
+    } else {
+      router.refresh();
+    }
+  }
 
   async function handleDelete() {
     setIsDeleting(true);
@@ -47,8 +58,14 @@ export default function CollectionDetailActions({ collection }: CollectionDetail
   return (
     <>
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" disabled>
-          <Star className="h-4 w-4" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-yellow-400"
+          onClick={handleFavorite}
+          title={isFav ? "Remove from favorites" : "Add to favorites"}
+        >
+          <Star className={`h-4 w-4 ${isFav ? "fill-yellow-400 text-yellow-400" : ""}`} />
         </Button>
         <Button
           variant="ghost"

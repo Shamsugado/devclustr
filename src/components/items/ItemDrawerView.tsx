@@ -15,11 +15,13 @@ export default function ItemDrawerView({
   item,
   onEdit,
   onDelete,
+  onFavorite,
   isDeleting,
 }: {
   item: ItemFull;
   onEdit: () => void;
   onDelete: () => void;
+  onFavorite: () => Promise<void>;
   isDeleting: boolean;
 }) {
   const { itemType } = item;
@@ -58,7 +60,7 @@ export default function ItemDrawerView({
       </SheetHeader>
 
       <div className="px-6">
-        <ActionBar item={item} onEdit={onEdit} onDelete={onDelete} isDeleting={isDeleting} />
+        <ActionBar item={item} onEdit={onEdit} onDelete={onDelete} onFavorite={onFavorite} isDeleting={isDeleting} />
       </div>
 
       <div className="px-6 pb-6 flex flex-col gap-5 overflow-y-auto">

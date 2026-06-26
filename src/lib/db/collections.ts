@@ -238,6 +238,16 @@ export async function getFavoriteCollections(userId: string): Promise<FavoriteCo
   }));
 }
 
+export async function toggleCollectionFavorite(id: string, userId: string) {
+  const col = await prisma.collection.findFirst({ where: { id, userId }, select: { isFavorite: true } });
+  if (!col) throw new Error("Not found");
+  return prisma.collection.update({
+    where: { id, userId },
+    data: { isFavorite: !col.isFavorite },
+    select: { isFavorite: true },
+  });
+}
+
 export async function deleteCollection(userId: string, collectionId: string): Promise<void> {
   const existing = await prisma.collection.findFirst({ where: { id: collectionId, userId } });
   if (!existing) throw new Error("Not found");

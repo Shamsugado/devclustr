@@ -1,16 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Star, Clock, File, Copy, Check } from "lucide-react";
 import { itemTypeIconMap } from "@/lib/item-type-icons";
 import type { ItemWithType } from "@/lib/db/items";
 import { formatRelativeTime } from "@/lib/format";
+import { toggleItemFavorite } from "@/actions/items";
 
 export default function ItemCard({ item, onClick }: { item: ItemWithType; onClick?: () => void }) {
+  const router = useRouter();
   const { itemType } = item;
   const Icon = itemTypeIconMap[itemType.icon] ?? File;
   const isUrl = item.contentType === "URL";
   const [copied, setCopied] = useState(false);
+  const [isFav, setIsFav] = useState(item.isFavorite);
 
   function handleCopy(e: React.MouseEvent) {
     e.stopPropagation();
@@ -19,6 +23,17 @@ export default function ItemCard({ item, onClick }: { item: ItemWithType; onClic
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     });
+  }
+
+  async function handleFavorite(e: React.MouseEvent) {
+    e.stopPropagation();
+    setIsFav((prev) => !prev);
+    const result = await toggleItemFavorite(item.id);
+    if (!result.success) {
+      setIsFav((prev) => !prev); // revert on error
+    } else {
+      router.refresh();
+    }
   }
 
   const CopyIcon = copied ? Check : Copy;
@@ -47,9 +62,13 @@ export default function ItemCard({ item, onClick }: { item: ItemWithType; onClic
           >
             <CopyIcon className={`h-3.5 w-3.5 ${copied ? "text-green-400" : ""}`} />
           </button>
-          {item.isFavorite && (
-            <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-          )}
+          <button
+            onClick={handleFavorite}
+            className={`p-0.5 rounded transition-opacity text-muted-foreground hover:text-yellow-400 ${isFav ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+            title={isFav ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Star className={`h-3.5 w-3.5 ${isFav ? "fill-yellow-400 text-yellow-400" : ""}`} />
+          </button>
         </div>
       </div>
 

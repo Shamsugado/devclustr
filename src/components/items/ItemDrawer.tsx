@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { updateItem, deleteItem } from "@/actions/items";
+import { updateItem, deleteItem, toggleItemFavorite } from "@/actions/items";
 import { DrawerSkeleton, type ItemFull } from "@/components/items/ItemDrawerParts";
 import ItemDrawerView from "@/components/items/ItemDrawerView";
 import ItemDrawerEdit, { type EditForm, initEditForm } from "@/components/items/ItemDrawerEdit";
@@ -79,6 +79,17 @@ export default function ItemDrawer({ itemId, initialData, onClose }: ItemDrawerP
     setEditForm((prev) => ({ ...prev, collectionIds: ids }));
   }
 
+  async function handleFavorite() {
+    if (!itemId) return;
+    const result = await toggleItemFavorite(itemId);
+    if (result.success) {
+      setItem((prev) => prev ? { ...prev, isFavorite: result.isFavorite } : prev);
+      router.refresh();
+    } else {
+      toast.error(result.error ?? "Failed to update favorite");
+    }
+  }
+
   async function handleDelete() {
     if (!itemId) return;
     setIsDeleting(true);
@@ -132,7 +143,7 @@ export default function ItemDrawer({ itemId, initialData, onClose }: ItemDrawerP
       >
         {loading && <DrawerSkeleton />}
         {!loading && item && !isEditing && (
-          <ItemDrawerView item={item} onEdit={handleEdit} onDelete={handleDelete} isDeleting={isDeleting} />
+          <ItemDrawerView item={item} onEdit={handleEdit} onDelete={handleDelete} onFavorite={handleFavorite} isDeleting={isDeleting} />
         )}
         {!loading && item && isEditing && (
           <ItemDrawerEdit
