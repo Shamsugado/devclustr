@@ -218,6 +218,16 @@ export async function getFavoriteItems(userId: string) {
 
 export type FavoriteItem = Awaited<ReturnType<typeof getFavoriteItems>>[0];
 
+export async function toggleItemFavorite(id: string, userId: string) {
+  const item = await prisma.item.findFirst({ where: { id, userId }, select: { isFavorite: true } });
+  if (!item) throw new Error("Not found");
+  return prisma.item.update({
+    where: { id, userId },
+    data: { isFavorite: !item.isFavorite },
+    select: { isFavorite: true },
+  });
+}
+
 export async function updateItem(
   id: string,
   userId: string,

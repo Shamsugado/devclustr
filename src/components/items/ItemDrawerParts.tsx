@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Star, Pin, Copy, Pencil, Trash2, Download } from "lucide-react";
 import {
   AlertDialog,
@@ -43,15 +43,27 @@ export function ActionBar({
   item,
   onEdit,
   onDelete,
+  onFavorite,
   isDeleting,
 }: {
   item: ItemFull;
   onEdit: () => void;
   onDelete: () => void;
+  onFavorite: () => Promise<void>;
   isDeleting: boolean;
 }) {
   const [copied, setCopied] = useState(false);
+  const [isFav, setIsFav] = useState(item.isFavorite);
   const isFile = item.contentType === "FILE";
+
+  useEffect(() => {
+    setIsFav(item.isFavorite);
+  }, [item.id, item.isFavorite]);
+
+  async function handleFavorite() {
+    setIsFav((prev) => !prev);
+    await onFavorite();
+  }
 
   async function handleCopy() {
     const text = item.contentType === "URL" ? (item.url ?? "") : (item.content ?? "");
@@ -62,8 +74,8 @@ export function ActionBar({
 
   return (
     <div className="flex items-center gap-1 py-3 border-b border-border">
-      <button title="Favorite" className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
-        <Star className={`h-4 w-4 ${item.isFavorite ? "fill-yellow-400 text-yellow-400" : ""}`} />
+      <button onClick={handleFavorite} title={isFav ? "Remove from favorites" : "Add to favorites"} className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
+        <Star className={`h-4 w-4 ${isFav ? "fill-yellow-400 text-yellow-400" : ""}`} />
       </button>
       <button title="Pin" className="flex items-center justify-center p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">
         <Pin className={`h-4 w-4 ${item.isPinned ? "fill-foreground text-foreground" : ""}`} />
