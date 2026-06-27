@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { FolderPlus, Menu, Plus, Search, Star } from "lucide-react";
+import { FolderOpen, FolderPlus, Menu, Plus, Search, Star } from "lucide-react";
 import NewItemDialog from "@/components/items/NewItemDialog";
 import NewCollectionDialog from "@/components/collections/NewCollectionDialog";
 import type { SidebarItemType } from "@/components/dashboard/Sidebar";
@@ -32,8 +32,8 @@ export default function TopBar({ onMobileMenuClick, onSearchClick, itemTypes = [
 
         {/* Logo */}
         <Link href="/dashboard" className="flex items-center gap-2 shrink-0 md:w-60">
-          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground text-xs font-bold">
-            DC
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-linear-to-br from-blue-500 to-indigo-600 text-white">
+            <FolderOpen className="h-4 w-4" />
           </div>
           <span className="font-semibold text-foreground text-base">DevClustr</span>
         </Link>

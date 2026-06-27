@@ -1,16 +1,22 @@
-# Current Feature
+# Current Feature: Homepage Nav on Auth Pages + Dashboard Logo Icon
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Add the homepage top nav (Navbar component) to the `/sign-in` and `/register` pages
+- Replace the text-only "DS" logo in the dashboard sidebar/topbar with the same folder icon used in the homepage Navbar
 
 ## Notes
 
-<!-- Add notes here -->
+- The homepage Navbar is at `src/components/homepage/Navbar.tsx` — reuse it directly on auth pages
+- Auth pages are at `src/app/(auth)/sign-in/page.tsx` and `src/app/(auth)/register/page.tsx`
+- The homepage Navbar logo uses a Lucide `FolderOpen` (or similar) icon — confirm which icon is used
+- The dashboard sidebar logo is rendered in `src/components/dashboard/Sidebar.tsx`; the TopBar logo is in `src/components/dashboard/TopBar.tsx`
+- Keep the "DS" text or "DevClustr" text alongside the icon — just add/replace the icon portion
+- The auth pages currently have no nav, so the Navbar will provide context/branding and a back-to-home link
 
 ## History
 
