@@ -1,16 +1,33 @@
-# Current Feature
+# Current Feature: Homepage
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Replace `src/app/page.tsx` with the public marketing homepage
+- Redirect authenticated users to `/dashboard` via server-side session check
+- Implement Navbar with sticky scroll, mobile hamburger menu, sign-in/get-started links
+- Implement Hero section with animated chaos canvas (left) and static mini-dashboard mockup (right)
+- Implement Features section with 6 feature cards in a 2×3 grid
+- Implement AI Section (Pro Feature) with checklist and mock code editor
+- Implement Pricing section with monthly/yearly toggle and Free/Pro cards
+- Implement CTA section
+- Implement Footer with dynamic copyright year and link columns
+- All dark-mode styling matching app (`bg-[#0c0e16]`), responsive (mobile-first)
+- No external animation libraries — CSS transitions and `useEffect` canvas only
 
 ## Notes
 
-<!-- Add notes here -->
+- Prototype lives at `prototypes/homepage/` for reference
+- Component structure: `src/components/homepage/` with Navbar, HeroSection, HeroDashboardVisual, FeaturesSection, AiSection, PricingSection, CtaSection, Footer
+- `HeroChaosCanvas.tsx` — client component with `useEffect` canvas animation (floating colored dots)
+- `Navbar` and `PricingSection` need `"use client"`; everything else is server components
+- Hero gradient: `bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent`
+- Dark surfaces: `bg-[#0c0e16]` / `bg-[#13151f]`, border: `border-[#252838]`, muted: `text-slate-500`
+- Pricing: Free $0, Pro $8/mo monthly → $6/mo yearly ($72/yr billed); yearly toggle shows 25% savings badge
+- Footer placeholder `#` links are fine for now
 
 ## History
 
