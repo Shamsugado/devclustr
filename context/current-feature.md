@@ -1,22 +1,16 @@
-# Current Feature: Homepage Nav on Auth Pages + Dashboard Logo Icon
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Add the homepage top nav (Navbar component) to the `/sign-in` and `/register` pages
-- Replace the text-only "DS" logo in the dashboard sidebar/topbar with the same folder icon used in the homepage Navbar
+<!-- Add goals here -->
 
 ## Notes
 
-- The homepage Navbar is at `src/components/homepage/Navbar.tsx` — reuse it directly on auth pages
-- Auth pages are at `src/app/(auth)/sign-in/page.tsx` and `src/app/(auth)/register/page.tsx`
-- The homepage Navbar logo uses a Lucide `FolderOpen` (or similar) icon — confirm which icon is used
-- The dashboard sidebar logo is rendered in `src/components/dashboard/Sidebar.tsx`; the TopBar logo is in `src/components/dashboard/TopBar.tsx`
-- Keep the "DS" text or "DevClustr" text alongside the icon — just add/replace the icon portion
-- The auth pages currently have no nav, so the Navbar will provide context/branding and a back-to-home link
+<!-- Add notes here -->
 
 ## History
 
@@ -66,3 +60,4 @@ In Progress
 - **2026-06-27** — Homepage mockup complete. Standalone marketing prototype at `prototypes/homepage/` (`index.html`, `styles.css`, `script.js`). Animated chaos-to-order hero: 8 floating app icons (RAF physics, wall bounce, mouse repulsion, rotation/scale pulse), pulsing gradient arrow, mini dashboard preview with colored nav labels (Snippets → Files) and "Recent Items" section header. Fixed navbar (opaque on scroll), features grid (6 cards with item-type accent colors), AI Pro section (code editor mockup with AI Generated Tags), pricing section (monthly/yearly toggle, $8/mo → $72/yr, "Most Popular" badge), CTA, and footer with dynamic year. Fully responsive (hero stacks vertically on mobile, arrow rotates 90°).
 - **2026-06-27** — Homepage complete. Public marketing page at `/` implemented in Next.js (replaces placeholder). Server-side auth redirect sends logged-in users to `/dashboard`. Components in `src/components/homepage/`: `Navbar` (sticky, mobile hamburger), `HeroSection` + `HeroChaosCanvas` (canvas animation, `useEffect`, 8 floating app icons) + `HeroDashboardVisual` (static mini-dashboard), `FeaturesSection` (2×3 grid, 6 cards), `AiSection` (Pro badge, checklist, mock code editor), `PricingSection` (monthly/yearly toggle, Free/$0 + Pro/$8→$6/mo), `CtaSection`, `Footer` (4 columns, dynamic year). Only `Navbar`, `PricingSection`, and `HeroChaosCanvasLoader` are client components. No new dependencies added.
 - **2026-06-27** — UI accessibility and responsiveness fixes complete. Sidebar collapsed mode now renders icon-only navigation (Quick Access + Item Types + user avatar) instead of a blank strip. TopBar logo uses `md:w-60` matching sidebar width; "New Collection" and "New Item" buttons collapse to icon-only below `sm` breakpoint. `PinnedItemCard` and `RecentItemCard` keyboard-accessible (`role=button`, `tabIndex`, `onKeyDown`). Dashboard section renamed "All Items" → "Recent Items". `ItemCard` copy/favorite buttons changed from `opacity-0` to `opacity-40` so they're visible on touch/keyboard; copy button gets `aria-label`. Pricing toggle track color bumped to `#252838` for visibility; `focus:outline-none` replaced with `focus-visible:ring`. `HeroChaosCanvas` wrapper and canvas get `aria-hidden="true"`. Hero arrow rotation fixed to `rotate-90 md:rotate-0` (points down on mobile, right on desktop). Hamburger touch target meets WCAG 2.5.8 (`min-h/w-[44px]`). "Files & Docs" feature card color `#64748b` → `#94a3b8` for contrast. Footer placeholder links marked `opacity-50 pointer-events-none title="Coming soon"`; nav columns wrapped in `<nav aria-label>`.
+- **2026-06-27** — Homepage nav on auth pages + logo icon complete. Homepage `Navbar` component added to `/sign-in` and `/register` pages (flex-col layout with nav at top, form centered below). Logo updated across homepage `Navbar` and dashboard `TopBar` to use a `FolderOpen` Lucide icon in a blue→indigo gradient box, replacing the plain "DC" text box.
