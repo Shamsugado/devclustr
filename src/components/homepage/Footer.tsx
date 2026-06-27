@@ -19,41 +19,41 @@ export default function Footer() {
           </div>
 
           {/* Product */}
-          <div>
+          <nav aria-label="Product">
             <h4 className="mb-3 text-sm font-semibold text-white">Product</h4>
             <ul className="flex flex-col gap-2">
               <li><a href="#features" className="text-sm text-slate-500 hover:text-slate-300">Features</a></li>
               <li><a href="#pricing" className="text-sm text-slate-500 hover:text-slate-300">Pricing</a></li>
-              <li><a href="#" className="text-sm text-slate-500 hover:text-slate-300">Changelog</a></li>
+              <li><a href="#" className="text-sm text-slate-500 pointer-events-none opacity-50" title="Coming soon">Changelog</a></li>
             </ul>
-          </div>
+          </nav>
 
           {/* Resources */}
-          <div>
+          <nav aria-label="Resources">
             <h4 className="mb-3 text-sm font-semibold text-white">Resources</h4>
             <ul className="flex flex-col gap-2">
-              <li><a href="#" className="text-sm text-slate-500 hover:text-slate-300">Documentation</a></li>
-              <li><a href="#" className="text-sm text-slate-500 hover:text-slate-300">API</a></li>
-              <li><a href="#" className="text-sm text-slate-500 hover:text-slate-300">Status</a></li>
+              <li><a href="#" className="text-sm text-slate-500 pointer-events-none opacity-50" title="Coming soon">Documentation</a></li>
+              <li><a href="#" className="text-sm text-slate-500 pointer-events-none opacity-50" title="Coming soon">API</a></li>
+              <li><a href="#" className="text-sm text-slate-500 pointer-events-none opacity-50" title="Coming soon">Status</a></li>
             </ul>
-          </div>
+          </nav>
 
           {/* Company */}
-          <div>
+          <nav aria-label="Company">
             <h4 className="mb-3 text-sm font-semibold text-white">Company</h4>
             <ul className="flex flex-col gap-2">
-              <li><a href="#" className="text-sm text-slate-500 hover:text-slate-300">About</a></li>
-              <li><a href="#" className="text-sm text-slate-500 hover:text-slate-300">Blog</a></li>
-              <li><a href="#" className="text-sm text-slate-500 hover:text-slate-300">Contact</a></li>
+              <li><a href="#" className="text-sm text-slate-500 pointer-events-none opacity-50" title="Coming soon">About</a></li>
+              <li><a href="#" className="text-sm text-slate-500 pointer-events-none opacity-50" title="Coming soon">Blog</a></li>
+              <li><a href="#" className="text-sm text-slate-500 pointer-events-none opacity-50" title="Coming soon">Contact</a></li>
             </ul>
-          </div>
+          </nav>
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-[#252838] pt-8 sm:flex-row">
           <p className="text-sm text-slate-500">© {year} DevClustr. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="text-sm text-slate-500 hover:text-slate-300">Privacy Policy</a>
-            <a href="#" className="text-sm text-slate-500 hover:text-slate-300">Terms of Service</a>
+            <a href="#" className="text-sm text-slate-500 pointer-events-none opacity-50" title="Coming soon">Privacy Policy</a>
+            <a href="#" className="text-sm text-slate-500 pointer-events-none opacity-50" title="Coming soon">Terms of Service</a>
           </div>
         </div>
       </div>

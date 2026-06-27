@@ -46,7 +46,7 @@ export default function Navbar() {
 
           {/* Hamburger */}
           <button
-            className="flex flex-col gap-1.5 p-2 md:hidden"
+            className="flex flex-col items-center justify-center gap-1.5 p-2 min-h-[44px] min-w-[44px] md:hidden"
             aria-label="Toggle menu"
             onClick={() => setMenuOpen((o) => !o)}
           >

@@ -50,30 +50,34 @@ interface SidebarProps {
   sidebarData: SidebarData;
 }
 
-function SidebarContent({ data }: { data: SidebarData }) {
+function SidebarContent({ data, collapsed = false }: { data: SidebarData; collapsed?: boolean }) {
   const { itemTypes, favoriteCollections, recentCollections, user } = data;
   const router = useRouter();
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-5">
+      <nav className={`flex-1 overflow-y-auto py-2 space-y-5 ${collapsed ? "px-1" : "px-3"}`}>
         {/* Quick Access */}
         <section>
-          <p className="px-2 mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Quick Access
-          </p>
+          {!collapsed && (
+            <p className="px-2 mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Quick Access
+            </p>
+          )}
           <ul className="space-y-0.5">
-            <NavItem href="/dashboard" icon={<LayoutGrid className="h-4 w-4" />} label="All Items" />
-            <NavItem href="/favorites" icon={<Star className="h-4 w-4" />} label="Favorites" />
-            <NavItem href="/dashboard/recent" icon={<Clock className="h-4 w-4" />} label="Recent" />
+            <NavItem href="/dashboard" icon={<LayoutGrid className="h-4 w-4" />} label="All Items" collapsed={collapsed} />
+            <NavItem href="/favorites" icon={<Star className="h-4 w-4" />} label="Favorites" collapsed={collapsed} />
+            <NavItem href="/dashboard/recent" icon={<Clock className="h-4 w-4" />} label="Recent" collapsed={collapsed} />
           </ul>
         </section>
 
         {/* Item Types */}
         <section>
-          <p className="px-2 mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Item Types
-          </p>
+          {!collapsed && (
+            <p className="px-2 mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Item Types
+            </p>
+          )}
           <ul className="space-y-0.5">
             {itemTypes.map((type) => {
               const Icon = itemTypeIconMap[type.icon] ?? File;
@@ -86,89 +90,123 @@ function SidebarContent({ data }: { data: SidebarData }) {
                   icon={<Icon className="h-4 w-4" style={{ color: type.color }} />}
                   label={type.name + "s"}
                   pro={isPro}
+                  collapsed={collapsed}
                 />
               );
             })}
           </ul>
         </section>
 
-        {/* Collections */}
-        <section>
-          <div className="flex items-center justify-between px-2 mb-1">
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Collections
-            </p>
-            <button className="text-muted-foreground hover:text-foreground transition-colors">
-              <Plus className="h-3.5 w-3.5" />
-            </button>
-          </div>
+        {/* Collections — hidden in collapsed mode */}
+        {!collapsed && (
+          <section>
+            <div className="flex items-center justify-between px-2 mb-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Collections
+              </p>
+              <button
+                aria-label="New collection"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </button>
+            </div>
 
-          {favoriteCollections.length > 0 && (
-            <>
-              <p className="px-2 mb-0.5 text-xs text-muted-foreground/60">Favorites</p>
-              <ul className="space-y-0.5 mb-2">
-                {favoriteCollections.map((col) => (
-                  <CollectionItem key={col.id} collection={col} showStar />
-                ))}
-              </ul>
-            </>
-          )}
+            {favoriteCollections.length > 0 && (
+              <>
+                <p className="px-2 mb-0.5 text-xs text-muted-foreground/60">Favorites</p>
+                <ul className="space-y-0.5 mb-2">
+                  {favoriteCollections.map((col) => (
+                    <CollectionItem key={col.id} collection={col} showStar />
+                  ))}
+                </ul>
+              </>
+            )}
 
-          {recentCollections.length > 0 && (
-            <>
-              <p className="px-2 mb-0.5 text-xs text-muted-foreground/60">Recent</p>
-              <ul className="space-y-0.5">
-                {recentCollections.map((col) => (
-                  <CollectionItem key={col.id} collection={col} showStar={false} />
-                ))}
-              </ul>
-            </>
-          )}
+            {recentCollections.length > 0 && (
+              <>
+                <p className="px-2 mb-0.5 text-xs text-muted-foreground/60">Recent</p>
+                <ul className="space-y-0.5">
+                  {recentCollections.map((col) => (
+                    <CollectionItem key={col.id} collection={col} showStar={false} />
+                  ))}
+                </ul>
+              </>
+            )}
 
-          <Link
-            href="/collections"
-            className="flex items-center gap-2 px-2 mt-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            View all collections
-          </Link>
-        </section>
+            <Link
+              href="/collections"
+              className="flex items-center gap-1 px-2 mt-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              View all collections
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
+          </section>
+        )}
       </nav>
 
       {/* User area */}
       {user && (
-        <div className="shrink-0 border-t border-border px-3 py-3">
-          <div className="flex items-center gap-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex flex-1 min-w-0 items-center gap-2.5 rounded-md p-1 text-left hover:bg-accent transition-colors">
-                <UserAvatar name={user.name} image={user.image} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="start">
-                <DropdownMenuItem onClick={() => router.push("/profile")}>
-                  <User className="h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  variant="destructive"
-                  onClick={() => signOut({ redirectTo: "/sign-in" })}
+        <div className={`shrink-0 border-t border-border ${collapsed ? "px-1 py-2" : "px-3 py-3"}`}>
+          {collapsed ? (
+            <div className="flex justify-center">
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className="rounded-md p-1 hover:bg-accent transition-colors"
+                  aria-label={user.name}
                 >
-                  <LogOut className="h-4 w-4" />
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Link
-              href="/settings"
-              className="shrink-0 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-              aria-label="Settings"
-            >
-              <Settings className="h-4 w-4" />
-            </Link>
-          </div>
+                  <UserAvatar name={user.name} image={user.image} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start">
+                  <DropdownMenuItem onClick={() => router.push("/profile")}>
+                    <User className="h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() => signOut({ redirectTo: "/sign-in" })}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex flex-1 min-w-0 items-center gap-2.5 rounded-md p-1 text-left hover:bg-accent transition-colors">
+                  <UserAvatar name={user.name} image={user.image} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start">
+                  <DropdownMenuItem onClick={() => router.push("/profile")}>
+                    <User className="h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() => signOut({ redirectTo: "/sign-in" })}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Link
+                href="/settings"
+                className="shrink-0 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                aria-label="Settings"
+              >
+                <Settings className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -180,12 +218,28 @@ function NavItem({
   icon,
   label,
   pro,
+  collapsed,
 }: {
   href: string;
   icon: React.ReactNode;
   label: string;
   pro?: boolean;
+  collapsed?: boolean;
 }) {
+  if (collapsed) {
+    return (
+      <li>
+        <Link
+          href={href}
+          title={label}
+          aria-label={label}
+          className="flex items-center justify-center h-8 w-8 mx-auto rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        >
+          {icon}
+        </Link>
+      </li>
+    );
+  }
   return (
     <li>
       <Link
@@ -260,7 +314,7 @@ export default function Sidebar({
             )}
           </button>
         </div>
-        {!collapsed && <SidebarContent data={sidebarData} />}
+        <SidebarContent data={sidebarData} collapsed={collapsed} />
       </aside>
 
       {/* Mobile drawer */}

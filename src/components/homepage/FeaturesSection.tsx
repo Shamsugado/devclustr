@@ -43,7 +43,7 @@ const FEATURES = [
     ),
   },
   {
-    color: "#64748b",
+    color: "#94a3b8",
     title: "Files & Docs",
     description: "Upload reference docs, architecture diagrams, PDFs, and images. Always at your fingertips.",
     icon: (

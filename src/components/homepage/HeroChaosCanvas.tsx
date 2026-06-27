@@ -211,8 +211,8 @@ export default function HeroChaosCanvas() {
   }, []);
 
   return (
-    <div ref={wrapRef} className="h-full w-full">
-      <canvas ref={canvasRef} className="block h-full w-full" />
+    <div ref={wrapRef} className="h-full w-full" aria-hidden="true">
+      <canvas ref={canvasRef} className="block h-full w-full" aria-hidden="true" />
     </div>
   );
 }

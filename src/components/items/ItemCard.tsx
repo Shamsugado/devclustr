@@ -57,15 +57,17 @@ export default function ItemCard({ item, onClick }: { item: ItemWithType; onClic
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={handleCopy}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded text-muted-foreground hover:text-foreground"
+            className="opacity-40 group-hover:opacity-100 transition-opacity p-0.5 rounded text-muted-foreground hover:text-foreground"
             title="Copy"
+            aria-label="Copy item content"
           >
             <CopyIcon className={`h-3.5 w-3.5 ${copied ? "text-green-400" : ""}`} />
           </button>
           <button
             onClick={handleFavorite}
-            className={`p-0.5 rounded transition-opacity text-muted-foreground hover:text-yellow-400 ${isFav ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+            className={`p-0.5 rounded transition-opacity text-muted-foreground hover:text-yellow-400 ${isFav ? "opacity-100" : "opacity-40 group-hover:opacity-100"}`}
             title={isFav ? "Remove from favorites" : "Add to favorites"}
+            aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
           >
             <Star className={`h-3.5 w-3.5 ${isFav ? "fill-yellow-400 text-yellow-400" : ""}`} />
           </button>

@@ -27,7 +27,7 @@ export default function HeroSection() {
             </Link>
             <a
               href="#features"
-              className="text-base font-medium text-slate-300 transition-colors hover:text-white"
+              className="text-base font-medium text-slate-300 transition-colors hover:text-white hover:underline"
             >
               See Features →
             </a>
@@ -49,7 +49,7 @@ export default function HeroSection() {
           {/* Arrow */}
           <div className="flex items-center justify-center md:flex-col">
             <svg
-              className="h-8 w-16 rotate-0 text-indigo-500 md:h-16 md:w-8 md:rotate-90"
+              className="h-8 w-16 rotate-90 text-indigo-500 md:rotate-0"
               viewBox="0 0 60 28"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"

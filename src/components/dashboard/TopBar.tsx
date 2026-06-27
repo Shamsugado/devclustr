@@ -31,7 +31,7 @@ export default function TopBar({ onMobileMenuClick, onSearchClick, itemTypes = [
         </button>
 
         {/* Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2 shrink-0 w-48">
+        <Link href="/dashboard" className="flex items-center gap-2 shrink-0 md:w-60">
           <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground text-xs font-bold">
             DC
           </div>
@@ -63,13 +63,14 @@ export default function TopBar({ onMobileMenuClick, onSearchClick, itemTypes = [
             variant="secondary"
             className="bg-foreground text-background hover:bg-foreground/90"
             onClick={() => setNewCollectionOpen(true)}
+            aria-label="New Collection"
           >
             <FolderPlus className="h-4 w-4" />
-            New Collection
+            <span className="hidden sm:inline">New Collection</span>
           </Button>
-          <Button onClick={() => setNewItemOpen(true)}>
+          <Button onClick={() => setNewItemOpen(true)} aria-label="New Item">
             <Plus className="h-4 w-4" />
-            New Item
+            <span className="hidden sm:inline">New Item</span>
           </Button>
         </div>
       </header>

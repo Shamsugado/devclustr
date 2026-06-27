@@ -124,6 +124,9 @@ function PinnedItemCard({ item, onItemClick }: { item: DashboardItem; onItemClic
       className="bg-card border border-border border-l-4 rounded-lg p-4 flex flex-col gap-2 relative cursor-pointer hover:bg-card/80 transition-colors min-w-0"
       style={{ borderLeftColor: itemType.color }}
       onClick={() => onItemClick(item)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onItemClick(item); } }}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
@@ -176,6 +179,9 @@ function RecentItemCard({ item, onItemClick }: { item: DashboardItem; onItemClic
       className="bg-card border border-border border-l-4 rounded-lg p-3 flex flex-col gap-2 cursor-pointer hover:bg-card/80 transition-colors"
       style={{ borderLeftColor: itemType.color }}
       onClick={() => onItemClick(item)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onItemClick(item); } }}
     >
       <div className="flex items-center justify-between">
         <span
@@ -252,7 +258,7 @@ export default function DashboardMain({
 
       {/* Recent Items */}
       <section>
-        <h2 className="text-base font-semibold text-foreground mb-3">All Items</h2>
+        <h2 className="text-base font-semibold text-foreground mb-3">Recent Items</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {recentItems.map((item) => (
             <RecentItemCard key={item.id} item={item} onItemClick={setSelectedItem} />

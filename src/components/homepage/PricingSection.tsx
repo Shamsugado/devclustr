@@ -42,7 +42,7 @@ export default function PricingSection() {
               role="switch"
               aria-checked={yearly}
               onClick={() => setYearly((y) => !y)}
-              className="relative h-6 w-11 rounded-full border border-[#252838] bg-[#13151f] transition-colors focus:outline-none"
+              className="relative h-6 w-11 rounded-full border border-[#252838] bg-[#252838] transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c0e16]"
             >
               <span
                 className={`absolute top-0.5 h-5 w-5 rounded-full bg-blue-600 transition-transform duration-200 ${yearly ? "translate-x-5" : "translate-x-0.5"}`}
