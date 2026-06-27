@@ -1,29 +1,16 @@
-# Current Feature: Homepage Mockup
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Create a standalone marketing homepage in `prototypes/homepage/` (`index.html`, `styles.css`, `script.js`)
-- Hero section with "chaos to order" concept: floating icon chaos container, pulsing transform arrow, and a simplified dashboard preview side by side
-- Chaos icons animate with requestAnimationFrame: random drift/bounce off walls, repel from mouse cursor, subtle rotation/scale pulsing
-- Fixed top navbar with logo, Features/Pricing links, Sign In/Get Started buttons; becomes more opaque on scroll
-- Features section: 6 cards (Code Snippets, AI Prompts, Instant Search, Commands, Files & Docs, Collections) using item type accent colors
-- AI Pro feature section with checklist and code editor mockup with "AI Generated Tags" demo
-- Pricing section: Free vs Pro ($8/mo) cards; yearly toggle showing $72 option; Pro card highlighted with "Most Popular" badge
-- CTA section and Footer with logo, link columns, and dynamic copyright year
-- Scroll-in fade animations for sections
-- Fully responsive: hero stacks vertically on mobile, arrow rotates 90° to point down
+<!-- Add goals here -->
 
 ## Notes
 
-- Output is a pure HTML/CSS/JS prototype — no Next.js, no frameworks
-- Dark theme throughout
-- Item type accent colors: Snippet `#3b82f6`, Prompt `#f59e0b`, Command `#06b6d4`, Note `#22c55e`, File `#64748b`, Image `#ec4899`, URL `#6366f1`
-- Spec uses "DevStash" branding but project is now "DevClustr" — use DevClustr in the prototype
-- Chaos container icons: Notion, GitHub, Slack, VS Code logos + browser tabs, terminal, text file, bookmark icons
+<!-- Add notes here -->
 
 ## History
 
@@ -70,3 +57,4 @@ In Progress
 - **2026-06-26** — Favorite toggle button complete.
 - **2026-06-26** — Favorites page sorting complete. Client-side sort controls added to `FavoritesClient`. Items sort by date (newest/oldest), name (A→Z/Z→A), type (A→Z/Z→A). Collections sort by date or name. Clicking the active button toggles direction (↑/↓); switching sorts resets to natural default. Type badges on item rows now colored with `itemType.color`. No DB or server changes. `toggleItemFavorite` and `toggleCollectionFavorite` server actions + DB helpers (ownership-checked, `{ success, isFavorite }` return). `ItemDrawer` `ActionBar` star button wired up (was a stub); syncs to new item via `useEffect`. `ItemCard` static star replaced with a clickable toggle (hidden on hover when not favorited, always visible when favorited). `CollectionCard` "Favorite/Unfavorite" dropdown item wired up. `CollectionDetailActions` star button enabled with filled/outline state. All surfaces use optimistic UI + `router.refresh()`. 8 unit tests added (106 total). `/favorites` route (protected) shows all favorited items and collections in a compact, VS Code-style monospace list. Star icon in TopBar links to the page. Two sections: Items (type icon + title + type badge + relative date) and Collections (folder icon + name + item count + relative date), each with counts. Sorted by `updatedAt` desc. Clicking an item opens `ItemDrawer`; clicking a collection navigates to `/collections/[id]`. Empty state when nothing is favorited. `getFavoriteItems` and `getFavoriteCollections` DB helpers added. `FavoritesClient` component in `src/components/favorites/`.
 - **2026-06-26** — Pinned items complete. `toggleItemPin` server action + DB helper (ownership-checked, `{ success, isPinned }` return). Pin button in `ItemDrawer` `ActionBar` wired with optimistic UI and `useEffect` sync; Sonner toast on error. Pinned items float to top of `/items/[type]` and `/collections/[id]` listings via DB-level `orderBy: [{ isPinned: "desc" }, { updatedAt: "desc" }]`. Dashboard "Pinned" section reflects live state. Pin icon on `ItemCard` remains a static indicator. 4 unit tests added (110 total).
+- **2026-06-27** — Homepage mockup complete. Standalone marketing prototype at `prototypes/homepage/` (`index.html`, `styles.css`, `script.js`). Animated chaos-to-order hero: 8 floating app icons (RAF physics, wall bounce, mouse repulsion, rotation/scale pulse), pulsing gradient arrow, mini dashboard preview with colored nav labels (Snippets → Files) and "Recent Items" section header. Fixed navbar (opaque on scroll), features grid (6 cards with item-type accent colors), AI Pro section (code editor mockup with AI Generated Tags), pricing section (monthly/yearly toggle, $8/mo → $72/yr, "Most Popular" badge), CTA, and footer with dynamic year. Fully responsive (hero stacks vertically on mobile, arrow rotates 90°).
