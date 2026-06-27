@@ -1,33 +1,16 @@
-# Current Feature: Homepage
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Replace `src/app/page.tsx` with the public marketing homepage
-- Redirect authenticated users to `/dashboard` via server-side session check
-- Implement Navbar with sticky scroll, mobile hamburger menu, sign-in/get-started links
-- Implement Hero section with animated chaos canvas (left) and static mini-dashboard mockup (right)
-- Implement Features section with 6 feature cards in a 2×3 grid
-- Implement AI Section (Pro Feature) with checklist and mock code editor
-- Implement Pricing section with monthly/yearly toggle and Free/Pro cards
-- Implement CTA section
-- Implement Footer with dynamic copyright year and link columns
-- All dark-mode styling matching app (`bg-[#0c0e16]`), responsive (mobile-first)
-- No external animation libraries — CSS transitions and `useEffect` canvas only
+<!-- Add goals here -->
 
 ## Notes
 
-- Prototype lives at `prototypes/homepage/` for reference
-- Component structure: `src/components/homepage/` with Navbar, HeroSection, HeroDashboardVisual, FeaturesSection, AiSection, PricingSection, CtaSection, Footer
-- `HeroChaosCanvas.tsx` — client component with `useEffect` canvas animation (floating colored dots)
-- `Navbar` and `PricingSection` need `"use client"`; everything else is server components
-- Hero gradient: `bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent`
-- Dark surfaces: `bg-[#0c0e16]` / `bg-[#13151f]`, border: `border-[#252838]`, muted: `text-slate-500`
-- Pricing: Free $0, Pro $8/mo monthly → $6/mo yearly ($72/yr billed); yearly toggle shows 25% savings badge
-- Footer placeholder `#` links are fine for now
+<!-- Add notes here -->
 
 ## History
 
@@ -75,3 +58,4 @@ In Progress
 - **2026-06-26** — Favorites page sorting complete. Client-side sort controls added to `FavoritesClient`. Items sort by date (newest/oldest), name (A→Z/Z→A), type (A→Z/Z→A). Collections sort by date or name. Clicking the active button toggles direction (↑/↓); switching sorts resets to natural default. Type badges on item rows now colored with `itemType.color`. No DB or server changes. `toggleItemFavorite` and `toggleCollectionFavorite` server actions + DB helpers (ownership-checked, `{ success, isFavorite }` return). `ItemDrawer` `ActionBar` star button wired up (was a stub); syncs to new item via `useEffect`. `ItemCard` static star replaced with a clickable toggle (hidden on hover when not favorited, always visible when favorited). `CollectionCard` "Favorite/Unfavorite" dropdown item wired up. `CollectionDetailActions` star button enabled with filled/outline state. All surfaces use optimistic UI + `router.refresh()`. 8 unit tests added (106 total). `/favorites` route (protected) shows all favorited items and collections in a compact, VS Code-style monospace list. Star icon in TopBar links to the page. Two sections: Items (type icon + title + type badge + relative date) and Collections (folder icon + name + item count + relative date), each with counts. Sorted by `updatedAt` desc. Clicking an item opens `ItemDrawer`; clicking a collection navigates to `/collections/[id]`. Empty state when nothing is favorited. `getFavoriteItems` and `getFavoriteCollections` DB helpers added. `FavoritesClient` component in `src/components/favorites/`.
 - **2026-06-26** — Pinned items complete. `toggleItemPin` server action + DB helper (ownership-checked, `{ success, isPinned }` return). Pin button in `ItemDrawer` `ActionBar` wired with optimistic UI and `useEffect` sync; Sonner toast on error. Pinned items float to top of `/items/[type]` and `/collections/[id]` listings via DB-level `orderBy: [{ isPinned: "desc" }, { updatedAt: "desc" }]`. Dashboard "Pinned" section reflects live state. Pin icon on `ItemCard` remains a static indicator. 4 unit tests added (110 total).
 - **2026-06-27** — Homepage mockup complete. Standalone marketing prototype at `prototypes/homepage/` (`index.html`, `styles.css`, `script.js`). Animated chaos-to-order hero: 8 floating app icons (RAF physics, wall bounce, mouse repulsion, rotation/scale pulse), pulsing gradient arrow, mini dashboard preview with colored nav labels (Snippets → Files) and "Recent Items" section header. Fixed navbar (opaque on scroll), features grid (6 cards with item-type accent colors), AI Pro section (code editor mockup with AI Generated Tags), pricing section (monthly/yearly toggle, $8/mo → $72/yr, "Most Popular" badge), CTA, and footer with dynamic year. Fully responsive (hero stacks vertically on mobile, arrow rotates 90°).
+- **2026-06-27** — Homepage complete. Public marketing page at `/` implemented in Next.js (replaces placeholder). Server-side auth redirect sends logged-in users to `/dashboard`. Components in `src/components/homepage/`: `Navbar` (sticky, mobile hamburger), `HeroSection` + `HeroChaosCanvas` (canvas animation, `useEffect`, 8 floating app icons) + `HeroDashboardVisual` (static mini-dashboard), `FeaturesSection` (2×3 grid, 6 cards), `AiSection` (Pro badge, checklist, mock code editor), `PricingSection` (monthly/yearly toggle, Free/$0 + Pro/$8→$6/mo), `CtaSection`, `Footer` (4 columns, dynamic year). Only `Navbar`, `PricingSection`, and `HeroChaosCanvasLoader` are client components. No new dependencies added.
