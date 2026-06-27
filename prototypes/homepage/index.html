@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevClustr - Your Developer Knowledge Hub</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">DC</div>
+        <span class="logo-text">DevClustr</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+      </div>
+      <div class="nav-actions">
+        <a href="#" class="btn btn-ghost">Sign In</a>
+        <a href="#" class="btn btn-primary">Get Started</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#">Sign In</a>
+      <a href="#" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-text">
+        <h1>Stop Losing Your<br><span class="gradient-text">Developer Knowledge</span></h1>
+        <p class="hero-sub">Your snippets are in VS Code, your prompts are in Notion, your commands are scattered across notes apps. DevClustr brings it all together in one searchable, organized hub.</p>
+        <div class="hero-cta">
+          <a href="#" class="btn btn-primary btn-lg">Get Started Free</a>
+          <a href="#features" class="btn btn-ghost btn-lg">See Features →</a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <!-- Chaos container -->
+        <div class="visual-box chaos-box">
+          <div class="box-label">Your knowledge today...</div>
+          <div class="canvas-wrap">
+            <canvas id="chaos-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Transform arrow -->
+        <div class="transform-arrow" id="transform-arrow">
+          <svg class="arrow-svg" viewBox="0 0 60 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="arrowGrad" x1="0" y1="14" x2="60" y2="14" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#3b82f6"/>
+                <stop offset="100%" stop-color="#6366f1"/>
+              </linearGradient>
+            </defs>
+            <path d="M2 14 H52" stroke="url(#arrowGrad)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M42 4 L56 14 L42 24" stroke="url(#arrowGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- Dashboard preview -->
+        <div class="visual-box dashboard-box">
+          <div class="box-label">...with DevClustr</div>
+          <div class="mini-dashboard">
+            <div class="mini-sidebar">
+              <div class="mini-logo-mark">DC</div>
+              <div class="mini-nav">
+                <div class="mini-nav-item active-item"></div>
+                <div class="mini-nav-item"></div>
+                <div class="mini-nav-item active-item"><span class="mini-dot" style="background:#3b82f6"></span><span class="mini-nav-label">Snippets</span></div>
+                <div class="mini-nav-item"><span class="mini-dot" style="background:#f59e0b"></span><span class="mini-nav-label">Prompts</span></div>
+                <div class="mini-nav-item"><span class="mini-dot" style="background:#06b6d4"></span><span class="mini-nav-label">Commands</span></div>
+                <div class="mini-nav-item"><span class="mini-dot" style="background:#22c55e"></span><span class="mini-nav-label">Notes</span></div>
+                <div class="mini-nav-item"><span class="mini-dot" style="background:#64748b"></span><span class="mini-nav-label">Collections</span></div>
+                <div class="mini-nav-item"><span class="mini-dot" style="background:#ec4899"></span><span class="mini-nav-label">Files</span></div>
+              </div>
+              <div class="mini-avatar"></div>
+            </div>
+            <div class="mini-main">
+              <div class="mini-topbar">
+                <div class="mini-search"></div>
+              </div>
+              <div class="mini-section-label">Recent Items</div>
+              <div class="mini-cards">
+                <div class="mini-card" style="--card-color: #3b82f6">
+                  <div class="mini-card-bar"></div>
+                  <div class="mini-card-line long"></div>
+                  <div class="mini-card-line short"></div>
+                </div>
+                <div class="mini-card" style="--card-color: #f59e0b">
+                  <div class="mini-card-bar"></div>
+                  <div class="mini-card-line long"></div>
+                  <div class="mini-card-line short"></div>
+                </div>
+                <div class="mini-card" style="--card-color: #06b6d4">
+                  <div class="mini-card-bar"></div>
+                  <div class="mini-card-line long"></div>
+                  <div class="mini-card-line short"></div>
+                </div>
+                <div class="mini-card" style="--card-color: #22c55e">
+                  <div class="mini-card-bar"></div>
+                  <div class="mini-card-line long"></div>
+                  <div class="mini-card-line short"></div>
+                </div>
+                <div class="mini-card" style="--card-color: #ec4899">
+                  <div class="mini-card-bar"></div>
+                  <div class="mini-card-line long"></div>
+                  <div class="mini-card-line short"></div>
+                </div>
+                <div class="mini-card" style="--card-color: #6366f1">
+                  <div class="mini-card-bar"></div>
+                  <div class="mini-card-line long"></div>
+                  <div class="mini-card-line short"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features section-fade" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Everything a developer needs</h2>
+        <p>One place for every type of knowledge you create</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon" style="--accent: #3b82f6">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+            </svg>
+          </div>
+          <div class="feature-accent-bar" style="background: #3b82f6"></div>
+          <h3>Code Snippets</h3>
+          <p>Save reusable code with Monaco syntax highlighting. Tag by language, framework, or topic.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="--accent: #f59e0b">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="feature-accent-bar" style="background: #f59e0b"></div>
+          <h3>AI Prompts</h3>
+          <p>Build your personal prompt library for ChatGPT, Claude, and other AI tools. Never rewrite a prompt again.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="--accent: #8b5cf6">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </div>
+          <div class="feature-accent-bar" style="background: #8b5cf6"></div>
+          <h3>Instant Search</h3>
+          <p>Find anything in milliseconds with full-text search and a keyboard-first command palette.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="--accent: #06b6d4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+            </svg>
+          </div>
+          <div class="feature-accent-bar" style="background: #06b6d4"></div>
+          <h3>CLI Commands</h3>
+          <p>Never forget a complex command again. Save flags, aliases, and one-liners with descriptions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="--accent: #64748b">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
+          <div class="feature-accent-bar" style="background: #64748b"></div>
+          <h3>Files &amp; Docs</h3>
+          <p>Upload reference docs, architecture diagrams, PDFs, and images. Always at your fingertips.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="--accent: #22c55e">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="feature-accent-bar" style="background: #22c55e"></div>
+          <h3>Collections</h3>
+          <p>Group related items into collections. Organize by project, technology, or team. Pin your favorites.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI Section -->
+  <section class="ai-section section-fade">
+    <div class="container">
+      <div class="ai-inner">
+        <div class="ai-text">
+          <span class="pro-badge">Pro Feature</span>
+          <h2>AI-Powered Organization</h2>
+          <p class="ai-sub">Let AI do the heavy lifting. Tag, search, and discover your knowledge automatically.</p>
+          <ul class="ai-checklist">
+            <li>
+              <span class="check-icon">✓</span>
+              <div class="check-content">
+                <strong>Auto-generate tags</strong>
+                <p>AI analyzes your content and suggests relevant tags automatically.</p>
+              </div>
+            </li>
+            <li>
+              <span class="check-icon">✓</span>
+              <div class="check-content">
+                <strong>Semantic search</strong>
+                <p>Search by meaning, not just keywords. Find what you meant to save.</p>
+              </div>
+            </li>
+            <li>
+              <span class="check-icon">✓</span>
+              <div class="check-content">
+                <strong>Content summaries</strong>
+                <p>Get instant AI summaries of long files, documents, and notes.</p>
+              </div>
+            </li>
+            <li>
+              <span class="check-icon">✓</span>
+              <div class="check-content">
+                <strong>Related suggestions</strong>
+                <p>Discover hidden connections between items across your library.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="ai-editor-wrap">
+          <div class="editor-window">
+            <div class="editor-titlebar">
+              <div class="editor-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <span class="editor-filename">fetchUser.js</span>
+            </div>
+            <div class="editor-body">
+              <div class="line-numbers">
+                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+              </div>
+              <div class="editor-code">
+                <div class="code-line"><span class="kw">const</span> <span class="fn">fetchUser</span> <span class="op">=</span> <span class="kw">async</span> <span class="pn">(</span>id<span class="pn">)</span> <span class="op">=&gt;</span> <span class="pn">{</span></div>
+                <div class="code-line">  <span class="kw">const</span> res <span class="op">=</span> <span class="kw">await</span> <span class="fn">fetch</span><span class="pn">(</span><span class="str">`/api/users/${<span class="pn">id</span>}`</span><span class="pn">)</span><span class="pn">;</span></div>
+                <div class="code-line">  <span class="kw">if</span> <span class="pn">(</span><span class="op">!</span>res<span class="pn">.</span>ok<span class="pn">)</span> <span class="kw">throw new</span> <span class="fn">Error</span><span class="pn">(</span><span class="str">'Not found'</span><span class="pn">)</span><span class="pn">;</span></div>
+                <div class="code-line">  <span class="kw">return</span> res<span class="pn">.</span><span class="fn">json</span><span class="pn">()</span><span class="pn">;</span></div>
+                <div class="code-line"><span class="pn">}</span><span class="pn">;</span></div>
+              </div>
+            </div>
+            <div class="ai-tags-panel">
+              <div class="ai-tags-header">
+                <span class="ai-sparkle">✦</span>
+                <span>AI Generated Tags</span>
+              </div>
+              <div class="ai-tags">
+                <span class="ai-tag">fetch</span>
+                <span class="ai-tag">async/await</span>
+                <span class="ai-tag">API</span>
+                <span class="ai-tag">error-handling</span>
+                <span class="ai-tag">javascript</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing section-fade" id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <h2>Simple, transparent pricing</h2>
+        <p>Start free. Upgrade when you need more.</p>
+        <div class="billing-toggle">
+          <span class="toggle-label" id="lbl-monthly">Monthly</span>
+          <label class="toggle-switch" aria-label="Toggle billing period">
+            <input type="checkbox" id="billing-toggle">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+          <span class="toggle-label" id="lbl-yearly">Yearly <span class="save-tag">Save 25%</span></span>
+        </div>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="plan-header">
+            <div class="plan-name">Free</div>
+            <div class="plan-price-wrap">
+              <span class="plan-price">$0</span>
+              <span class="plan-period">/mo</span>
+            </div>
+            <div class="plan-desc">Perfect for getting started</div>
+          </div>
+          <ul class="plan-features">
+            <li class="feature-yes"><span>✓</span> Up to 50 items</li>
+            <li class="feature-yes"><span>✓</span> 3 collections</li>
+            <li class="feature-yes"><span>✓</span> Code snippets &amp; prompts</li>
+            <li class="feature-yes"><span>✓</span> Basic search</li>
+            <li class="feature-no"><span>✗</span> AI features</li>
+            <li class="feature-no"><span>✗</span> File &amp; image storage</li>
+          </ul>
+          <a href="#" class="btn btn-outline btn-block">Get Started Free</a>
+        </div>
+
+        <div class="pricing-card pricing-popular">
+          <div class="popular-badge">Most Popular</div>
+          <div class="plan-header">
+            <div class="plan-name">Pro</div>
+            <div class="plan-price-wrap">
+              <span class="plan-price" id="pro-price">$8</span>
+              <span class="plan-period" id="pro-period">/mo</span>
+            </div>
+            <div class="plan-desc" id="pro-desc">Billed monthly</div>
+          </div>
+          <ul class="plan-features">
+            <li class="feature-yes"><span>✓</span> Unlimited items</li>
+            <li class="feature-yes"><span>✓</span> Unlimited collections</li>
+            <li class="feature-yes"><span>✓</span> All item types</li>
+            <li class="feature-yes"><span>✓</span> AI-powered tagging &amp; search</li>
+            <li class="feature-yes"><span>✓</span> File &amp; image storage (10 GB)</li>
+            <li class="feature-yes"><span>✓</span> Priority support</li>
+          </ul>
+          <a href="#" class="btn btn-primary btn-block">Start Pro Trial</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section section-fade">
+    <div class="container">
+      <div class="cta-inner">
+        <h2>Ready to Organize Your Knowledge?</h2>
+        <p>Join thousands of developers who stopped losing their best code and ideas.</p>
+        <div class="cta-buttons">
+          <a href="#" class="btn btn-primary btn-lg">Get Started Free</a>
+          <a href="#pricing" class="btn btn-ghost btn-lg">View Pricing</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <a href="#" class="logo">
+            <div class="logo-icon">DC</div>
+            <span class="logo-text">DevClustr</span>
+          </a>
+          <p class="footer-tagline">The developer knowledge hub</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <h4>Product</h4>
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#">Changelog</a>
+          </div>
+          <div class="footer-col">
+            <h4>Resources</h4>
+            <a href="#">Documentation</a>
+            <a href="#">API</a>
+            <a href="#">Status</a>
+          </div>
+          <div class="footer-col">
+            <h4>Company</h4>
+            <a href="#">About</a>
+            <a href="#">Blog</a>
+            <a href="#">Contact</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© <span id="footer-year"></span> DevClustr. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

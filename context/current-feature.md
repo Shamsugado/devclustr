@@ -1,16 +1,29 @@
-# Current Feature
+# Current Feature: Homepage Mockup
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Create a standalone marketing homepage in `prototypes/homepage/` (`index.html`, `styles.css`, `script.js`)
+- Hero section with "chaos to order" concept: floating icon chaos container, pulsing transform arrow, and a simplified dashboard preview side by side
+- Chaos icons animate with requestAnimationFrame: random drift/bounce off walls, repel from mouse cursor, subtle rotation/scale pulsing
+- Fixed top navbar with logo, Features/Pricing links, Sign In/Get Started buttons; becomes more opaque on scroll
+- Features section: 6 cards (Code Snippets, AI Prompts, Instant Search, Commands, Files & Docs, Collections) using item type accent colors
+- AI Pro feature section with checklist and code editor mockup with "AI Generated Tags" demo
+- Pricing section: Free vs Pro ($8/mo) cards; yearly toggle showing $72 option; Pro card highlighted with "Most Popular" badge
+- CTA section and Footer with logo, link columns, and dynamic copyright year
+- Scroll-in fade animations for sections
+- Fully responsive: hero stacks vertically on mobile, arrow rotates 90° to point down
 
 ## Notes
 
-<!-- Add notes here -->
+- Output is a pure HTML/CSS/JS prototype — no Next.js, no frameworks
+- Dark theme throughout
+- Item type accent colors: Snippet `#3b82f6`, Prompt `#f59e0b`, Command `#06b6d4`, Note `#22c55e`, File `#64748b`, Image `#ec4899`, URL `#6366f1`
+- Spec uses "DevStash" branding but project is now "DevClustr" — use DevClustr in the prototype
+- Chaos container icons: Notion, GitHub, Slack, VS Code logos + browser tabs, terminal, text file, bookmark icons
 
 ## History
 
