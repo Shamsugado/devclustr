@@ -1,4 +1,4 @@
-# Current Feature
+# Current Feature: Stripe Integration — Phase 2: Webhooks, Feature Gating & Billing UI
 
 ## Status
 
@@ -6,11 +6,53 @@ Not Started
 
 ## Goals
 
-<!-- Add goals here -->
+- Webhook route that keeps `isPro` in sync with subscription lifecycle events
+- Checkout session route that starts a Stripe-hosted upgrade flow
+- Billing portal route for managing/cancelling an existing subscription
+- Tier enforcement on item creation, collection creation, and file upload
+- `/settings/billing` page (server component + `BillingActions` client component)
+- Billing link card on `/settings`
 
 ## Notes
 
-<!-- Add notes here -->
+- Prerequisite: Phase 1 must be complete (`stripe` installed, `isPro` in session, tier helpers in place)
+- Requires Stripe CLI for local webhook testing: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
+- Copy the webhook signing secret printed by the CLI and set as `STRIPE_WEBHOOK_SECRET` in `.env`
+- Webhook route must NOT use `auth()` — Stripe has no session
+- Read raw body with `req.text()` (not `.json()`) for webhook signature verification
+- Use `metadata.userId` (not `customer_email`) as the primary lookup key in `checkout.session.completed`
+- Price IDs passed as server-side props to `BillingActions` — no `NEXT_PUBLIC_` exposure needed
+- Tier check goes after auth, before DB write in all creation actions
+
+### Webhook Events to Handle
+
+| Event | Action |
+|-------|--------|
+| `checkout.session.completed` | Set `isPro = true`, store `stripeCustomerId` + `stripeSubscriptionId` via `metadata.userId` |
+| `customer.subscription.updated` | Set `isPro = active \| trialing`, false otherwise |
+| `customer.subscription.deleted` | Set `isPro = false`, clear `stripeSubscriptionId` |
+| `customer.subscription.paused` | Set `isPro = false`, clear `stripeSubscriptionId` |
+| `invoice.payment_failed` | Set `isPro = false` |
+
+### Files to Create
+
+| File | Purpose |
+|------|---------|
+| `src/app/api/webhooks/stripe/route.ts` | Subscription lifecycle webhook |
+| `src/app/api/stripe/checkout/route.ts` | Start Stripe Checkout session |
+| `src/app/api/stripe/portal/route.ts` | Open Stripe Customer Portal |
+| `src/app/settings/billing/page.tsx` | Billing server page |
+| `src/components/billing/billing-actions.tsx` | Checkout / portal client component |
+
+### Files to Modify
+
+| File | Change |
+|------|--------|
+| `src/actions/items.ts` | Add `canCreateItem` check in `createItem` |
+| `src/actions/collections.ts` | Add `canCreateCollection` check in `createCollection` |
+| `src/app/api/upload/route.ts` | Add `isPro` guard before file validation |
+| `src/app/settings/page.tsx` | Add subscription card with billing link |
+| `src/lib/db/users.ts` | Add `isPro` to select if not present |
 
 ## History
 
