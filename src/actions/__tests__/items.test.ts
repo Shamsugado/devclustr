@@ -1,6 +1,7 @@
 import { vi, describe, it, expect } from "vitest";
 
 vi.mock("@/auth", () => ({ auth: vi.fn() }));
+vi.mock("@/lib/tier", () => ({ canCreateItem: vi.fn().mockResolvedValue(true) }));
 vi.mock("@/lib/db/items", () => ({ createItem: vi.fn(), updateItem: vi.fn(), deleteItem: vi.fn(), toggleItemFavorite: vi.fn(), toggleItemPin: vi.fn() }));
 
 const { CreateItemSchema, UpdateItemSchema } = await import("@/actions/item-schemas");

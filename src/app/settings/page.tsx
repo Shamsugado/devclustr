@@ -5,6 +5,7 @@ import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
 import DeleteAccountDialog from "@/components/profile/DeleteAccountDialog";
 import EditorSettingsForm from "@/components/settings/EditorSettingsForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -66,6 +67,25 @@ export default async function SettingsPage() {
               <DeleteAccountDialog />
             </CardContent>
           </Card>
+        </section>
+
+        {/* Subscription section */}
+        <section className="space-y-4">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            Subscription
+          </h2>
+          <div className="rounded-lg border p-6">
+            <h2 className="text-lg font-medium mb-1">Billing</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              {user.isPro ? "You are on the Pro plan." : "You are on the Free plan."}
+            </p>
+            <Link
+              href="/settings/billing"
+              className="inline-flex items-center text-sm font-medium underline underline-offset-4"
+            >
+              Manage billing →
+            </Link>
+          </div>
         </section>
       </div>
     </div>

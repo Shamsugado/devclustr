@@ -44,6 +44,7 @@ export async function getProfileUser(userId: string) {
       email: true,
       image: true,
       password: true,
+      isPro: true,
       createdAt: true,
     },
   });

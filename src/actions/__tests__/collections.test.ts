@@ -1,6 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
 vi.mock("@/auth", () => ({ auth: vi.fn() }));
+vi.mock("@/lib/tier", () => ({ canCreateCollection: vi.fn().mockResolvedValue(true) }));
 vi.mock("@/lib/db/collections", () => ({
   createCollection: vi.fn(),
   updateCollection: vi.fn(),
