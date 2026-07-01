@@ -11,6 +11,8 @@ import {
 } from "@/lib/db/items";
 import { r2, R2_BUCKET } from "@/lib/r2";
 import { CreateItemSchema, UpdateItemSchema } from "@/actions/item-schemas";
+import { canCreateItem } from "@/lib/tier";
+import { FREE_TIER_ITEM_LIMIT } from "@/lib/constants";
 
 export async function createItem(formData: {
   typeId: string;
@@ -29,6 +31,11 @@ export async function createItem(formData: {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false as const, error: "Unauthorized" };
+  }
+
+  const allowed = await canCreateItem(session.user.id, session.user.isPro);
+  if (!allowed) {
+    return { success: false as const, error: `Free plan is limited to ${FREE_TIER_ITEM_LIMIT} items. Upgrade to Pro for unlimited items.` };
   }
 
   const parsed = CreateItemSchema.safeParse(formData);

@@ -8,11 +8,18 @@ import {
   toggleCollectionFavorite as toggleCollectionFavoriteInDb,
 } from "@/lib/db/collections";
 import { CreateCollectionSchema, UpdateCollectionSchema } from "@/actions/collection-schemas";
+import { canCreateCollection } from "@/lib/tier";
+import { FREE_TIER_COLLECTION_LIMIT } from "@/lib/constants";
 
 export async function createCollection(formData: { name: string; description: string | null }) {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false as const, error: "Unauthorized" };
+  }
+
+  const allowed = await canCreateCollection(session.user.id, session.user.isPro);
+  if (!allowed) {
+    return { success: false as const, error: `Free plan is limited to ${FREE_TIER_COLLECTION_LIMIT} collections. Upgrade to Pro for unlimited collections.` };
   }
 
   const parsed = CreateCollectionSchema.safeParse(formData);
