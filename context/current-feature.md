@@ -1,58 +1,16 @@
-# Current Feature: Stripe Integration — Phase 2: Webhooks, Feature Gating & Billing UI
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- Not Started | In Progress | Complete -->
 
 ## Goals
 
-- Webhook route that keeps `isPro` in sync with subscription lifecycle events
-- Checkout session route that starts a Stripe-hosted upgrade flow
-- Billing portal route for managing/cancelling an existing subscription
-- Tier enforcement on item creation, collection creation, and file upload
-- `/settings/billing` page (server component + `BillingActions` client component)
-- Billing link card on `/settings`
+<!-- bullet points -->
 
 ## Notes
 
-- Prerequisite: Phase 1 must be complete (`stripe` installed, `isPro` in session, tier helpers in place)
-- Requires Stripe CLI for local webhook testing: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
-- Copy the webhook signing secret printed by the CLI and set as `STRIPE_WEBHOOK_SECRET` in `.env`
-- Webhook route must NOT use `auth()` — Stripe has no session
-- Read raw body with `req.text()` (not `.json()`) for webhook signature verification
-- Use `metadata.userId` (not `customer_email`) as the primary lookup key in `checkout.session.completed`
-- Price IDs passed as server-side props to `BillingActions` — no `NEXT_PUBLIC_` exposure needed
-- Tier check goes after auth, before DB write in all creation actions
-
-### Webhook Events to Handle
-
-| Event | Action |
-|-------|--------|
-| `checkout.session.completed` | Set `isPro = true`, store `stripeCustomerId` + `stripeSubscriptionId` via `metadata.userId` |
-| `customer.subscription.updated` | Set `isPro = active \| trialing`, false otherwise |
-| `customer.subscription.deleted` | Set `isPro = false`, clear `stripeSubscriptionId` |
-| `customer.subscription.paused` | Set `isPro = false`, clear `stripeSubscriptionId` |
-| `invoice.payment_failed` | Set `isPro = false` |
-
-### Files to Create
-
-| File | Purpose |
-|------|---------|
-| `src/app/api/webhooks/stripe/route.ts` | Subscription lifecycle webhook |
-| `src/app/api/stripe/checkout/route.ts` | Start Stripe Checkout session |
-| `src/app/api/stripe/portal/route.ts` | Open Stripe Customer Portal |
-| `src/app/settings/billing/page.tsx` | Billing server page |
-| `src/components/billing/billing-actions.tsx` | Checkout / portal client component |
-
-### Files to Modify
-
-| File | Change |
-|------|--------|
-| `src/actions/items.ts` | Add `canCreateItem` check in `createItem` |
-| `src/actions/collections.ts` | Add `canCreateCollection` check in `createCollection` |
-| `src/app/api/upload/route.ts` | Add `isPro` guard before file validation |
-| `src/app/settings/page.tsx` | Add subscription card with billing link |
-| `src/lib/db/users.ts` | Add `isPro` to select if not present |
+<!-- additional context -->
 
 ## History
 
@@ -103,3 +61,5 @@ In Progress
 - **2026-06-27** — Homepage complete. Public marketing page at `/` implemented in Next.js (replaces placeholder). Server-side auth redirect sends logged-in users to `/dashboard`. Components in `src/components/homepage/`: `Navbar` (sticky, mobile hamburger), `HeroSection` + `HeroChaosCanvas` (canvas animation, `useEffect`, 8 floating app icons) + `HeroDashboardVisual` (static mini-dashboard), `FeaturesSection` (2×3 grid, 6 cards), `AiSection` (Pro badge, checklist, mock code editor), `PricingSection` (monthly/yearly toggle, Free/$0 + Pro/$8→$6/mo), `CtaSection`, `Footer` (4 columns, dynamic year). Only `Navbar`, `PricingSection`, and `HeroChaosCanvasLoader` are client components. No new dependencies added.
 - **2026-06-27** — UI accessibility and responsiveness fixes complete. Sidebar collapsed mode now renders icon-only navigation (Quick Access + Item Types + user avatar) instead of a blank strip. TopBar logo uses `md:w-60` matching sidebar width; "New Collection" and "New Item" buttons collapse to icon-only below `sm` breakpoint. `PinnedItemCard` and `RecentItemCard` keyboard-accessible (`role=button`, `tabIndex`, `onKeyDown`). Dashboard section renamed "All Items" → "Recent Items". `ItemCard` copy/favorite buttons changed from `opacity-0` to `opacity-40` so they're visible on touch/keyboard; copy button gets `aria-label`. Pricing toggle track color bumped to `#252838` for visibility; `focus:outline-none` replaced with `focus-visible:ring`. `HeroChaosCanvas` wrapper and canvas get `aria-hidden="true"`. Hero arrow rotation fixed to `rotate-90 md:rotate-0` (points down on mobile, right on desktop). Hamburger touch target meets WCAG 2.5.8 (`min-h/w-[44px]`). "Files & Docs" feature card color `#64748b` → `#94a3b8` for contrast. Footer placeholder links marked `opacity-50 pointer-events-none title="Coming soon"`; nav columns wrapped in `<nav aria-label>`.
 - **2026-06-27** — Homepage nav on auth pages + logo icon complete. Homepage `Navbar` component added to `/sign-in` and `/register` pages (flex-col layout with nav at top, form centered below). Logo updated across homepage `Navbar` and dashboard `TopBar` to use a `FolderOpen` Lucide icon in a blue→indigo gradient box, replacing the plain "DC" text box.
+- **2026-07-01** — Stripe Phase 1 complete. `stripe` npm package installed. Stripe singleton at `src/lib/stripe.ts` (lazy-initialized to avoid build-time errors). `isPro` added to `Session.user` and `JWT`; `jwt` callback always reads from DB on every validation so webhook DB changes are reflected on next page reload. Free-tier limit constants (`FREE_TIER_ITEM_LIMIT = 50`, `FREE_TIER_COLLECTION_LIMIT = 3`) added to `src/lib/constants.ts`. `canCreateItem` and `canCreateCollection` tier helpers in `src/lib/tier.ts`. Unit tests for tier helpers (119 tests total).
+- **2026-07-01** — Stripe Phase 2 complete. Webhook handler at `/api/webhooks/stripe` processes 5 subscription lifecycle events (`checkout.session.completed`, `subscription.updated/deleted/paused`, `invoice.payment_failed`) using raw body + signature verification, `updateMany` to avoid throws on missing records. Checkout route at `/api/stripe/checkout` (auth-guarded, Zod-validated, server-side price ID allowlist, base URL derived from `req.url`). Portal route at `/api/stripe/portal` (404 if no `stripeCustomerId`). Tier enforcement wired into `createItem`, `createCollection`, and file upload. `/settings/billing` server page with `BillingActions` client component (Free: two upgrade buttons; Pro: manage subscription button). Subscription card added to `/settings`. Verified Stripe Checkout redirect in browser.
