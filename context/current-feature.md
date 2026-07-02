@@ -2,15 +2,18 @@
 
 ## Status
 
-<!-- Not Started | In Progress | Complete -->
+In Progress
 
 ## Goals
 
-<!-- bullet points -->
+- Free (non-Pro) users should not be able to view `/items/files` or `/items/images`
+- Visiting either route as a free user shows an upgrade prompt instead of the item list
 
 ## Notes
 
-<!-- additional context -->
+- `Files` and `Image` types are already flagged "PRO" in the sidebar (`src/components/dashboard/Sidebar.tsx`), but the routes themselves are unguarded today
+- `session.user.isPro` is already available (added in Stripe Phase 1), no extra DB query needed
+- Follow the `canCreateItem`/`canCreateCollection` pattern in `src/lib/tier.ts` for a testable gate function
 
 ## History
 
