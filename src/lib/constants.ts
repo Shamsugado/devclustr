@@ -5,3 +5,5 @@ export const DASHBOARD_RECENT_ITEMS_LIMIT = 10;
 
 export const FREE_TIER_ITEM_LIMIT = 50;
 export const FREE_TIER_COLLECTION_LIMIT = 3;
+
+export const PRO_ONLY_ITEM_TYPE_SLUGS = ["files", "images"] as const;

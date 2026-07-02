@@ -2,9 +2,11 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getItemsByTypeSlug, getSystemItemTypes } from "@/lib/db/items";
 import { ITEMS_PER_PAGE } from "@/lib/constants";
+import { canAccessItemTypeSlug } from "@/lib/tier";
 import ItemListClient from "@/components/items/ItemListClient";
 import AddTypeButton from "@/components/items/AddTypeButton";
 import Pagination from "@/components/ui/Pagination";
+import UpgradePrompt from "@/components/items/UpgradePrompt";
 
 const ALLOWED_TYPES = ["snippet", "prompt", "command", "note", "link", "image", "file"];
 
@@ -24,6 +26,17 @@ export default async function ItemTypePage({
 
   if (!userId) notFound();
 
+  const label = type.charAt(0).toUpperCase() + type.slice(1);
+
+  if (!canAccessItemTypeSlug(type, !!session.user.isPro)) {
+    return (
+      <div className="space-y-4 pb-6">
+        <h1 className="text-lg font-semibold text-foreground">{label}</h1>
+        <UpgradePrompt label={label} />
+      </div>
+    );
+  }
+
   const [pageResult, itemTypes] = await Promise.all([
     getItemsByTypeSlug(userId, type, { page, pageSize: ITEMS_PER_PAGE }),
     getSystemItemTypes(),
@@ -31,7 +44,6 @@ export default async function ItemTypePage({
   const { items, total } = pageResult;
 
   const singularName = type.slice(0, -1); // "snippets" → "snippet"
-  const label = type.charAt(0).toUpperCase() + type.slice(1);
   const singularLabel = singularName.charAt(0).toUpperCase() + singularName.slice(1);
 
   const matchedType = itemTypes.find(

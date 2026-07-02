@@ -2,7 +2,7 @@
 
 ## Status
 
-In Progress
+Complete
 
 ## Goals
 
@@ -66,3 +66,5 @@ In Progress
 - **2026-06-27** — Homepage nav on auth pages + logo icon complete. Homepage `Navbar` component added to `/sign-in` and `/register` pages (flex-col layout with nav at top, form centered below). Logo updated across homepage `Navbar` and dashboard `TopBar` to use a `FolderOpen` Lucide icon in a blue→indigo gradient box, replacing the plain "DC" text box.
 - **2026-07-01** — Stripe Phase 1 complete. `stripe` npm package installed. Stripe singleton at `src/lib/stripe.ts` (lazy-initialized to avoid build-time errors). `isPro` added to `Session.user` and `JWT`; `jwt` callback always reads from DB on every validation so webhook DB changes are reflected on next page reload. Free-tier limit constants (`FREE_TIER_ITEM_LIMIT = 50`, `FREE_TIER_COLLECTION_LIMIT = 3`) added to `src/lib/constants.ts`. `canCreateItem` and `canCreateCollection` tier helpers in `src/lib/tier.ts`. Unit tests for tier helpers (119 tests total).
 - **2026-07-01** — Stripe Phase 2 complete. Webhook handler at `/api/webhooks/stripe` processes 5 subscription lifecycle events (`checkout.session.completed`, `subscription.updated/deleted/paused`, `invoice.payment_failed`) using raw body + signature verification, `updateMany` to avoid throws on missing records. Checkout route at `/api/stripe/checkout` (auth-guarded, Zod-validated, server-side price ID allowlist, base URL derived from `req.url`). Portal route at `/api/stripe/portal` (404 if no `stripeCustomerId`). Tier enforcement wired into `createItem`, `createCollection`, and file upload. `/settings/billing` server page with `BillingActions` client component (Free: two upgrade buttons; Pro: manage subscription button). Subscription card added to `/settings`. Verified Stripe Checkout redirect in browser.
+- **2026-07-02** — Demo seed trimmed to 3 collections complete. `prisma/seed.ts` DevOps and Design Resources collections removed so the demo user's seed data matches `FREE_TIER_COLLECTION_LIMIT` (3 collections, 10 items). Ran `db:purge-users` + reseed against the dev DB; also cleaned up stale pre-existing collections/items left over from prior seed runs (upsert-based seeding doesn't delete removed records) and a stray manually-created test collection.
+- **2026-07-02** — Pro-only item type gate complete. `/items/files` and `/items/images` now show an `UpgradePrompt` (lock icon, message, reused `BillingActions` upgrade buttons) instead of the item list when a free user visits them, checked via `session.user.isPro` (no extra DB query). New `canAccessItemTypeSlug(typeSlug, isPro)` helper in `src/lib/tier.ts` and `PRO_ONLY_ITEM_TYPE_SLUGS` constant, following the existing `canCreateItem`/`canCreateCollection` pattern. 6 unit tests added (129 total). Verified in browser as the free demo user: `/items/files` and `/items/images` show the upgrade prompt; `/items/snippets` unaffected.

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { canCreateItem, canCreateCollection } from "../tier";
+import { canCreateItem, canCreateCollection, canAccessItemTypeSlug } from "../tier";
 import { FREE_TIER_ITEM_LIMIT, FREE_TIER_COLLECTION_LIMIT } from "../constants";
 
 vi.mock("@/lib/prisma", () => ({
@@ -78,5 +78,29 @@ describe("canCreateCollection", () => {
     mockCollectionCount.mockResolvedValue(FREE_TIER_COLLECTION_LIMIT);
     const result = await canCreateCollection("user-1", false);
     expect(result).toBe(false);
+  });
+});
+
+describe("canAccessItemTypeSlug", () => {
+  it("returns true for pro user regardless of type", () => {
+    expect(canAccessItemTypeSlug("files", true)).toBe(true);
+    expect(canAccessItemTypeSlug("images", true)).toBe(true);
+    expect(canAccessItemTypeSlug("snippets", true)).toBe(true);
+  });
+
+  it("returns false for free user accessing files", () => {
+    expect(canAccessItemTypeSlug("files", false)).toBe(false);
+  });
+
+  it("returns false for free user accessing images", () => {
+    expect(canAccessItemTypeSlug("images", false)).toBe(false);
+  });
+
+  it("returns true for free user accessing non-pro types", () => {
+    expect(canAccessItemTypeSlug("snippets", false)).toBe(true);
+    expect(canAccessItemTypeSlug("prompts", false)).toBe(true);
+    expect(canAccessItemTypeSlug("commands", false)).toBe(true);
+    expect(canAccessItemTypeSlug("notes", false)).toBe(true);
+    expect(canAccessItemTypeSlug("links", false)).toBe(true);
   });
 });
