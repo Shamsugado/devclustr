@@ -2,23 +2,15 @@
 
 ## Status
 
-Complete
+<!-- Not Started | In Progress | Complete -->
 
 ## Goals
 
-- Add an "Upgrade" button to the dashboard header (`TopBar`), visible only to free-tier users.
-- Instead of the button linking directly to Stripe Checkout, it should link to a new `/upgrade` page.
-- `/upgrade` displays the Free vs Pro feature comparison (similar to the homepage pricing section) with a monthly/yearly toggle.
-- User selects monthly ($8) or yearly ($72) on that page, then clicks a single CTA to start Stripe Checkout for the selected plan.
+<!-- bullet points -->
 
 ## Notes
 
-- Reuse the existing Stripe checkout flow (`POST /api/stripe/checkout`) — no new backend/webhook work needed, this is UI-only.
-- `session.user.isPro` is already reliable server-side (`src/auth.ts` jwt/session callbacks).
-- `TopBar` currently has no `isPro` awareness — needs threading through `SidebarData` from the 4 dashboard layouts (`dashboard`, `favorites`, `items`, `collections`) → `DashboardShell` → `TopBar`.
-- `/settings` and `/settings/billing` are standalone pages (no sidebar shell) — `/upgrade` should follow that same standalone pattern since it's a full-page destination, not a dashboard sub-view.
-- If a Pro user hits `/upgrade` directly (e.g. stale bookmark), redirect to `/settings/billing` since there's nothing to upgrade.
-- `/upgrade` needs to be added to `src/proxy.ts` (protected routes + matcher).
+<!-- additional context -->
 
 ## History
 
