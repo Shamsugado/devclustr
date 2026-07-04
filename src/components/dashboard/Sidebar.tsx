@@ -39,7 +39,7 @@ export type SidebarData = {
   itemTypes: SidebarItemType[];
   favoriteCollections: CollectionMeta[];
   recentCollections: CollectionMeta[];
-  user: { name: string; email: string; image: string | null } | null;
+  user: { name: string; email: string; image: string | null; isPro: boolean } | null;
 };
 
 interface SidebarProps {

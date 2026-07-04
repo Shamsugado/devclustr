@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { FolderOpen, FolderPlus, Menu, Plus, Search, Star } from "lucide-react";
+import { Crown, FolderOpen, FolderPlus, Menu, Plus, Search, Star } from "lucide-react";
 import NewItemDialog from "@/components/items/NewItemDialog";
 import NewCollectionDialog from "@/components/collections/NewCollectionDialog";
 import type { SidebarItemType } from "@/components/dashboard/Sidebar";
@@ -12,9 +12,10 @@ interface TopBarProps {
   onMobileMenuClick?: () => void;
   onSearchClick?: () => void;
   itemTypes?: SidebarItemType[];
+  isPro?: boolean;
 }
 
-export default function TopBar({ onMobileMenuClick, onSearchClick, itemTypes = [] }: TopBarProps) {
+export default function TopBar({ onMobileMenuClick, onSearchClick, itemTypes = [], isPro = false }: TopBarProps) {
   const [newItemOpen, setNewItemOpen] = useState(false);
   const [newCollectionOpen, setNewCollectionOpen] = useState(false);
 
@@ -52,6 +53,15 @@ export default function TopBar({ onMobileMenuClick, onSearchClick, itemTypes = [
 
         {/* Actions */}
         <div className="flex items-center gap-2 shrink-0 justify-end">
+          {!isPro && (
+            <Link
+              href="/upgrade"
+              className="flex items-center gap-1.5 rounded-md bg-linear-to-r from-amber-400 to-amber-600 px-3 py-1.5 text-sm font-medium text-amber-950 hover:from-amber-300 hover:to-amber-500 transition-colors"
+            >
+              <Crown className="h-4 w-4" />
+              <span className="hidden sm:inline">Upgrade</span>
+            </Link>
+          )}
           <Link
             href="/favorites"
             className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"

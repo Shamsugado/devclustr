@@ -12,7 +12,8 @@ export default auth((req) => {
     req.nextUrl.pathname.startsWith("/settings") ||
     req.nextUrl.pathname.startsWith("/items") ||
     req.nextUrl.pathname.startsWith("/collections") ||
-    req.nextUrl.pathname.startsWith("/favorites");
+    req.nextUrl.pathname.startsWith("/favorites") ||
+    req.nextUrl.pathname.startsWith("/upgrade");
 
   if (isProtected && !isLoggedIn) {
     const signInUrl = new URL("/sign-in", req.nextUrl.origin);
@@ -22,5 +23,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*", "/settings/:path*", "/items/:path*", "/collections/:path*", "/favorites/:path*"],
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/settings/:path*", "/items/:path*", "/collections/:path*", "/favorites/:path*", "/upgrade/:path*"],
 };

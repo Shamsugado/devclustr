@@ -35,6 +35,7 @@ export default function DashboardShell({ children, sidebarData, editorSettings }
           onMobileMenuClick={() => setMobileOpen(true)}
           itemTypes={sidebarData.itemTypes}
           onSearchClick={() => setPaletteOpen(true)}
+          isPro={sidebarData.user?.isPro ?? false}
         />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar

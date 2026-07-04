@@ -2,15 +2,23 @@
 
 ## Status
 
-<!-- Not Started | In Progress | Complete -->
+Complete
 
 ## Goals
 
-<!-- bullet points -->
+- Add an "Upgrade" button to the dashboard header (`TopBar`), visible only to free-tier users.
+- Instead of the button linking directly to Stripe Checkout, it should link to a new `/upgrade` page.
+- `/upgrade` displays the Free vs Pro feature comparison (similar to the homepage pricing section) with a monthly/yearly toggle.
+- User selects monthly ($8) or yearly ($72) on that page, then clicks a single CTA to start Stripe Checkout for the selected plan.
 
 ## Notes
 
-<!-- additional context -->
+- Reuse the existing Stripe checkout flow (`POST /api/stripe/checkout`) — no new backend/webhook work needed, this is UI-only.
+- `session.user.isPro` is already reliable server-side (`src/auth.ts` jwt/session callbacks).
+- `TopBar` currently has no `isPro` awareness — needs threading through `SidebarData` from the 4 dashboard layouts (`dashboard`, `favorites`, `items`, `collections`) → `DashboardShell` → `TopBar`.
+- `/settings` and `/settings/billing` are standalone pages (no sidebar shell) — `/upgrade` should follow that same standalone pattern since it's a full-page destination, not a dashboard sub-view.
+- If a Pro user hits `/upgrade` directly (e.g. stale bookmark), redirect to `/settings/billing` since there's nothing to upgrade.
+- `/upgrade` needs to be added to `src/proxy.ts` (protected routes + matcher).
 
 ## History
 
@@ -66,3 +74,5 @@
 - **2026-07-02** — Demo seed trimmed to 3 collections complete. `prisma/seed.ts` DevOps and Design Resources collections removed so the demo user's seed data matches `FREE_TIER_COLLECTION_LIMIT` (3 collections, 10 items). Ran `db:purge-users` + reseed against the dev DB; also cleaned up stale pre-existing collections/items left over from prior seed runs (upsert-based seeding doesn't delete removed records) and a stray manually-created test collection.
 - **2026-07-02** — Pro-only item type gate complete. `/items/files` and `/items/images` now show an `UpgradePrompt` (lock icon, message, reused `BillingActions` upgrade buttons) instead of the item list when a free user visits them, checked via `session.user.isPro` (no extra DB query). New `canAccessItemTypeSlug(typeSlug, isPro)` helper in `src/lib/tier.ts` and `PRO_ONLY_ITEM_TYPE_SLUGS` constant, following the existing `canCreateItem`/`canCreateCollection` pattern. 6 unit tests added (129 total). Verified in browser as the free demo user: `/items/files` and `/items/images` show the upgrade prompt; `/items/snippets` unaffected.
 - **2026-07-03** — Full Stripe checkout flow verified end-to-end in dev with `stripe listen` forwarding webhooks to `/api/webhooks/stripe`: registered a fresh test user, confirmed Files/Images stayed gated on the Free tier, completed a real Stripe test-mode subscription checkout (card `4242 4242 4242 4242`), and confirmed the webhook flipped `isPro: true` with `stripeCustomerId`/`stripeSubscriptionId` set. Also fixed a real Stripe webhook signing secret that had been accidentally pasted into `.env.example` (never committed). Settings UI polish: `/settings` gained a "Back to Dashboard" link and `/settings/billing` a "Back to Settings" button in the post-checkout success banner; both pages' "Billing" headings got a `CreditCard` icon; current plan (Free/Pro) is now shown as a `Badge` (gradient amber + `Crown` icon for Pro) next to the existing plan text on both pages, instead of plain text alone.
+- **2026-07-04** — Upgrade page complete. New standalone `/upgrade` page (protected in `src/proxy.ts`, no sidebar shell — same pattern as `/settings/billing`) shows a Free vs Pro feature comparison with a monthly/yearly toggle, mirroring the homepage pricing section but wired to real checkout. `UpgradePricing` client component (`src/components/upgrade/UpgradePricing.tsx`) toggles between $8/mo and $72/yr (displayed as $6/mo billed annually) and posts the selected price ID to `/api/stripe/checkout` on a single "Upgrade" CTA. Server page redirects unauthenticated users to `/sign-in` and existing Pro users straight to `/settings/billing`. Header `TopBar` now shows an amber "Upgrade" button (Crown icon) linking to `/upgrade`, visible only to free users — required threading `isPro` through `SidebarData.user` in all 4 dashboard layouts (`dashboard`, `favorites`, `items`, `collections`) → `DashboardShell` → `TopBar`. Verified end-to-end in browser as the free demo user: button appears, toggle updates price/CTA text live, clicking "Upgrade — $72/year" redirects to a real Stripe Checkout session showing "$72.00 per year ($6.00/month billed annually)". No new server actions/utilities, so no new unit tests; all 123 existing tests and `npm run build` pass.
+- **2026-07-04** — Pro item type gate now redirects to `/upgrade`. `src/app/items/[type]/page.tsx` no longer renders an inline `UpgradePrompt` for free users hitting `/items/files` or `/items/images` — it `redirect("/upgrade")`s instead, consolidating on the single upgrade page. Deleted the now-unused `src/components/items/UpgradePrompt.tsx`. Verified in browser: clicking "Files" or "Images" in the sidebar as the free demo user lands on `/upgrade`.

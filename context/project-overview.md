@@ -138,8 +138,6 @@ Full-text search across:
 | Priority support     | ❌                    | ✅                    |
 | Search               | Basic                 | Full                  |
 
-> 🛠️ During development, all users have full access regardless of plan.
-
 ---
 
 ## UI / UX
@@ -410,6 +408,7 @@ model TagsOnItems {
 | `/collections/[id]` | Single collection view         |
 | `/settings`         | User settings                  |
 | `/settings/billing` | Subscription management        |
+| `/upgrade`          | Plan comparison & checkout CTA |
 
 ---
 

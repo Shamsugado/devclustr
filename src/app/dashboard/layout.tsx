@@ -21,7 +21,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     favoriteCollections: sidebarCollections.favorites,
     recentCollections: sidebarCollections.recents,
     user: user
-      ? { name: user.name ?? "User", email: user.email ?? "", image: user.image ?? null }
+      ? { name: user.name ?? "User", email: user.email ?? "", image: user.image ?? null, isPro: user.isPro }
       : null,
   };
 
