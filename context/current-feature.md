@@ -1,31 +1,16 @@
-# Current Feature: AI Explain Code
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- Not Started | In Progress | Complete -->
 
 ## Goals
 
-- Create an `explainCode` server action with auth, Pro gating, Zod validation, rate limiting
-- Add "Explain" button (Sparkles icon) to code editor window controls header (next to Copy button)
-- Only show for snippet and command types in the item drawer (not in create/edit forms)
-- After generating, show Code/Explain tabs in the editor header to toggle between views
-- Render explanation as markdown in the same container space as the code editor
-- Explanation should be concise (~200-300 words) covering what the code does and key concepts
-- Loading state: Loader2 spinner while generating
-- Pro gating in UI: show Crown icon + tooltip ("AI features require Pro subscription") for free users
-- Error handling via toast (Pro gating, rate limit, AI service errors)
-- Follow existing patterns
-- Unit tests for server action
+<!-- bullet points -->
 
 ## Notes
 
-- Uses OpenAI "gpt-5-nano" model, same as existing AI auto-tagging/auto-summary features
-- Only for snippet and command item types — other types are already human-readable or non-code
-- Explanations are not saved to the database — regenerated on each click
-- Not available in create/edit forms, only in the item drawer read view
-- `isPro` needs to be passed as a prop to the item drawer / code editor
-- See `docs/ai-integration-plan.md` for full architectural context
+<!-- additional context -->
 
 ## History
 
@@ -85,3 +70,4 @@ In Progress
 - **2026-07-04** — Pro item type gate now redirects to `/upgrade`. `src/app/items/[type]/page.tsx` no longer renders an inline `UpgradePrompt` for free users hitting `/items/files` or `/items/images` — it `redirect("/upgrade")`s instead, consolidating on the single upgrade page. Deleted the now-unused `src/components/items/UpgradePrompt.tsx`. Verified in browser: clicking "Files" or "Images" in the sidebar as the free demo user lands on `/upgrade`.
 - **2026-07-07** — AI auto-tagging complete. New "Suggest Tags" button (Sparkles icon) in the create-item dialog and item drawer edit mode, visible only to Pro users. Calls new `generateAutoTags` server action (`src/actions/ai.ts`, auth + Pro-gated + Zod-validated + rate-limited) which uses OpenAI `gpt-5-nano` via the **Responses API** (not Chat Completions, which returns empty content for this model) to suggest 3-5 freeform tags from an item's title/description/content (content truncated to 2000 chars). Suggestions render as badges with accept/reject controls; accepted tags merge into the existing comma-separated tags field. Establishes the OpenAI foundation for future AI features: `src/lib/openai.ts` (lazy client singleton, mirrors `stripe.ts`), `AI_MODEL`/`AI_MAX_INPUT_CHARS` constants, and `isAiRateLimited` (20/hr/user, mirrors `isLoginRateLimited`) in `rate-limit.ts`. New `IsProContext` (`src/contexts/IsProContext.tsx`, mirrors `EditorSettingsContext`) provided by `DashboardShell` lets dialog/drawer components read `isPro` via `useIsPro()` without prop-drilling through every dashboard layout. Two undocumented Responses API gotchas found and fixed during verification: (1) `text: { format: { type: "json_object" } }` requires the literal word "json" in the `input` string itself, not just `instructions`, or the API 400s; (2) `gpt-5-nano` spends `max_output_tokens` on internal reasoning first — needed `reasoning: { effort: "low" }` and `max_output_tokens: 300` (not the initial 100) to get actual output back instead of a silent empty `status: "incomplete"`. 10 unit tests added (139 total); `npm run build` passes. Verified end-to-end in browser: free demo user sees no Suggest Tags button; temporarily flipped to Pro in the dev DB, generated real suggestions for a command item ("docker", "prune", "containers", "images", "volumes"), accepted one into the tags field, then reverted the demo user back to Free.
 - **2026-07-07** — AI auto-summary complete. New "Generate description with AI" button (Sparkles icon) next to the Description label in the create-item dialog and item drawer edit mode, visible only to Pro users. Calls new `generateAutoSummary` server action (`src/actions/ai.ts`, auth + Pro-gated + Zod-validated + rate-limited via the same `isAiRateLimited` bucket as auto-tagging) which uses the OpenAI Responses API to write a 1-2 sentence summary from the item's current in-memory title, content, url, language, and filename (no save/DB read required). New `SummarySuggestButton` component (`src/components/items/SummarySuggestButton.tsx`) fills the Description textarea on success; Sonner toast on error. `GenerateAutoSummarySchema`/`AutoSummaryResultSchema` added to `src/actions/ai-schemas.ts`. `DetailSection` in both `NewItemDialog.tsx` and `ItemDrawerParts.tsx` extended with an optional `action` slot next to the label to host the button. 15 unit tests added (154 total); `npm run build` and lint pass (6 pre-existing lint errors in unrelated files unchanged). Verified end-to-end in browser as the free demo user (button absent), then temporarily flipped to Pro in the dev DB: generated a real summary for a new command item from its title + Monaco editor content in the create dialog, and regenerated the description for an existing "Docker cleanup commands" item from its full content in the drawer edit mode; reverted the demo user back to Free afterward.
+- **2026-07-07** — AI code explanation complete. New "Explain" button (Sparkles icon) in the `CodeEditor` header next to Copy, shown only in the item drawer's read-only view for snippet/command types (not in create/edit forms) via a new `explainable` prop. Calls new `explainCode` server action (`src/actions/ai.ts`, auth + Pro-gated + Zod-validated + rate-limited via the same `isAiRateLimited` bucket) which uses the OpenAI Responses API to write a 200-300 word Markdown explanation from the code content + language; not persisted, regenerated on each click. `ExplainCodeSchema`/`ExplainCodeResultSchema` added to `src/actions/ai-schemas.ts`. Free users see a Crown icon + "AI features require Pro subscription" tooltip instead of the button. Loader2 spinner while generating; once generated, Code/Explain tabs appear in the header (mirrors `MarkdownEditor`'s Write/Preview pattern) to toggle between the Monaco editor and the rendered explanation (`react-markdown` + `remark-gfm`, same container). Sonner toast on error. 16 unit tests added (168 total); `npm run build` passes, lint unchanged (same 6 pre-existing errors in unrelated files). Verified end-to-end in browser: free demo user sees the Crown-gated button; temporarily flipped to Pro in the dev DB, generated a real explanation for a "Common utility functions" snippet, toggled Code/Explain tabs back and forth, confirmed edit mode has no Explain button at all, then reverted the demo user back to Free.
