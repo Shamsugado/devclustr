@@ -8,3 +8,14 @@ export const GenerateAutoTagsSchema = z.object({
 
 // The model may return `{ "tags": [...] }` or a bare `[...]` array.
 export const AutoTagResultSchema = z.array(z.string().trim().min(1)).max(10);
+
+export const GenerateAutoSummarySchema = z.object({
+  title: z.string().trim(),
+  content: z.string().nullable(),
+  url: z.string().trim().nullable(),
+  language: z.string().trim().nullable(),
+  fileName: z.string().trim().nullable(),
+});
+
+// The model may return `{ "summary": "..." }` or a bare string.
+export const AutoSummaryResultSchema = z.string().trim().min(1).max(500);

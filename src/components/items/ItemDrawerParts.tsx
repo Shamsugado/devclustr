@@ -174,10 +174,21 @@ export function EditBar({
   );
 }
 
-export function DetailSection({ label, children }: { label: string; children: React.ReactNode }) {
+export function DetailSection({
+  label,
+  action,
+  children,
+}: {
+  label: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+        {action}
+      </div>
       {children}
     </div>
   );

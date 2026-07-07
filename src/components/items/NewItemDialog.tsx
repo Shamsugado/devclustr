@@ -19,6 +19,7 @@ import MarkdownEditor from "@/components/items/MarkdownEditor";
 import FileUpload, { type UploadedFile } from "@/components/items/FileUpload";
 import CollectionMultiSelect, { type CollectionOption } from "@/components/items/CollectionMultiSelect";
 import TagSuggestions from "@/components/items/TagSuggestions";
+import SummarySuggestButton from "@/components/items/SummarySuggestButton";
 import { useIsPro } from "@/contexts/IsProContext";
 import type { SidebarItemType } from "@/components/dashboard/Sidebar";
 
@@ -39,10 +40,21 @@ function emptyForm(): CreateForm {
   return { title: "", description: "", content: "", url: "", language: "", tags: "", collectionIds: [], uploadedFile: null };
 }
 
-function DetailSection({ label, children }: { label: string; children: React.ReactNode }) {
+function DetailSection({
+  label,
+  action,
+  children,
+}: {
+  label: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+        {action}
+      </div>
       {children}
     </div>
   );
@@ -194,7 +206,21 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
           </div>
 
           {/* Description */}
-          <DetailSection label="Description">
+          <DetailSection
+            label="Description"
+            action={
+              isPro && (
+                <SummarySuggestButton
+                  title={form.title}
+                  content={form.content}
+                  url={form.url}
+                  language={form.language}
+                  fileName={form.uploadedFile?.fileName ?? ""}
+                  onGenerate={(summary) => handleChange("description", summary)}
+                />
+              )
+            }
+          >
             <textarea
               value={form.description}
               onChange={(e) => handleChange("description", e.target.value)}

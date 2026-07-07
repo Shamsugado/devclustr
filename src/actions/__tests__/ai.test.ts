@@ -6,8 +6,9 @@ vi.mock("@/lib/rate-limit", () => ({ isAiRateLimited: vi.fn().mockResolvedValue(
 const responsesCreate = vi.fn();
 vi.mock("@/lib/openai", () => ({ getOpenAI: () => ({ responses: { create: responsesCreate } }) }));
 
-const { GenerateAutoTagsSchema, AutoTagResultSchema } = await import("@/actions/ai-schemas");
-const { generateAutoTags } = await import("@/actions/ai");
+const { GenerateAutoTagsSchema, AutoTagResultSchema, GenerateAutoSummarySchema, AutoSummaryResultSchema } =
+  await import("@/actions/ai-schemas");
+const { generateAutoTags, generateAutoSummary } = await import("@/actions/ai");
 const { auth } = await import("@/auth");
 const { isAiRateLimited } = await import("@/lib/rate-limit");
 
@@ -121,6 +122,123 @@ describe("generateAutoTags", () => {
     vi.mocked(auth).mockResolvedValueOnce(proSession as never);
     responsesCreate.mockRejectedValueOnce(new Error("network error"));
     const result = await generateAutoTags(input);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/Failed to generate/);
+  });
+});
+
+const summaryInput = {
+  title: "My Snippet",
+  content: "console.log('hello')",
+  url: null,
+  language: "typescript",
+  fileName: null,
+};
+
+describe("GenerateAutoSummarySchema", () => {
+  it("accepts a valid request", () => {
+    expect(GenerateAutoSummarySchema.safeParse(summaryInput).success).toBe(true);
+  });
+
+  it("accepts null content, url, language, and fileName", () => {
+    const result = GenerateAutoSummarySchema.safeParse({
+      title: "Title",
+      content: null,
+      url: null,
+      language: null,
+      fileName: null,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("trims the title", () => {
+    const result = GenerateAutoSummarySchema.safeParse({ ...summaryInput, title: "  hi  " });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.title).toBe("hi");
+  });
+});
+
+describe("AutoSummaryResultSchema", () => {
+  it("accepts a non-empty string", () => {
+    expect(AutoSummaryResultSchema.safeParse("A short summary.").success).toBe(true);
+  });
+
+  it("rejects an empty string", () => {
+    expect(AutoSummaryResultSchema.safeParse("").success).toBe(false);
+  });
+
+  it("rejects a non-string value", () => {
+    expect(AutoSummaryResultSchema.safeParse(["not", "a", "string"]).success).toBe(false);
+  });
+
+  it("rejects a string over 500 characters", () => {
+    expect(AutoSummaryResultSchema.safeParse("a".repeat(501)).success).toBe(false);
+  });
+});
+
+describe("generateAutoSummary", () => {
+  it("returns an error when unauthenticated", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
+    const result = await generateAutoSummary(summaryInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toBe("Unauthorized");
+  });
+
+  it("returns an error for a free-tier user", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(freeSession as never);
+    const result = await generateAutoSummary(summaryInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/Pro subscription/);
+  });
+
+  it("returns an error when title, content, url, and fileName are all empty", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    const result = await generateAutoSummary({
+      title: "  ",
+      content: "  ",
+      url: null,
+      language: null,
+      fileName: null,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("returns an error when rate limited", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    vi.mocked(isAiRateLimited).mockResolvedValueOnce(true);
+    const result = await generateAutoSummary(summaryInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/Too many/);
+  });
+
+  it("parses a {summary: ...} response", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockResolvedValueOnce({ output_text: '{"summary": "A helper snippet."}' });
+    const result = await generateAutoSummary(summaryInput);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data).toBe("A helper snippet.");
+  });
+
+  it("parses a bare string response", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockResolvedValueOnce({ output_text: '"A helper snippet."' });
+    const result = await generateAutoSummary(summaryInput);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data).toBe("A helper snippet.");
+  });
+
+  it("returns an error when the AI response fails schema validation", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockResolvedValueOnce({ output_text: '{"summary": ""}' });
+    const result = await generateAutoSummary(summaryInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/unexpected format/);
+  });
+
+  it("returns an error when the OpenAI call throws", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockRejectedValueOnce(new Error("network error"));
+    const result = await generateAutoSummary(summaryInput);
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error).toMatch(/Failed to generate/);
   });

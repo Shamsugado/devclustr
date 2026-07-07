@@ -7,6 +7,7 @@ import CodeEditor from "@/components/items/CodeEditor";
 import MarkdownEditor from "@/components/items/MarkdownEditor";
 import CollectionMultiSelect, { type CollectionOption } from "@/components/items/CollectionMultiSelect";
 import TagSuggestions from "@/components/items/TagSuggestions";
+import SummarySuggestButton from "@/components/items/SummarySuggestButton";
 import { useIsPro } from "@/contexts/IsProContext";
 import { EditBar, DetailSection, type ItemFull } from "@/components/items/ItemDrawerParts";
 
@@ -101,7 +102,21 @@ export default function ItemDrawerEdit({
       </div>
 
       <div className="px-6 pb-6 flex flex-col gap-5 overflow-y-auto">
-        <DetailSection label="Description">
+        <DetailSection
+          label="Description"
+          action={
+            isPro && (
+              <SummarySuggestButton
+                title={form.title}
+                content={form.content}
+                url={form.url}
+                language={form.language}
+                fileName={item.fileName ?? ""}
+                onGenerate={(summary) => onChange("description", summary)}
+              />
+            )
+          }
+        >
           <textarea
             value={form.description}
             onChange={(e) => onChange("description", e.target.value)}

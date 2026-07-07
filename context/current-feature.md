@@ -1,16 +1,24 @@
-# Current Feature
+# Current Feature: AI Summary (auto-description)
 
 ## Status
 
-<!-- Not Started | In Progress | Complete -->
+In Progress
 
 ## Goals
 
-<!-- bullet points -->
+- Add an icon button (Sparkles-style, matching the existing "Suggest Tags" AI button) next to the Description field in both the create-item dialog (`NewItemDialog`) and the item drawer edit mode (`ItemDrawerEdit`).
+- Clicking it generates a concise 1-2 sentence summary from the item's current in-memory title + content (and any other available fields) and fills the Description field with it.
+- Works for all item types, using whatever fields are available for that type (e.g. snippet/command have content + language, link has URL, note/prompt have content, file/image may only have title).
+- Uses current unsaved form inputs only — no need to save the item first, no DB read required.
+- Pro-only, consistent with the existing AI auto-tagging feature.
 
 ## Notes
 
-<!-- additional context -->
+- Mirror the existing AI auto-tagging feature (`src/actions/ai.ts` `generateAutoTags`, 2026-07-07 history entry) for the pattern: OpenAI Responses API (`gpt-5-nano`, `reasoning: { effort: "low" }`, `max_output_tokens` high enough for actual output), Zod-validated server action, Pro-gated via `useIsPro()` / session check, rate-limited via `isAiRateLimited` (or a new limiter following the same pattern).
+- New server action, e.g. `generateAutoSummary(title, content, description?, url?, language?, type)` in `src/actions/ai.ts` — takes raw field values from the client (not an item ID), since the item may not exist yet.
+- Content should be truncated the same way as auto-tagging (`AI_MAX_INPUT_CHARS`).
+- UI: icon button placed near/inside the Description field label area in both `NewItemDialog` and `ItemDrawerEdit`; loading state while generating; overwrite (or fill if empty) the Description textarea on success; Sonner toast on error.
+- No DB schema changes expected — this only affects the Description form field.
 
 ## History
 
