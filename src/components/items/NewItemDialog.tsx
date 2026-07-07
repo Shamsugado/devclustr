@@ -18,6 +18,8 @@ import CodeEditor from "@/components/items/CodeEditor";
 import MarkdownEditor from "@/components/items/MarkdownEditor";
 import FileUpload, { type UploadedFile } from "@/components/items/FileUpload";
 import CollectionMultiSelect, { type CollectionOption } from "@/components/items/CollectionMultiSelect";
+import TagSuggestions from "@/components/items/TagSuggestions";
+import { useIsPro } from "@/contexts/IsProContext";
 import type { SidebarItemType } from "@/components/dashboard/Sidebar";
 
 const ALLOWED_TYPES = ["snippet", "prompt", "command", "note", "link", "file", "image"];
@@ -55,6 +57,7 @@ interface NewItemDialogProps {
 
 export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTypeId }: NewItemDialogProps) {
   const router = useRouter();
+  const isPro = useIsPro();
   const allowedTypes = itemTypes.filter((t) => ALLOWED_TYPES.includes(t.name.toLowerCase()));
 
   const defaultTypeId = () => {
@@ -275,6 +278,22 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
               className="w-full text-sm bg-background border border-border rounded-md px-3 py-2 text-foreground outline-none focus:border-primary placeholder:text-muted-foreground"
             />
             <p className="text-xs text-muted-foreground mt-1">Separate tags with commas</p>
+            {isPro && (
+              <div className="mt-2">
+                <TagSuggestions
+                  title={form.title}
+                  description={form.description}
+                  content={form.content}
+                  existingTags={form.tags.split(",").map((t) => t.trim()).filter(Boolean)}
+                  onAccept={(tag) => {
+                    const current = form.tags.split(",").map((t) => t.trim()).filter(Boolean);
+                    if (!current.includes(tag)) {
+                      handleChange("tags", [...current, tag].join(", "));
+                    }
+                  }}
+                />
+              </div>
+            )}
           </DetailSection>
 
           {/* Collections */}

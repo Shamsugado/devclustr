@@ -5,6 +5,7 @@ import TopBar from "@/components/dashboard/TopBar";
 import Sidebar, { type SidebarData } from "@/components/dashboard/Sidebar";
 import CommandPalette from "@/components/search/CommandPalette";
 import { EditorSettingsProvider, type EditorSettings } from "@/contexts/EditorSettingsContext";
+import { IsProProvider } from "@/contexts/IsProContext";
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -29,26 +30,28 @@ export default function DashboardShell({ children, sidebarData, editorSettings }
   }, []);
 
   return (
-    <EditorSettingsProvider value={editorSettings}>
-      <div className="flex flex-col h-screen bg-background">
-        <TopBar
-          onMobileMenuClick={() => setMobileOpen(true)}
-          itemTypes={sidebarData.itemTypes}
-          onSearchClick={() => setPaletteOpen(true)}
-          isPro={sidebarData.user?.isPro ?? false}
-        />
-        <div className="flex flex-1 overflow-hidden">
-          <Sidebar
-            collapsed={collapsed}
-            onCollapse={() => setCollapsed((c) => !c)}
-            mobileOpen={mobileOpen}
-            onMobileClose={() => setMobileOpen(false)}
-            sidebarData={sidebarData}
+    <IsProProvider value={sidebarData.user?.isPro ?? false}>
+      <EditorSettingsProvider value={editorSettings}>
+        <div className="flex flex-col h-screen bg-background">
+          <TopBar
+            onMobileMenuClick={() => setMobileOpen(true)}
+            itemTypes={sidebarData.itemTypes}
+            onSearchClick={() => setPaletteOpen(true)}
+            isPro={sidebarData.user?.isPro ?? false}
           />
-          <main className="flex-1 overflow-y-auto p-4">{children}</main>
+          <div className="flex flex-1 overflow-hidden">
+            <Sidebar
+              collapsed={collapsed}
+              onCollapse={() => setCollapsed((c) => !c)}
+              mobileOpen={mobileOpen}
+              onMobileClose={() => setMobileOpen(false)}
+              sidebarData={sidebarData}
+            />
+            <main className="flex-1 overflow-y-auto p-4">{children}</main>
+          </div>
+          <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
         </div>
-        <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
-      </div>
-    </EditorSettingsProvider>
+      </EditorSettingsProvider>
+    </IsProProvider>
   );
 }

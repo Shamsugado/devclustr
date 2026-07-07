@@ -30,6 +30,10 @@ const resendVerificationLimiter = redis
   ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, "15 m"), prefix: "rl:resend-verification" })
   : null;
 
+const aiLimiter = redis
+  ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(20, "1 h"), prefix: "rl:ai" })
+  : null;
+
 export function getIp(request: Request): string {
   const xff = request.headers.get("x-forwarded-for");
   return xff ? xff.split(",")[0].trim() : "127.0.0.1";
@@ -85,5 +89,10 @@ export async function checkResendVerificationRateLimit(
 
 export async function isLoginRateLimited(ip: string, email: string): Promise<boolean> {
   const { success } = await doLimit(loginLimiter, `${ip}:${email}`);
+  return !success;
+}
+
+export async function isAiRateLimited(userId: string): Promise<boolean> {
+  const { success } = await doLimit(aiLimiter, userId);
   return !success;
 }

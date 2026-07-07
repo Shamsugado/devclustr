@@ -1,16 +1,33 @@
-# Current Feature
+# Current Feature: AI Auto-Tagging
 
 ## Status
 
-<!-- Not Started | In Progress | Complete -->
+In Progress
 
 ## Goals
 
-<!-- bullet points -->
+- Create OpenAI client utility with `AI_MODEL` constant (foundation for future AI features, if not already present)
+- Create `generateAutoTags` server action with auth, Pro gating, Zod validation, and rate limiting
+- Add AI rate limit config (20 requests/hour per user) to the existing rate limit utility (if not already added)
+- Add a "Suggest Tags" button (Sparkles icon, ghost variant) near the tags input in the create item dialog and item drawer edit mode
+- Display suggested tags as badges with per-tag accept (check) and reject (X) controls
+- Accepted tags get added to the item's tag list; tags are freeform, not limited to existing DB tags
+- Truncate content to 2000 chars before the API call
+- Hide the Suggest Tags button for free users (Pro-only UI gating), in addition to server-side gating
+- Handle errors via toast (Pro gating, rate limit, AI service errors)
+- Follow existing codebase patterns; add unit tests for the server action
 
 ## Notes
 
-<!-- additional context -->
+- Model: OpenAI `gpt-5-nano`. Uses the standard `openai` SDK, kept simple.
+- **CRITICAL gotcha**: gpt-5-nano does NOT work with the Chat Completions API (returns empty content) — MUST use the **Responses API** (`client.responses.create(...)`, read `response.output_text`), with `text: { format: { type: 'json_object' } }` instead of `response_format`.
+- `zodResponseFormat` structured output consumes excessive tokens with this model and hits length limits — use `json_object` format and parse manually. Model may return `{"tags": [...]}` or a bare `[...]` array — handle both. Normalize tags to lowercase.
+- `OPENAI_API_KEY` already in `.env`.
+- `isPro` is available server-side via session but not currently passed into the create/edit UI components — server-side gating handles enforcement; UI gating (button visibility) requires passing `isPro` as a prop or fetching it client-side.
+- Full architectural context/background in `docs/ai-integration-plan.md` and research in `context/research/ai-integration-research.md` — note the plan doc's earlier API-route/Chat-Completions sketch is superseded by the spec's server-action + Responses-API approach in `context/features/ai-auto-tag-spec.md` (the authoritative spec for this feature).
+- Spec file: `context/features/ai-auto-tag-spec.md`
+- **Two more Responses API gotchas discovered during implementation (not in the spec's gotcha list):** (1) `text: { format: { type: "json_object" } }` requires the literal word "json" to appear in the `input` string itself — putting it only in `instructions` throws a 400 `invalid_request_error`. (2) `gpt-5-nano` spends its `max_output_tokens` budget on internal reasoning tokens first; with the default reasoning effort and `max_output_tokens: 100`, the response comes back `status: "incomplete"` with empty `output_text` and no error. Fixed by adding `reasoning: { effort: "low" }` and raising `max_output_tokens` to 300.
+- Implementation added an `IsProContext` (`src/contexts/IsProContext.tsx`, mirrors the existing `EditorSettingsContext` pattern) provided by `DashboardShell`, so `NewItemDialog`/`ItemDrawerEdit` can read `isPro` via `useIsPro()` without prop-drilling through every page/layout.
 
 ## History
 

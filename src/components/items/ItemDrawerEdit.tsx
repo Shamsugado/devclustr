@@ -6,6 +6,8 @@ import { itemTypeIconMap } from "@/lib/item-type-icons";
 import CodeEditor from "@/components/items/CodeEditor";
 import MarkdownEditor from "@/components/items/MarkdownEditor";
 import CollectionMultiSelect, { type CollectionOption } from "@/components/items/CollectionMultiSelect";
+import TagSuggestions from "@/components/items/TagSuggestions";
+import { useIsPro } from "@/contexts/IsProContext";
 import { EditBar, DetailSection, type ItemFull } from "@/components/items/ItemDrawerParts";
 
 export interface EditForm {
@@ -49,6 +51,7 @@ export default function ItemDrawerEdit({
   onCancel: () => void;
   isSaving: boolean;
 }) {
+  const isPro = useIsPro();
   const { itemType } = item;
   const Icon = itemTypeIconMap[itemType.icon] ?? File;
   const isUrl = item.contentType === "URL";
@@ -153,6 +156,22 @@ export default function ItemDrawerEdit({
             className="w-full text-sm bg-background border border-border rounded-md px-3 py-2 text-foreground outline-none focus:border-primary placeholder:text-muted-foreground"
           />
           <p className="text-xs text-muted-foreground mt-1">Separate tags with commas</p>
+          {isPro && (
+            <div className="mt-2">
+              <TagSuggestions
+                title={form.title}
+                description={form.description}
+                content={form.content}
+                existingTags={form.tags.split(",").map((t) => t.trim()).filter(Boolean)}
+                onAccept={(tag) => {
+                  const current = form.tags.split(",").map((t) => t.trim()).filter(Boolean);
+                  if (!current.includes(tag)) {
+                    onChange("tags", [...current, tag].join(", "));
+                  }
+                }}
+              />
+            </div>
+          )}
         </DetailSection>
 
         <DetailSection label="Collections">
