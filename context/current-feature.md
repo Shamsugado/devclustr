@@ -1,33 +1,16 @@
-# Current Feature: AI Auto-Tagging
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- Not Started | In Progress | Complete -->
 
 ## Goals
 
-- Create OpenAI client utility with `AI_MODEL` constant (foundation for future AI features, if not already present)
-- Create `generateAutoTags` server action with auth, Pro gating, Zod validation, and rate limiting
-- Add AI rate limit config (20 requests/hour per user) to the existing rate limit utility (if not already added)
-- Add a "Suggest Tags" button (Sparkles icon, ghost variant) near the tags input in the create item dialog and item drawer edit mode
-- Display suggested tags as badges with per-tag accept (check) and reject (X) controls
-- Accepted tags get added to the item's tag list; tags are freeform, not limited to existing DB tags
-- Truncate content to 2000 chars before the API call
-- Hide the Suggest Tags button for free users (Pro-only UI gating), in addition to server-side gating
-- Handle errors via toast (Pro gating, rate limit, AI service errors)
-- Follow existing codebase patterns; add unit tests for the server action
+<!-- bullet points -->
 
 ## Notes
 
-- Model: OpenAI `gpt-5-nano`. Uses the standard `openai` SDK, kept simple.
-- **CRITICAL gotcha**: gpt-5-nano does NOT work with the Chat Completions API (returns empty content) — MUST use the **Responses API** (`client.responses.create(...)`, read `response.output_text`), with `text: { format: { type: 'json_object' } }` instead of `response_format`.
-- `zodResponseFormat` structured output consumes excessive tokens with this model and hits length limits — use `json_object` format and parse manually. Model may return `{"tags": [...]}` or a bare `[...]` array — handle both. Normalize tags to lowercase.
-- `OPENAI_API_KEY` already in `.env`.
-- `isPro` is available server-side via session but not currently passed into the create/edit UI components — server-side gating handles enforcement; UI gating (button visibility) requires passing `isPro` as a prop or fetching it client-side.
-- Full architectural context/background in `docs/ai-integration-plan.md` and research in `context/research/ai-integration-research.md` — note the plan doc's earlier API-route/Chat-Completions sketch is superseded by the spec's server-action + Responses-API approach in `context/features/ai-auto-tag-spec.md` (the authoritative spec for this feature).
-- Spec file: `context/features/ai-auto-tag-spec.md`
-- **Two more Responses API gotchas discovered during implementation (not in the spec's gotcha list):** (1) `text: { format: { type: "json_object" } }` requires the literal word "json" to appear in the `input` string itself — putting it only in `instructions` throws a 400 `invalid_request_error`. (2) `gpt-5-nano` spends its `max_output_tokens` budget on internal reasoning tokens first; with the default reasoning effort and `max_output_tokens: 100`, the response comes back `status: "incomplete"` with empty `output_text` and no error. Fixed by adding `reasoning: { effort: "low" }` and raising `max_output_tokens` to 300.
-- Implementation added an `IsProContext` (`src/contexts/IsProContext.tsx`, mirrors the existing `EditorSettingsContext` pattern) provided by `DashboardShell`, so `NewItemDialog`/`ItemDrawerEdit` can read `isPro` via `useIsPro()` without prop-drilling through every page/layout.
+<!-- additional context -->
 
 ## History
 
@@ -85,3 +68,4 @@ In Progress
 - **2026-07-03** — Full Stripe checkout flow verified end-to-end in dev with `stripe listen` forwarding webhooks to `/api/webhooks/stripe`: registered a fresh test user, confirmed Files/Images stayed gated on the Free tier, completed a real Stripe test-mode subscription checkout (card `4242 4242 4242 4242`), and confirmed the webhook flipped `isPro: true` with `stripeCustomerId`/`stripeSubscriptionId` set. Also fixed a real Stripe webhook signing secret that had been accidentally pasted into `.env.example` (never committed). Settings UI polish: `/settings` gained a "Back to Dashboard" link and `/settings/billing` a "Back to Settings" button in the post-checkout success banner; both pages' "Billing" headings got a `CreditCard` icon; current plan (Free/Pro) is now shown as a `Badge` (gradient amber + `Crown` icon for Pro) next to the existing plan text on both pages, instead of plain text alone.
 - **2026-07-04** — Upgrade page complete. New standalone `/upgrade` page (protected in `src/proxy.ts`, no sidebar shell — same pattern as `/settings/billing`) shows a Free vs Pro feature comparison with a monthly/yearly toggle, mirroring the homepage pricing section but wired to real checkout. `UpgradePricing` client component (`src/components/upgrade/UpgradePricing.tsx`) toggles between $8/mo and $72/yr (displayed as $6/mo billed annually) and posts the selected price ID to `/api/stripe/checkout` on a single "Upgrade" CTA. Server page redirects unauthenticated users to `/sign-in` and existing Pro users straight to `/settings/billing`. Header `TopBar` now shows an amber "Upgrade" button (Crown icon) linking to `/upgrade`, visible only to free users — required threading `isPro` through `SidebarData.user` in all 4 dashboard layouts (`dashboard`, `favorites`, `items`, `collections`) → `DashboardShell` → `TopBar`. Verified end-to-end in browser as the free demo user: button appears, toggle updates price/CTA text live, clicking "Upgrade — $72/year" redirects to a real Stripe Checkout session showing "$72.00 per year ($6.00/month billed annually)". No new server actions/utilities, so no new unit tests; all 123 existing tests and `npm run build` pass.
 - **2026-07-04** — Pro item type gate now redirects to `/upgrade`. `src/app/items/[type]/page.tsx` no longer renders an inline `UpgradePrompt` for free users hitting `/items/files` or `/items/images` — it `redirect("/upgrade")`s instead, consolidating on the single upgrade page. Deleted the now-unused `src/components/items/UpgradePrompt.tsx`. Verified in browser: clicking "Files" or "Images" in the sidebar as the free demo user lands on `/upgrade`.
+- **2026-07-07** — AI auto-tagging complete. New "Suggest Tags" button (Sparkles icon) in the create-item dialog and item drawer edit mode, visible only to Pro users. Calls new `generateAutoTags` server action (`src/actions/ai.ts`, auth + Pro-gated + Zod-validated + rate-limited) which uses OpenAI `gpt-5-nano` via the **Responses API** (not Chat Completions, which returns empty content for this model) to suggest 3-5 freeform tags from an item's title/description/content (content truncated to 2000 chars). Suggestions render as badges with accept/reject controls; accepted tags merge into the existing comma-separated tags field. Establishes the OpenAI foundation for future AI features: `src/lib/openai.ts` (lazy client singleton, mirrors `stripe.ts`), `AI_MODEL`/`AI_MAX_INPUT_CHARS` constants, and `isAiRateLimited` (20/hr/user, mirrors `isLoginRateLimited`) in `rate-limit.ts`. New `IsProContext` (`src/contexts/IsProContext.tsx`, mirrors `EditorSettingsContext`) provided by `DashboardShell` lets dialog/drawer components read `isPro` via `useIsPro()` without prop-drilling through every dashboard layout. Two undocumented Responses API gotchas found and fixed during verification: (1) `text: { format: { type: "json_object" } }` requires the literal word "json" in the `input` string itself, not just `instructions`, or the API 400s; (2) `gpt-5-nano` spends `max_output_tokens` on internal reasoning first — needed `reasoning: { effort: "low" }` and `max_output_tokens: 300` (not the initial 100) to get actual output back instead of a silent empty `status: "incomplete"`. 10 unit tests added (139 total); `npm run build` passes. Verified end-to-end in browser: free demo user sees no Suggest Tags button; temporarily flipped to Pro in the dev DB, generated real suggestions for a command item ("docker", "prune", "containers", "images", "volumes"), accepted one into the tags field, then reverted the demo user back to Free.
