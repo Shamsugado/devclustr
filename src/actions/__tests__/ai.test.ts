@@ -6,9 +6,15 @@ vi.mock("@/lib/rate-limit", () => ({ isAiRateLimited: vi.fn().mockResolvedValue(
 const responsesCreate = vi.fn();
 vi.mock("@/lib/openai", () => ({ getOpenAI: () => ({ responses: { create: responsesCreate } }) }));
 
-const { GenerateAutoTagsSchema, AutoTagResultSchema, GenerateAutoSummarySchema, AutoSummaryResultSchema } =
-  await import("@/actions/ai-schemas");
-const { generateAutoTags, generateAutoSummary } = await import("@/actions/ai");
+const {
+  GenerateAutoTagsSchema,
+  AutoTagResultSchema,
+  GenerateAutoSummarySchema,
+  AutoSummaryResultSchema,
+  ExplainCodeSchema,
+  ExplainCodeResultSchema,
+} = await import("@/actions/ai-schemas");
+const { generateAutoTags, generateAutoSummary, explainCode } = await import("@/actions/ai");
 const { auth } = await import("@/auth");
 const { isAiRateLimited } = await import("@/lib/rate-limit");
 
@@ -239,6 +245,102 @@ describe("generateAutoSummary", () => {
     vi.mocked(auth).mockResolvedValueOnce(proSession as never);
     responsesCreate.mockRejectedValueOnce(new Error("network error"));
     const result = await generateAutoSummary(summaryInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/Failed to generate/);
+  });
+});
+
+const explainInput = {
+  content: "console.log('hello')",
+  language: "typescript",
+};
+
+describe("ExplainCodeSchema", () => {
+  it("accepts a valid request", () => {
+    expect(ExplainCodeSchema.safeParse(explainInput).success).toBe(true);
+  });
+
+  it("accepts a null language", () => {
+    const result = ExplainCodeSchema.safeParse({ content: "echo hi", language: null });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("ExplainCodeResultSchema", () => {
+  it("accepts a non-empty string", () => {
+    expect(ExplainCodeResultSchema.safeParse("This code logs hello.").success).toBe(true);
+  });
+
+  it("rejects an empty string", () => {
+    expect(ExplainCodeResultSchema.safeParse("").success).toBe(false);
+  });
+
+  it("rejects a non-string value", () => {
+    expect(ExplainCodeResultSchema.safeParse(["not", "a", "string"]).success).toBe(false);
+  });
+
+  it("rejects a string over 3000 characters", () => {
+    expect(ExplainCodeResultSchema.safeParse("a".repeat(3001)).success).toBe(false);
+  });
+});
+
+describe("explainCode", () => {
+  it("returns an error when unauthenticated", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
+    const result = await explainCode(explainInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toBe("Unauthorized");
+  });
+
+  it("returns an error for a free-tier user", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(freeSession as never);
+    const result = await explainCode(explainInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/Pro subscription/);
+  });
+
+  it("returns an error when content is empty", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    const result = await explainCode({ content: "   ", language: null });
+    expect(result.success).toBe(false);
+  });
+
+  it("returns an error when rate limited", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    vi.mocked(isAiRateLimited).mockResolvedValueOnce(true);
+    const result = await explainCode(explainInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/Too many/);
+  });
+
+  it("parses a {explanation: ...} response", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockResolvedValueOnce({ output_text: '{"explanation": "This logs hello to the console."}' });
+    const result = await explainCode(explainInput);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data).toBe("This logs hello to the console.");
+  });
+
+  it("parses a bare string response", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockResolvedValueOnce({ output_text: '"This logs hello to the console."' });
+    const result = await explainCode(explainInput);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data).toBe("This logs hello to the console.");
+  });
+
+  it("returns an error when the AI response fails schema validation", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockResolvedValueOnce({ output_text: '{"explanation": ""}' });
+    const result = await explainCode(explainInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/unexpected format/);
+  });
+
+  it("returns an error when the OpenAI call throws", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockRejectedValueOnce(new Error("network error"));
+    const result = await explainCode(explainInput);
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error).toMatch(/Failed to generate/);
   });

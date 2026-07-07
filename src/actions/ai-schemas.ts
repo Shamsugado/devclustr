@@ -19,3 +19,11 @@ export const GenerateAutoSummarySchema = z.object({
 
 // The model may return `{ "summary": "..." }` or a bare string.
 export const AutoSummaryResultSchema = z.string().trim().min(1).max(500);
+
+export const ExplainCodeSchema = z.object({
+  content: z.string(),
+  language: z.string().trim().nullable(),
+});
+
+// The model may return `{ "explanation": "..." }` or a bare string.
+export const ExplainCodeResultSchema = z.string().trim().min(1).max(3000);

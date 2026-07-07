@@ -108,6 +108,7 @@ export default function ItemDrawerView({
               value={item.content ?? ""}
               language={item.language ?? undefined}
               readOnly
+              explainable
             />
           ) : isMarkdownType ? (
             <MarkdownEditor value={item.content ?? ""} readOnly />
