@@ -3,7 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Sparkles, Loader2, Crown, X } from "lucide-react";
+import { toast } from "sonner";
+import { useIsPro } from "@/contexts/IsProContext";
+import { optimizePrompt } from "@/actions/ai";
 
 const MIN_HEIGHT = 80;
 const MAX_HEIGHT = 360;
@@ -13,6 +16,7 @@ interface MarkdownEditorProps {
   onChange?: (value: string) => void;
   readOnly?: boolean;
   placeholder?: string;
+  optimizable?: boolean;
 }
 
 export default function MarkdownEditor({
@@ -20,9 +24,13 @@ export default function MarkdownEditor({
   onChange,
   readOnly = false,
   placeholder = "Write markdown…",
+  optimizable = false,
 }: MarkdownEditorProps) {
-  const [tab, setTab] = useState<"write" | "preview">(readOnly ? "preview" : "write");
+  const isPro = useIsPro();
+  const [tab, setTab] = useState<"write" | "preview" | "suggestion">(readOnly ? "preview" : "write");
   const [copied, setCopied] = useState(false);
+  const [suggestion, setSuggestion] = useState<string | null>(null);
+  const [isOptimizing, setIsOptimizing] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -37,6 +45,31 @@ export default function MarkdownEditor({
     await navigator.clipboard.writeText(value);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  }
+
+  async function handleOptimize() {
+    if (isOptimizing || !value.trim()) return;
+    setIsOptimizing(true);
+    const result = await optimizePrompt({ content: value });
+    setIsOptimizing(false);
+    if (result.success) {
+      setSuggestion(result.data);
+      setTab("suggestion");
+    } else {
+      toast.error(result.error ?? "Failed to optimize prompt");
+    }
+  }
+
+  function handleAcceptSuggestion() {
+    if (!suggestion) return;
+    onChange?.(suggestion);
+    setSuggestion(null);
+    setTab("write");
+  }
+
+  function handleRejectSuggestion() {
+    setSuggestion(null);
+    setTab("write");
   }
 
   return (
@@ -72,7 +105,42 @@ export default function MarkdownEditor({
           >
             Preview
           </button>
+          {suggestion && (
+            <button
+              type="button"
+              onClick={() => setTab("suggestion")}
+              className={`text-xs px-2 py-0.5 rounded transition-colors ${
+                tab === "suggestion"
+                  ? "text-zinc-200 bg-white/10"
+                  : "text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              Suggested
+            </button>
+          )}
         </div>
+        {optimizable && (
+          isPro ? (
+            <button
+              type="button"
+              onClick={handleOptimize}
+              disabled={isOptimizing || !value.trim()}
+              title={suggestion ? "Regenerate suggestion" : "Optimize this prompt"}
+              className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-200 transition-colors ml-2 disabled:opacity-50"
+            >
+              {isOptimizing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+              {isOptimizing ? "Optimizing…" : "Optimize"}
+            </button>
+          ) : (
+            <span
+              title="AI features require Pro subscription"
+              className="flex items-center gap-1 text-xs text-zinc-600 ml-2 cursor-not-allowed"
+            >
+              <Crown className="h-3 w-3" />
+              Optimize
+            </span>
+          )
+        )}
         <button
           type="button"
           onClick={handleCopy}
@@ -82,6 +150,30 @@ export default function MarkdownEditor({
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
+
+      {tab === "suggestion" && suggestion && (
+        <div className="flex items-center justify-between gap-2 px-3 py-2 bg-accent/40 border-b border-white/[0.08]">
+          <span className="text-xs text-muted-foreground">Use this optimized version?</span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handleAcceptSuggestion}
+              className="flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              <Check className="h-3 w-3" />
+              Use this version
+            </button>
+            <button
+              type="button"
+              onClick={handleRejectSuggestion}
+              className="flex items-center gap-1 text-xs px-2 py-1 rounded-md text-muted-foreground hover:bg-accent transition-colors"
+            >
+              <X className="h-3 w-3" />
+              Discard
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="bg-[#1e1e1e]" style={{ maxHeight: MAX_HEIGHT, overflowY: "auto" }}>
         {tab === "write" ? (
@@ -93,6 +185,10 @@ export default function MarkdownEditor({
             style={{ minHeight: MIN_HEIGHT, resize: "none", overflow: "hidden" }}
             className="w-full p-3 bg-transparent text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
           />
+        ) : tab === "suggestion" && suggestion ? (
+          <div className="markdown-preview min-h-20 p-4">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{suggestion}</ReactMarkdown>
+          </div>
         ) : (
           <div className="markdown-preview min-h-20 p-4">
             {value ? (

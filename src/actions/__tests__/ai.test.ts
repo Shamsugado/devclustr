@@ -13,8 +13,10 @@ const {
   AutoSummaryResultSchema,
   ExplainCodeSchema,
   ExplainCodeResultSchema,
+  OptimizePromptSchema,
+  OptimizePromptResultSchema,
 } = await import("@/actions/ai-schemas");
-const { generateAutoTags, generateAutoSummary, explainCode } = await import("@/actions/ai");
+const { generateAutoTags, generateAutoSummary, explainCode, optimizePrompt } = await import("@/actions/ai");
 const { auth } = await import("@/auth");
 const { isAiRateLimited } = await import("@/lib/rate-limit");
 
@@ -343,5 +345,95 @@ describe("explainCode", () => {
     const result = await explainCode(explainInput);
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error).toMatch(/Failed to generate/);
+  });
+});
+
+const optimizeInput = {
+  content: "write me a good prompt for a chatbot",
+};
+
+describe("OptimizePromptSchema", () => {
+  it("accepts a valid request", () => {
+    expect(OptimizePromptSchema.safeParse(optimizeInput).success).toBe(true);
+  });
+});
+
+describe("OptimizePromptResultSchema", () => {
+  it("accepts a non-empty string", () => {
+    expect(OptimizePromptResultSchema.safeParse("An optimized prompt.").success).toBe(true);
+  });
+
+  it("rejects an empty string", () => {
+    expect(OptimizePromptResultSchema.safeParse("").success).toBe(false);
+  });
+
+  it("rejects a non-string value", () => {
+    expect(OptimizePromptResultSchema.safeParse(["not", "a", "string"]).success).toBe(false);
+  });
+
+  it("rejects a string over 4000 characters", () => {
+    expect(OptimizePromptResultSchema.safeParse("a".repeat(4001)).success).toBe(false);
+  });
+});
+
+describe("optimizePrompt", () => {
+  it("returns an error when unauthenticated", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
+    const result = await optimizePrompt(optimizeInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toBe("Unauthorized");
+  });
+
+  it("returns an error for a free-tier user", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(freeSession as never);
+    const result = await optimizePrompt(optimizeInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/Pro subscription/);
+  });
+
+  it("returns an error when content is empty", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    const result = await optimizePrompt({ content: "   " });
+    expect(result.success).toBe(false);
+  });
+
+  it("returns an error when rate limited", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    vi.mocked(isAiRateLimited).mockResolvedValueOnce(true);
+    const result = await optimizePrompt(optimizeInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/Too many/);
+  });
+
+  it("parses a {prompt: ...} response", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockResolvedValueOnce({ output_text: '{"prompt": "A clearer, more specific prompt."}' });
+    const result = await optimizePrompt(optimizeInput);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data).toBe("A clearer, more specific prompt.");
+  });
+
+  it("parses a bare string response", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockResolvedValueOnce({ output_text: '"A clearer, more specific prompt."' });
+    const result = await optimizePrompt(optimizeInput);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data).toBe("A clearer, more specific prompt.");
+  });
+
+  it("returns an error when the AI response fails schema validation", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockResolvedValueOnce({ output_text: '{"prompt": ""}' });
+    const result = await optimizePrompt(optimizeInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/unexpected format/);
+  });
+
+  it("returns an error when the OpenAI call throws", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(proSession as never);
+    responsesCreate.mockRejectedValueOnce(new Error("network error"));
+    const result = await optimizePrompt(optimizeInput);
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/Failed to optimize/);
   });
 });

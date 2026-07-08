@@ -1,16 +1,23 @@
-# Current Feature
+# Current Feature: AI Prompt Optimization
 
 ## Status
 
-<!-- Not Started | In Progress | Complete -->
+In Progress
 
 ## Goals
 
-<!-- bullet points -->
+- New "Optimize" button (Sparkles icon) in the `MarkdownEditor` header, visible only for `prompt`-type items and only to Pro users — mirrors `CodeEditor`'s "Explain" button (Crown icon + tooltip for free users).
+- Clicking sends the current prompt content to OpenAI and gets back a refined/optimized version of the prompt.
+- User is shown the optimized version and must explicitly choose to accept (replace the editor content) or reject (keep the original) — do not silently overwrite.
+- Button appears wherever prompt content is editable (create-item dialog, item drawer edit mode); not shown in read-only view mode since optimization mutates content.
+- `MarkdownEditor` is shared with the `note` type — the button must only render for prompts, not notes.
 
 ## Notes
 
-<!-- additional context -->
+- Reuse the existing AI foundation: `src/lib/openai.ts`, `AI_MODEL`/`AI_MAX_INPUT_CHARS` constants, and `isAiRateLimited` (shared 20/hr/user bucket with auto-tagging/auto-summary/explain).
+- New server action in `src/actions/ai.ts` (e.g. `optimizePrompt`), Zod-validated, Pro-gated, rate-limited — follow the existing pattern (`generateAutoTags`, `generateAutoSummary`, `explainCode`).
+- `MarkdownEditor` currently has no Pro-gating or `explainable`-style prop; needs an equivalent (e.g. `optimizable`) to scope the button to prompt items in edit mode.
+- Accept/reject UX should follow the auto-tagging suggestion pattern (explicit accept/reject controls), not auto-summary's silent auto-fill, since the user wants to be asked before the prompt is replaced.
 
 ## History
 

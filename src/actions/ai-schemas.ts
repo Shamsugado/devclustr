@@ -27,3 +27,10 @@ export const ExplainCodeSchema = z.object({
 
 // The model may return `{ "explanation": "..." }` or a bare string.
 export const ExplainCodeResultSchema = z.string().trim().min(1).max(3000);
+
+export const OptimizePromptSchema = z.object({
+  content: z.string(),
+});
+
+// The model may return `{ "prompt": "..." }` or a bare string.
+export const OptimizePromptResultSchema = z.string().trim().min(1).max(4000);

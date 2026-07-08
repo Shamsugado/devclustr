@@ -138,6 +138,7 @@ export default function ItemDrawerEdit({
               <MarkdownEditor
                 value={form.content}
                 onChange={(v) => onChange("content", v)}
+                optimizable={typeName === "prompt"}
               />
             ) : (
               <textarea

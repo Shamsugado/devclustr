@@ -254,6 +254,7 @@ export default function NewItemDialog({ open, onOpenChange, itemTypes, initialTy
                 <MarkdownEditor
                   value={form.content}
                   onChange={(v) => handleChange("content", v)}
+                  optimizable={typeName === "prompt"}
                 />
               ) : (
                 <textarea
