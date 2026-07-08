@@ -183,7 +183,7 @@ export default function MarkdownEditor({
             onChange={(e) => onChange?.(e.target.value)}
             placeholder={placeholder}
             style={{ minHeight: MIN_HEIGHT, resize: "none", overflow: "hidden" }}
-            className="w-full p-3 bg-transparent text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
+            className="w-full p-3 bg-transparent text-base text-zinc-200 outline-none placeholder:text-zinc-600"
           />
         ) : tab === "suggestion" && suggestion ? (
           <div className="markdown-preview min-h-20 p-4">

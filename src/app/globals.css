@@ -131,7 +131,7 @@
 /* Markdown preview styles — scoped to .markdown-preview container */
 .markdown-preview {
   color: #e4e4e7; /* zinc-200 */
-  font-size: 0.875rem;
+  font-size: 1rem;
   line-height: 1.6;
 }
 .markdown-preview h1,

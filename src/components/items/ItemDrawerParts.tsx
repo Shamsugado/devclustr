@@ -186,7 +186,7 @@ export function DetailSection({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+        <p className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
         {action}
       </div>
       {children}

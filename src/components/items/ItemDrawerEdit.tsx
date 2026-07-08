@@ -78,7 +78,7 @@ export default function ItemDrawerEdit({
           />
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs px-2 py-0.5 rounded-md bg-accent text-muted-foreground">
+          <span className="text-[13px] px-2 py-0.5 rounded-md bg-accent text-muted-foreground">
             {itemType.name}
           </span>
           {showLanguage && (
@@ -86,7 +86,7 @@ export default function ItemDrawerEdit({
               value={form.language}
               onChange={(e) => onChange("language", e.target.value)}
               placeholder="Language"
-              className="text-xs px-2 py-0.5 rounded-md bg-background border border-border text-muted-foreground outline-none focus:border-primary w-24"
+              className="text-[13px] px-2 py-0.5 rounded-md bg-background border border-border text-muted-foreground outline-none focus:border-primary w-24"
             />
           )}
         </div>

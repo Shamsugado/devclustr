@@ -50,11 +50,11 @@ export default function ItemDrawerView({
           </SheetTitle>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs px-2 py-0.5 rounded-md bg-accent text-muted-foreground">
+          <span className="text-[13px] px-2 py-0.5 rounded-md bg-accent text-muted-foreground">
             {itemType.name}
           </span>
           {item.language && (
-            <span className="text-xs px-2 py-0.5 rounded-md bg-accent text-muted-foreground">
+            <span className="text-[13px] px-2 py-0.5 rounded-md bg-accent text-muted-foreground">
               {item.language}
             </span>
           )}
@@ -125,7 +125,7 @@ export default function ItemDrawerView({
               {item.tags.map(({ tag }) => (
                 <span
                   key={tag.name}
-                  className="text-xs px-2 py-0.5 rounded-md bg-background text-muted-foreground border border-border"
+                  className="text-[13px] px-2 py-0.5 rounded-md bg-background text-muted-foreground border border-border"
                 >
                   {tag.name}
                 </span>
@@ -140,7 +140,7 @@ export default function ItemDrawerView({
               {item.collections.map(({ collection }) => (
                 <span
                   key={collection.id}
-                  className="text-xs px-2 py-0.5 rounded-md bg-accent text-muted-foreground border border-border"
+                  className="text-[13px] px-2 py-0.5 rounded-md bg-accent text-muted-foreground border border-border"
                 >
                   {collection.name}
                 </span>
