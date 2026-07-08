@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   Star,
@@ -53,6 +53,7 @@ interface SidebarProps {
 function SidebarContent({ data, collapsed = false }: { data: SidebarData; collapsed?: boolean }) {
   const { itemTypes, favoriteCollections, recentCollections, user } = data;
   const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -65,9 +66,9 @@ function SidebarContent({ data, collapsed = false }: { data: SidebarData; collap
             </p>
           )}
           <ul className="space-y-0.5">
-            <NavItem href="/dashboard" icon={<LayoutGrid className="h-4 w-4" />} label="All Items" collapsed={collapsed} />
-            <NavItem href="/favorites" icon={<Star className="h-4 w-4" />} label="Favorites" collapsed={collapsed} />
-            <NavItem href="/dashboard/recent" icon={<Clock className="h-4 w-4" />} label="Recent" collapsed={collapsed} />
+            <NavItem href="/dashboard" icon={<LayoutGrid className="h-4 w-4" />} label="All Items" collapsed={collapsed} active={pathname === "/dashboard"} />
+            <NavItem href="/favorites" icon={<Star className="h-4 w-4" />} label="Favorites" collapsed={collapsed} active={pathname === "/favorites"} />
+            <NavItem href="/dashboard/recent" icon={<Clock className="h-4 w-4" />} label="Recent" collapsed={collapsed} active={pathname === "/dashboard/recent"} />
           </ul>
         </section>
 
@@ -91,6 +92,7 @@ function SidebarContent({ data, collapsed = false }: { data: SidebarData; collap
                   label={type.name + "s"}
                   pro={isPro}
                   collapsed={collapsed}
+                  active={pathname === `/items/${slug}`}
                 />
               );
             })}
@@ -117,7 +119,7 @@ function SidebarContent({ data, collapsed = false }: { data: SidebarData; collap
                 <p className="px-2 mb-0.5 text-xs text-muted-foreground/60">Favorites</p>
                 <ul className="space-y-0.5 mb-2">
                   {favoriteCollections.map((col) => (
-                    <CollectionItem key={col.id} collection={col} showStar />
+                    <CollectionItem key={col.id} collection={col} showStar active={pathname === `/collections/${col.id}`} />
                   ))}
                 </ul>
               </>
@@ -128,7 +130,7 @@ function SidebarContent({ data, collapsed = false }: { data: SidebarData; collap
                 <p className="px-2 mb-0.5 text-xs text-muted-foreground/60">Recent</p>
                 <ul className="space-y-0.5">
                   {recentCollections.map((col) => (
-                    <CollectionItem key={col.id} collection={col} showStar={false} />
+                    <CollectionItem key={col.id} collection={col} showStar={false} active={pathname === `/collections/${col.id}`} />
                   ))}
                 </ul>
               </>
@@ -219,12 +221,14 @@ function NavItem({
   label,
   pro,
   collapsed,
+  active,
 }: {
   href: string;
   icon: React.ReactNode;
   label: string;
   pro?: boolean;
   collapsed?: boolean;
+  active?: boolean;
 }) {
   if (collapsed) {
     return (
@@ -233,7 +237,12 @@ function NavItem({
           href={href}
           title={label}
           aria-label={label}
-          className="flex items-center justify-center h-8 w-8 mx-auto rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          aria-current={active ? "page" : undefined}
+          className={`flex items-center justify-center h-8 w-8 mx-auto rounded-md transition-colors ${
+            active
+              ? "bg-accent text-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-accent"
+          }`}
         >
           {icon}
         </Link>
@@ -244,7 +253,12 @@ function NavItem({
     <li>
       <Link
         href={href}
-        className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-base text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        aria-current={active ? "page" : undefined}
+        className={`flex items-center gap-2.5 px-2 py-1.5 rounded-md text-base transition-colors ${
+          active
+            ? "bg-accent text-foreground font-medium"
+            : "text-muted-foreground hover:text-foreground hover:bg-accent"
+        }`}
       >
         {icon}
         <span className="flex-1">{label}</span>
@@ -261,15 +275,22 @@ function NavItem({
 function CollectionItem({
   collection,
   showStar,
+  active,
 }: {
   collection: CollectionMeta;
   showStar: boolean;
+  active?: boolean;
 }) {
   return (
     <li>
       <Link
         href={`/collections/${collection.id}`}
-        className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-base text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        aria-current={active ? "page" : undefined}
+        className={`flex items-center gap-2.5 px-2 py-1.5 rounded-md text-base transition-colors ${
+          active
+            ? "bg-accent text-foreground font-medium"
+            : "text-muted-foreground hover:text-foreground hover:bg-accent"
+        }`}
       >
         {showStar ? (
           <Star className="h-2.5 w-2.5 shrink-0 fill-yellow-400 text-yellow-400" />
