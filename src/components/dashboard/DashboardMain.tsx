@@ -3,23 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  Link2,
-  File,
-  Image as ImageIcon,
   Star,
   Pin,
   Layers,
   FolderOpen,
   Clock,
+  File,
 } from "lucide-react";
 import ItemDrawer from "@/components/items/ItemDrawer";
 import type { CollectionMeta } from "@/lib/db/collections";
 import type { getPinnedItems, getRecentItems } from "@/lib/db/items";
 import { formatRelativeTime } from "@/lib/format";
+import { itemTypeIconMap } from "@/lib/item-type-icons";
 
 type DashboardItem = Awaited<ReturnType<typeof getPinnedItems>>[0];
 type DashboardStats = {
@@ -35,16 +30,6 @@ interface DashboardMainProps {
   pinnedItems: DashboardItem[];
   recentItems: Awaited<ReturnType<typeof getRecentItems>>;
 }
-
-const iconMap: Record<string, React.ElementType> = {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  Link: Link2,
-  File,
-  Image: ImageIcon,
-};
 
 // --- Sub-components ---
 
@@ -77,7 +62,7 @@ function StatsCards({ stats }: { stats: DashboardStats }) {
   );
 }
 
-function CollectionCard({ collection }: { collection: CollectionMeta }) {
+function DashboardCollectionCard({ collection }: { collection: CollectionMeta }) {
   return (
     <Link
       href={`/collections/${collection.id}`}
@@ -96,7 +81,7 @@ function CollectionCard({ collection }: { collection: CollectionMeta }) {
       <div className="flex items-center justify-between mt-auto pt-1">
         <div className="flex items-center gap-1">
           {collection.itemTypes.map(({ typeId, icon, color }) => {
-            const Icon = iconMap[icon] ?? File;
+            const Icon = itemTypeIconMap[icon] ?? File;
             return (
               <span
                 key={typeId}
@@ -116,7 +101,7 @@ function CollectionCard({ collection }: { collection: CollectionMeta }) {
 
 function PinnedItemCard({ item, onItemClick }: { item: DashboardItem; onItemClick: (item: DashboardItem) => void }) {
   const { itemType } = item;
-  const Icon = iconMap[itemType.icon] ?? File;
+  const Icon = itemTypeIconMap[itemType.icon] ?? File;
   const isUrl = item.contentType === "URL";
 
   return (
@@ -172,7 +157,7 @@ function PinnedItemCard({ item, onItemClick }: { item: DashboardItem; onItemClic
 
 function RecentItemCard({ item, onItemClick }: { item: DashboardItem; onItemClick: (item: DashboardItem) => void }) {
   const { itemType } = item;
-  const Icon = iconMap[itemType.icon] ?? File;
+  const Icon = itemTypeIconMap[itemType.icon] ?? File;
 
   return (
     <div
@@ -236,7 +221,7 @@ export default function DashboardMain({
         <h2 className="text-base font-semibold text-foreground mb-3">Recent Collections</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {recentCollections.map((col) => (
-            <CollectionCard key={col.id} collection={col} />
+            <DashboardCollectionCard key={col.id} collection={col} />
           ))}
         </div>
       </section>

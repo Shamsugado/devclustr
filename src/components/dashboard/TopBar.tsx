@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Crown, FolderOpen, FolderPlus, Menu, Plus, Search, Star } from "lucide-react";
 import NewItemDialog from "@/components/items/NewItemDialog";
-import NewCollectionDialog from "@/components/collections/NewCollectionDialog";
+import CollectionFormDialog from "@/components/collections/CollectionFormDialog";
 import type { SidebarItemType } from "@/components/dashboard/Sidebar";
 
 interface TopBarProps {
@@ -86,7 +86,7 @@ export default function TopBar({ onMobileMenuClick, onSearchClick, itemTypes = [
       </header>
 
       <NewItemDialog open={newItemOpen} onOpenChange={setNewItemOpen} itemTypes={itemTypes} />
-      <NewCollectionDialog open={newCollectionOpen} onOpenChange={setNewCollectionOpen} />
+      <CollectionFormDialog mode="create" open={newCollectionOpen} onOpenChange={setNewCollectionOpen} />
     </>
   );
 }
