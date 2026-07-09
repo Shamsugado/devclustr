@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { auth } from "@/auth";
+import { getAuthedUser } from "@/lib/auth-helpers";
 import { saveEditorSettings } from "@/lib/db/users";
 
 const UpdateEditorSettingsSchema = z.object({
@@ -15,8 +15,8 @@ export async function updateEditorSettings(formData: {
   tabSize: number;
   theme: string;
 }) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthedUser();
+  if (!user) {
     return { success: false as const, error: "Unauthorized" };
   }
 
@@ -26,7 +26,7 @@ export async function updateEditorSettings(formData: {
   }
 
   try {
-    await saveEditorSettings(session.user.id, parsed.data);
+    await saveEditorSettings(user.id, parsed.data);
     return { success: true as const };
   } catch {
     return { success: false as const, error: "Failed to save settings" };

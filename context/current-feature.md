@@ -2,7 +2,7 @@
 
 ## Status
 
-<!-- Not Started | In Progress | Complete -->
+Complete
 
 ## Goals
 
@@ -11,6 +11,10 @@
 ## Notes
 
 <!-- additional context -->
+
+## History
+
+- **2026-07-09** — `src/actions` shared-helper refactor complete. A folder scan (mirroring the new `refactor-scanner` subagent's checks) found repeated duplication across `items.ts`, `collections.ts`, `settings.ts`, and `ai.ts`. Extracted: `getAuthedUser()` in `src/lib/auth-helpers.ts` (replaces 14 copies of the `auth()` + `session?.user?.id` null-check); `toggleAction()` in `src/lib/toggle-action.ts` (collapses the 3 near-identical toggle-favorite/pin actions into one generic helper parameterized by DB fn, result key, and error messages); `callAiJson()` in `src/lib/ai-json.ts` (collapses the 4 AI actions' repeated rate-limit-check + OpenAI Responses API call + JSON parse/validate into one helper, keeping only the action-specific instructions/schema/error message inline). Also collapsed `CreateItemSchema`/`UpdateItemSchema` and `CreateCollectionSchema`/`UpdateCollectionSchema` to share a base schema via Zod `.extend()` instead of duplicating field validators. Pure internal refactor, no behavior change: all 181 existing unit tests pass unchanged, `npm run build` passes with no new TypeScript errors, lint shows the same 6 pre-existing unrelated errors. Verified end-to-end in browser as the demo user: toggled item favorite/pin and collection favorite (confirming the generic `toggleAction` computed-property return works at runtime, not just type-checks), edited an item's title via `updateItem`, and attempted to create a 4th collection as a free-tier user to confirm `canCreateCollection`'s tier gate still rejects correctly through `getAuthedUser`.
 
 ## History
 

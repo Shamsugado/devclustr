@@ -1,7 +1,8 @@
 "use server";
 
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { auth } from "@/auth";
+import { getAuthedUser } from "@/lib/auth-helpers";
+import { toggleAction } from "@/lib/toggle-action";
 import {
   createItem as createItemInDb,
   updateItem as updateItemInDb,
@@ -28,12 +29,12 @@ export async function createItem(formData: {
   fileName: string | null;
   fileSize: number | null;
 }) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthedUser();
+  if (!user) {
     return { success: false as const, error: "Unauthorized" };
   }
 
-  const allowed = await canCreateItem(session.user.id, session.user.isPro);
+  const allowed = await canCreateItem(user.id, user.isPro);
   if (!allowed) {
     return { success: false as const, error: `Free plan is limited to ${FREE_TIER_ITEM_LIMIT} items. Upgrade to Pro for unlimited items.` };
   }
@@ -57,7 +58,7 @@ export async function createItem(formData: {
   const contentType = isLink ? "URL" : isFileType ? "FILE" : "TEXT";
 
   try {
-    const item = await createItemInDb(session.user.id, { ...parsed.data, contentType, collectionIds: parsed.data.collectionIds });
+    const item = await createItemInDb(user.id, { ...parsed.data, contentType, collectionIds: parsed.data.collectionIds });
     return { success: true as const, data: item };
   } catch {
     return { success: false as const, error: "Failed to create item" };
@@ -65,8 +66,8 @@ export async function createItem(formData: {
 }
 
 export async function deleteItem(itemId: string) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthedUser();
+  if (!user) {
     return { success: false as const, error: "Unauthorized" };
   }
 
@@ -75,7 +76,7 @@ export async function deleteItem(itemId: string) {
   }
 
   try {
-    const deleted = await deleteItemInDb(itemId, session.user.id);
+    const deleted = await deleteItemInDb(itemId, user.id);
     if (deleted?.contentType === "FILE" && deleted.fileUrl) {
       await r2.send(new DeleteObjectCommand({ Bucket: R2_BUCKET, Key: deleted.fileUrl }));
     }
@@ -86,27 +87,11 @@ export async function deleteItem(itemId: string) {
 }
 
 export async function toggleItemFavorite(itemId: string) {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false as const, error: "Unauthorized" };
-  if (!itemId) return { success: false as const, error: "Invalid item ID" };
-  try {
-    const { isFavorite } = await toggleItemFavoriteInDb(itemId, session.user.id);
-    return { success: true as const, isFavorite };
-  } catch {
-    return { success: false as const, error: "Failed to update favorite" };
-  }
+  return toggleAction(itemId, "Invalid item ID", toggleItemFavoriteInDb, "isFavorite", "Failed to update favorite");
 }
 
 export async function toggleItemPin(itemId: string) {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false as const, error: "Unauthorized" };
-  if (!itemId) return { success: false as const, error: "Invalid item ID" };
-  try {
-    const { isPinned } = await toggleItemPinInDb(itemId, session.user.id);
-    return { success: true as const, isPinned };
-  } catch {
-    return { success: false as const, error: "Failed to update pin" };
-  }
+  return toggleAction(itemId, "Invalid item ID", toggleItemPinInDb, "isPinned", "Failed to update pin");
 }
 
 export async function updateItem(
@@ -121,8 +106,8 @@ export async function updateItem(
     collectionIds: string[];
   }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthedUser();
+  if (!user) {
     return { success: false as const, error: "Unauthorized" };
   }
 
@@ -132,7 +117,7 @@ export async function updateItem(
   }
 
   try {
-    const item = await updateItemInDb(itemId, session.user.id, parsed.data);
+    const item = await updateItemInDb(itemId, user.id, parsed.data);
     return { success: true as const, data: item };
   } catch {
     return { success: false as const, error: "Failed to update item" };

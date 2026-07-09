@@ -1,6 +1,7 @@
 "use server";
 
-import { auth } from "@/auth";
+import { getAuthedUser } from "@/lib/auth-helpers";
+import { toggleAction } from "@/lib/toggle-action";
 import {
   createCollection as createCollectionInDb,
   updateCollection as updateCollectionInDb,
@@ -12,12 +13,12 @@ import { canCreateCollection } from "@/lib/tier";
 import { FREE_TIER_COLLECTION_LIMIT } from "@/lib/constants";
 
 export async function createCollection(formData: { name: string; description: string | null }) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthedUser();
+  if (!user) {
     return { success: false as const, error: "Unauthorized" };
   }
 
-  const allowed = await canCreateCollection(session.user.id, session.user.isPro);
+  const allowed = await canCreateCollection(user.id, user.isPro);
   if (!allowed) {
     return { success: false as const, error: `Free plan is limited to ${FREE_TIER_COLLECTION_LIMIT} collections. Upgrade to Pro for unlimited collections.` };
   }
@@ -28,7 +29,7 @@ export async function createCollection(formData: { name: string; description: st
   }
 
   try {
-    const collection = await createCollectionInDb(session.user.id, parsed.data);
+    const collection = await createCollectionInDb(user.id, parsed.data);
     return { success: true as const, data: collection };
   } catch {
     return { success: false as const, error: "Failed to create collection" };
@@ -40,8 +41,8 @@ export async function updateCollection(formData: {
   name: string;
   description: string | null;
 }) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthedUser();
+  if (!user) {
     return { success: false as const, error: "Unauthorized" };
   }
 
@@ -51,7 +52,7 @@ export async function updateCollection(formData: {
   }
 
   try {
-    const collection = await updateCollectionInDb(session.user.id, parsed.data.id, parsed.data);
+    const collection = await updateCollectionInDb(user.id, parsed.data.id, parsed.data);
     return { success: true as const, data: collection };
   } catch {
     return { success: false as const, error: "Failed to update collection" };
@@ -59,20 +60,12 @@ export async function updateCollection(formData: {
 }
 
 export async function toggleCollectionFavorite(collectionId: string) {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false as const, error: "Unauthorized" };
-  if (!collectionId) return { success: false as const, error: "Invalid ID" };
-  try {
-    const { isFavorite } = await toggleCollectionFavoriteInDb(collectionId, session.user.id);
-    return { success: true as const, isFavorite };
-  } catch {
-    return { success: false as const, error: "Failed to update favorite" };
-  }
+  return toggleAction(collectionId, "Invalid ID", toggleCollectionFavoriteInDb, "isFavorite", "Failed to update favorite");
 }
 
 export async function deleteCollection(formData: { id: string }) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const user = await getAuthedUser();
+  if (!user) {
     return { success: false as const, error: "Unauthorized" };
   }
 
@@ -81,7 +74,7 @@ export async function deleteCollection(formData: { id: string }) {
   }
 
   try {
-    await deleteCollectionInDb(session.user.id, formData.id);
+    await deleteCollectionInDb(user.id, formData.id);
     return { success: true as const };
   } catch {
     return { success: false as const, error: "Failed to delete collection" };
