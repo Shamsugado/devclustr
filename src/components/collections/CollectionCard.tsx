@@ -26,7 +26,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import EditCollectionDialog from "@/components/collections/EditCollectionDialog";
+import CollectionFormDialog from "@/components/collections/CollectionFormDialog";
 
 export default function CollectionCard({ collection }: { collection: CollectionMeta }) {
   const router = useRouter();
@@ -125,7 +125,8 @@ export default function CollectionCard({ collection }: { collection: CollectionM
         </div>
       </Link>
 
-      <EditCollectionDialog
+      <CollectionFormDialog
+        mode="edit"
         open={editOpen}
         onOpenChange={setEditOpen}
         collection={collection}

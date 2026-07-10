@@ -17,7 +17,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import EditCollectionDialog from "@/components/collections/EditCollectionDialog";
+import CollectionFormDialog from "@/components/collections/CollectionFormDialog";
 
 interface CollectionDetailActionsProps {
   collection: { id: string; name: string; description: string | null; isFavorite: boolean };
@@ -85,7 +85,8 @@ export default function CollectionDetailActions({ collection }: CollectionDetail
         </Button>
       </div>
 
-      <EditCollectionDialog
+      <CollectionFormDialog
+        mode="edit"
         open={editOpen}
         onOpenChange={setEditOpen}
         collection={collection}

@@ -11,59 +11,77 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { updateCollection } from "@/actions/collections";
+import { createCollection, updateCollection } from "@/actions/collections";
 
-interface EditForm {
+interface CollectionForm {
   name: string;
   description: string;
 }
 
-interface EditCollectionDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  collection: { id: string; name: string; description: string | null };
+function emptyForm(): CollectionForm {
+  return { name: "", description: "" };
 }
 
-export default function EditCollectionDialog({
+interface CollectionFormDialogProps {
+  mode: "create" | "edit";
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  collection?: { id: string; name: string; description: string | null };
+}
+
+export default function CollectionFormDialog({
+  mode,
   open,
   onOpenChange,
   collection,
-}: EditCollectionDialogProps) {
+}: CollectionFormDialogProps) {
   const router = useRouter();
-  const [form, setForm] = useState<EditForm>({
-    name: collection.name,
-    description: collection.description ?? "",
-  });
+  const [form, setForm] = useState<CollectionForm>(emptyForm);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      setForm({ name: collection.name, description: collection.description ?? "" });
-    }
-  }, [open, collection]);
+    if (!open) return;
+    setForm(
+      mode === "edit" && collection
+        ? { name: collection.name, description: collection.description ?? "" }
+        : emptyForm()
+    );
+  }, [open, mode, collection]);
 
-  function handleChange(field: keyof EditForm, value: string) {
+  function handleChange(field: keyof CollectionForm, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
   async function handleSave() {
     setIsSaving(true);
 
-    const result = await updateCollection({
-      id: collection.id,
-      name: form.name.trim(),
-      description: form.description.trim() || null,
-    });
+    const result =
+      mode === "edit" && collection
+        ? await updateCollection({
+            id: collection.id,
+            name: form.name.trim(),
+            description: form.description.trim() || null,
+          })
+        : await createCollection({
+            name: form.name.trim(),
+            description: form.description.trim() || null,
+          });
 
     setIsSaving(false);
 
     if (result.success) {
-      toast.success("Collection updated");
+      toast.success(mode === "edit" ? "Collection updated" : "Collection created");
       onOpenChange(false);
       router.refresh();
     } else {
       const err = result.error;
-      toast.error(typeof err === "string" ? err : "Failed to update collection");
+      toast.error(
+        typeof err === "string"
+          ? err
+          : mode === "edit"
+            ? "Failed to update collection"
+            : "Failed to create collection"
+      );
     }
   }
 
@@ -73,7 +91,7 @@ export default function EditCollectionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Edit Collection</DialogTitle>
+          <DialogTitle>{mode === "edit" ? "Edit Collection" : "New Collection"}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
@@ -109,7 +127,13 @@ export default function EditCollectionDialog({
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={isSaving || !canSave}>
-            {isSaving ? "Saving…" : "Save Changes"}
+            {isSaving
+              ? mode === "edit"
+                ? "Saving…"
+                : "Creating…"
+              : mode === "edit"
+                ? "Save Changes"
+                : "Create Collection"}
           </Button>
         </DialogFooter>
       </DialogContent>
