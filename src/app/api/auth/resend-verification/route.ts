@@ -43,7 +43,15 @@ export async function POST(request: Request) {
     },
   });
 
-  await sendVerificationEmail(email, raw);
+  try {
+    await sendVerificationEmail(email, raw);
+  } catch (err) {
+    console.error("Failed to resend verification email:", err);
+    return NextResponse.json(
+      { error: "We couldn't send the verification email. Please try again in a moment." },
+      { status: 500 }
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }

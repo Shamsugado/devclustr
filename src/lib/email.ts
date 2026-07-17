@@ -6,7 +6,7 @@ export async function sendVerificationEmail(email: string, token: string) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
 
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: FROM,
     to: email,
     subject: "Verify your DevClustr email",
@@ -17,13 +17,17 @@ export async function sendVerificationEmail(email: string, token: string) {
       <p>If you didn't create an account, you can safely ignore this email.</p>
     `,
   });
+
+  if (error) {
+    throw new Error(`Resend error (verification email): ${error.message}`);
+  }
 }
 
 export async function sendPasswordResetEmail(email: string, token: string) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
 
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: FROM,
     to: email,
     subject: "Reset your DevClustr password",
@@ -34,4 +38,8 @@ export async function sendPasswordResetEmail(email: string, token: string) {
       <p>If you didn't request a password reset, you can safely ignore this email.</p>
     `,
   });
+
+  if (error) {
+    throw new Error(`Resend error (password reset email): ${error.message}`);
+  }
 }
