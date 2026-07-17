@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 
-const FROM = "onboarding@resend.dev";
+const FROM = "noreply@devclustr.io";
 
 export async function sendVerificationEmail(email: string, token: string) {
   const resend = new Resend(process.env.RESEND_API_KEY);
