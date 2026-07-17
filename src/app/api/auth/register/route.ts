@@ -53,7 +53,16 @@ export async function POST(request: Request) {
       },
     });
 
-    await sendVerificationEmail(email, raw);
+    try {
+      await sendVerificationEmail(email, raw);
+    } catch (err) {
+      console.error("Failed to send verification email during registration:", err);
+      await prisma.user.delete({ where: { id: user.id } });
+      return NextResponse.json(
+        { error: "We couldn't send your verification email. Please try again in a moment." },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(
       { id: user.id, name: user.name, email: user.email, requiresVerification: true },

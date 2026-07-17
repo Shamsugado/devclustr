@@ -41,7 +41,11 @@ export async function POST(request: Request) {
     data: { identifier, token: hashed, expires },
   });
 
-  await sendPasswordResetEmail(email, raw);
+  try {
+    await sendPasswordResetEmail(email, raw);
+  } catch (err) {
+    console.error("Failed to send password reset email:", err);
+  }
 
   return NextResponse.json({ ok: true });
 }
